@@ -27,7 +27,8 @@ uchar*** initImage(int width, int height)
 	return image;
 }
 
-void setImage(image_t image, int width, int height){
+void setImage(image_t image, int width, int height)
+{
 	//Turns the image black.
 	int x;
 	int y;
@@ -45,7 +46,8 @@ void setImage(image_t image, int width, int height){
 	}
 }
 
-void dispImage(image_t image, int width, int height){
+void dispImage(image_t image, int width, int height)
+{
 	//Displays the values of the pixels. Line by line.
 	int x;
 	int y;
@@ -58,9 +60,10 @@ void dispImage(image_t image, int width, int height){
 	}
 }
 
-void drawRect(uchar* color ,int botLeftX,int botLeftY, int topRightX, int topRightY, image_t image){
+void drawRect(uchar* color ,int botLeftX,int botLeftY, int topRightX, int topRightY, image_t image)
+{
 	//Draws a colored rectangle in an image.
-	int x;
+    int x;
 	int y;
 	int k;
 	for(x=botLeftX; x <= topRightX; ++x)
@@ -75,7 +78,8 @@ void drawRect(uchar* color ,int botLeftX,int botLeftY, int topRightX, int topRig
 	}
 }
 
-void drawPoints(point_t** seq,int nPoints, image_t image){
+void drawPoints(point_t** seq,int nPoints, image_t image)
+{
 	// Draws a sequence of points into an image.
 	int i;
 	int x;
@@ -92,7 +96,8 @@ void drawPoints(point_t** seq,int nPoints, image_t image){
 }
 
 
-point_t initPoint(){
+point_t initPoint()
+{
 	point_t point;
 	point.blue = 0;
 	point.green = 0;
@@ -103,7 +108,8 @@ point_t initPoint(){
 	return point;
 }
 
-figure_t initFigure(uint nombre_Point){
+figure_t initFigure(uint nombre_Point)
+{
 	//Initialise une sequence de nombre_Point point_t.
 	figure_t figure;
 
@@ -119,7 +125,8 @@ figure_t initFigure(uint nombre_Point){
 }
 
 
-void freeImage(image_t image, int width, int height){
+void freeImage(image_t image, int width, int height)
+{
 	//Frees the memory the image occupies in memory.
 	int x;
 	int y;
@@ -134,7 +141,8 @@ void freeImage(image_t image, int width, int height){
 	free(image);
 }
 
-void brownien2(image_t image,int width,int height,int iterations, int spread,int x0, int y0){
+void brownien2(image_t image,int width,int height,int iterations, int spread,int x0, int y0)
+{
 	/*Ajoute un mouvement brownien à l'image de longueur "iterations" et de point
 	 *de départ (x0,y0).
 	 */
@@ -153,7 +161,8 @@ void brownien2(image_t image,int width,int height,int iterations, int spread,int
 		{
 
 			image[x][y][color] = pixels[0][color];
-			if(color == 1){
+			if(color == 1)
+			{
 				delta = rand()%3-1;
 				pixels[0][color] = saturator(pixels[0][color] + delta ,SAT_MIN, SAT_MAX);
 			}
@@ -167,7 +176,8 @@ void brownien2(image_t image,int width,int height,int iterations, int spread,int
 		x = modulo(x,width);
 
 
-		if( (i%10000) == 0){
+		if( (i%10000) == 0)
+		{
 			printf("point (%d,%d)",x,y);
 			ok(i);
 		}
@@ -176,7 +186,8 @@ void brownien2(image_t image,int width,int height,int iterations, int spread,int
 	printf("Processus terminé\n");
 }
 
-void barres1(image_t image, int width, int height, int spread){
+void barres1(image_t image, int width, int height, int spread)
+{
 	/*Ajoutes des barres blanches brouillées verticales à l'image. Elles sont espacées centre-à-centre
 	 *de la distance "spread".
 	 */
@@ -189,7 +200,8 @@ void barres1(image_t image, int width, int height, int spread){
 	int xPrime;
 	char bool=1;
 
-	for(y = 0; y<height; ++y){
+	for(y = 0; y<height; ++y)
+	{
 		x = 2;
 		xPrime = x;
 		bool=1;
@@ -209,7 +221,8 @@ void barres1(image_t image, int width, int height, int spread){
 
 }
 
-void barres2(image_t image, int width, int height, int spread){
+void barres2(image_t image, int width, int height, int spread)
+{
 	/*Ajoutes des barres verticales brouillées à l'image. Elles sont espacées centre-à-centre
 	 *de la distance "spread".
 	 */
@@ -243,14 +256,16 @@ void barres2(image_t image, int width, int height, int spread){
 }
 
 
-void randCoord(point_t* m,int height, int width){
+void randCoord(point_t* m,int height, int width)
+{
 	int randX = rand()%width;
 	int randY = rand()%height;
 	m -> x = randX;
 	m -> y = randY;
 }
 
-void randDeltaPoint(point_t* m, int amplitude,int width, int height){
+void randDeltaPoint(point_t* m, int amplitude,int width, int height)
+{
 	//Randomly moves a point.
 	m -> x += rand()%( 2*amplitude + 1 ) - amplitude;
 	modulo(m -> x,width);
@@ -258,7 +273,8 @@ void randDeltaPoint(point_t* m, int amplitude,int width, int height){
 	modulo(m -> y,height);
 }
 
-void freePoints(point_t** seq, int n){
+void freePoints(point_t** seq, int n)
+{
 	int i;
 	for(i=0;i<n;++i)
 	{
@@ -267,7 +283,8 @@ void freePoints(point_t** seq, int n){
 	free(seq);
 }
 
-void renderFigure(image_t image, figure_t figure ,camera_t camera, uchar* color){
+void renderFigure(image_t image, figure_t figure ,camera_t camera, uchar* color)
+{
 
 	vector_t o;
 	vector_t f;
@@ -314,7 +331,8 @@ void renderFigure(image_t image, figure_t figure ,camera_t camera, uchar* color)
 	float op_v_scalaire;
     float op_w_scalaire;
 
-	for(int i=0;i<figure.nombre_Point;++i){
+	for(int i=0;i<figure.nombre_Point;++i)
+	{
 		p.x = figure.sequence[i].x;
 		p.y = figure.sequence[i].y;
 		p.z = figure.sequence[i].z;
@@ -335,7 +353,8 @@ void renderFigure(image_t image, figure_t figure ,camera_t camera, uchar* color)
 		y_image = 400 + distance*op_w_scalaire/op_u_scalaire;
 
 //		printf("%d,%d\n\n",x_image,y_image);
-		if( (x_image<1280) && (x_image>=0) && (y_image < 800) && (y_image >= 0) && op_u_scalaire>0){
+		if( (x_image<1280) && (x_image>=0) && (y_image < 800) && (y_image >= 0) && op_u_scalaire>0)
+		{
 			image[x_image][y_image][0] = color[0];
 			image[x_image][y_image][1] = color[1];
 			image[x_image][y_image][2] = color[2];
