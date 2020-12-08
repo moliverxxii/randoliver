@@ -6,12 +6,12 @@
  */
 #include "main.h"
 
-uchar*** initImage(int width, int height)
+image_t initImage(int width, int height)
 {
 	//Returns a pointer to an image.
 	int x;
 	int y;
-	image_t image = (uchar***) malloc(width*sizeof(uchar**));
+	image_t image = (image_t) malloc(width*sizeof(uchar**));
 
 	for(x=0; x<width; ++x)
 	{
