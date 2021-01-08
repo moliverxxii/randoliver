@@ -12,18 +12,13 @@ image_t initImage(int width, int height)
 
     int x;
     int y;
-    image_t image = (image_t) malloc(width*sizeof(uchar**));
+    image_t image = (image_t) malloc(width*sizeof(color_t*));
 
     for(x=0; x<width; ++x)
     {
-        image[x] = (uchar**) malloc(height*
-                sizeof(uchar*));
+        image[x] = (color_t*) malloc(height*
+                sizeof(color_t));
         if(image[x] == NULL) exit(1);
-        for(y=0;y<height; ++y)
-        {
-            image[x][y] = (uchar*) malloc(3*sizeof(uchar));
-            if(image[x][y] == NULL) exit(1);
-        }
     }
     printf("image à : %p\n",image);
     return image;
@@ -66,7 +61,7 @@ void dispImage(image_t image, int width, int height)
     }
 }
 
-void drawRect(uchar* color,
+void drawRect(color_t color,
         int botLeftX,
         int botLeftY,
         int topRightX,
@@ -103,7 +98,6 @@ void drawPoints(point_t** seq,int nPoints, image_t image)
         image[x][y][1] = seq[i] -> green;
         image[x][y][2] = seq[i] -> red;
     }
-
 }
 
 
@@ -152,7 +146,7 @@ void freeImage(image_t image, int width, int height)
     free(image);
 }
 
-void brownien2(image_t image,int width,int height,int iterations, int spread,int x0, int y0)
+void brownien2(image_t image, int width, int height, int iterations, int spread, int x0, int y0)
 {
     /*Ajoute un mouvement brownien à l'image de longueur "iterations" et de point
      *de départ (x0,y0).
@@ -204,7 +198,7 @@ void barres1(image_t image, int width, int height, int spread)
      */
     printf("Début du processus\n");
 
-    uchar pixel[3] = {0xFF,0xFF,0xFF};
+    color_t pixel = {0xFF,0xFF,0xFF};
     int i = 0;
     int y;
     int x;
@@ -239,12 +233,12 @@ void barres2(image_t image, int width, int height, int spread)
      */
     printf("Début du processus\n");
 
-    uchar pixel[3] = {0xFF,0xFF,0xFF};
+    color_t pixel = {0xFF,0xFF,0xFF};
     int i = 0;
     int y;
     int x;
-    int* xPrime = calloc(3,sizeof(int));
-    char bool=1;
+    uint xPrime[3];
+    uchar bool; 
 
     for(y = 0; y<height; ++y){
         x = 2;
@@ -294,7 +288,7 @@ void freePoints(point_t** seq, int n)
     free(seq);
 }
 
-void renderFigure(image_t image, figure_t figure ,camera_t camera, uchar* color)
+void renderFigure(image_t image, figure_t figure ,camera_t camera, color_t color)
 {
 
     vector_t o;
