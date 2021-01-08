@@ -40,7 +40,7 @@ void flou(image_t image, int width, int height)
 
         }
     }
-    freeImage(image2,width,height);
+//  freeImage(image2,width,height);
 }
 
 

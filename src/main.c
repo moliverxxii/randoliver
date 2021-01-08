@@ -23,7 +23,7 @@ int main()
     uint nb = 400;
     int distX = 100;
     figure_t test = initFigure(nb);
-    uchar color[3] = {0xFF,0xFF,0xFF};
+    color_t color = {0xFF,0xFF,0xFF};
     camera_t camera;
     camera.origine.x = 350;
     camera.origine.y = 0;
@@ -43,8 +43,9 @@ int main()
         //		printf("x,y = %d,%d\n",test.sequence[i].x,test.sequence[i].y);
     }
 
+    ok(0);
     renderFigure(image,test,camera,color);
-
+    ok(1);
     for(int i=0; i<5;++i)flou(image,1280,800);
     writeImage(image,1280,800,fichier);
 
