@@ -288,7 +288,26 @@ void freePoints(point_t** seq, int n)
     free(seq);
 }
 
-void renderFigure(image_t image, figure_t figure ,camera_t camera, color_t color)
+
+void initCamera(camera_t* camera_p,
+                float origin_x, float origin_y, float origin_z,
+                float destin_x, float destin_y, float destin_z, 
+                float distance)
+{
+    camera_t camera_loc;
+    camera_loc.origine.x = origin_x;
+    camera_loc.origine.y = origin_y;
+    camera_loc.origine.z = origin_z;
+    camera_loc.direction.x = destin_x;
+    camera_loc.direction.y = destin_y;
+    camera_loc.direction.z = destin_z;
+    camera_loc.distance = distance;
+
+    (*camera_p) = camera_loc;
+}
+
+void renderFigure(image_t image, figure_t figure ,camera_t camera,
+                  color_t color)
 {
 
     vector_t o;
@@ -358,7 +377,9 @@ void renderFigure(image_t image, figure_t figure ,camera_t camera, color_t color
         y_image = 400 + distance*op_w_scalaire/op_u_scalaire;
 
         //		printf("%d,%d\n\n",x_image,y_image);
-        if( (x_image<1280) && (x_image>=0) && (y_image < 800) && (y_image >= 0) && op_u_scalaire>0)
+        if( (x_image<1280) && (x_image>=0)
+         && (y_image < 800) && (y_image >= 0)
+         && op_u_scalaire>0)
         {
             image[x_image][y_image][0] = color[0];
             image[x_image][y_image][1] = color[1];

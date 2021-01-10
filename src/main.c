@@ -22,18 +22,11 @@ int main()
 
     uint nb = 400;
     int distX = 100;
+
     figure_t test = initFigure(nb);
     color_t color = {0xFF,0xFF,0xFF};
     camera_t camera;
-    camera.origine.x = 350;
-    camera.origine.y = 0;
-    camera.origine.z = 100;
-
-    camera.direction.x = 350;
-    camera.direction.y = 10;
-    camera.direction.z = 100;
-
-    camera.distance = 100;
+    initCamera(&camera, 350, 0, 100, 350, 10, 100, 100);
 
     for(int i=0; i<nb;++i)
     {

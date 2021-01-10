@@ -55,6 +55,9 @@ void randDeltaPoint(point_t* m, int amplitude,int width, int height);
 void freePoints(point_t** seq, int n);
 
 /* Rendu */
+void initCamera(camera_t* camera_p,
+                float origin_x, float origin_y, float origin_z,
+                float destin_x, float destin_y, float destin_z, float distance);
 void renderFigure(image_t image, figure_t figure ,camera_t camera, color_t color);
 
 #endif /* IMGUTIL_H_ */
