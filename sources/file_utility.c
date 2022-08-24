@@ -6,7 +6,7 @@
  */
 #include "main.h"
 
-FILE* initImageFile(char name[], int width, int height,image_t image)
+FILE* initImageFile(char* name, int width, int height,image_t image)
 {
     //FILE CREATION AND NAME
     char* fileName = bmpExtension(name);
@@ -108,7 +108,7 @@ int getInt(FILE* file)
     return output;
 }
 
-char* bmpExtension(char input[])
+char* bmpExtension(char* input)
 {
     //Returns the name for BMP file with the ".bmp" extension
     char* output = NULL;
@@ -120,21 +120,14 @@ char* bmpExtension(char input[])
     return output;
 }
 
-char* numExtension(char input[], int number)
+char* numExtension(char* input, int number)
 {
     // Creates a string with a number appended to the end of the input.
     char* output = NULL;
     int length = strlen(input);
-    char digit;
-    int k;
-    length +=3;
+    length +=4;
     output = malloc(length);
-    strcpy(output,input);
-    for(k=length-1; k>=length-3; --k)
-    {
-        digit = number%10;
-        number = number/10;
-        output[k] = digit + 48;
-    }
+    sprintf(output,"%s%d",input,number);
+    free(input);
     return output;
 }
