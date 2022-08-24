@@ -1,19 +1,27 @@
-SOURCE = $(wildcard src/*.c)
-HEADERS = $(wildcard src/*.h)
-OBJECTS = $(SOURCE:.c=.o)
-BIN = bin
+SOURCE_DIR = sources
+HEADER_DIR = headers
+OBJECT_DIR = objects
 
-all: bmp-generator
+SOURCES = $(wildcard $(SOURCE_DIR)/*.c)
+HEADERS = $(SOURCES:$(SOURCE_DIR)/%.c=$(HEADER_DIR)/%.h)
+HEADERS = $(wildcard src/*.h)
+OBJECTS = $(SOURCES:$(SOURCE_DIR)/%.c=$(OBJECT_DIR)/%.o)
+CC = gcc
+PROJECT = bmp-generator
+
+all: $(PROJECT)
 
 bmp-generator: $(OBJECTS)
-	gcc -o $@ $^ -lm
+	$(CC) -o $@ $^ -lm
 
-obj/%.o : src/%.c src/main.h
-	gcc -c -o $@ $< 
+$(OBJECTS): $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c $(HEADER_DIR)/main.h
+	mkdir -p $(OBJECT_DIR)
+	$(CC) -c -o $@ -I$(HEADER_DIR)  $< 
 
-src/main.h: $(HEADERS)
-	touch src/main.h
+$(HEADER_DIR)/main.h: $(HEADERS)
+	touch $@
 
 clean:
-	rm obj/*.o bmp-generator -f
+	rm -fr $(OBJECT_DIR) $(PROJECT) 
 	
+.PHONY: clean
