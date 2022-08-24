@@ -14,9 +14,9 @@
 #include <time.h>
 #include <math.h>
 
-#include "util.h"
-#include "imgUtil.h"
-#include "fileUtil.h"
+#include "utility.h"
+#include "image_utility.h"
+#include "file_utility.h"
 #include "filter.h"
 
 
