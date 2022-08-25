@@ -144,11 +144,15 @@ void freeImage(image_t image, int width, int height)
         free(image[x]);
     }
     free(image);
+    image = NULL;
 }
 
-void brownien2(image_t image, int width, int height, int iterations, int spread, int x0, int y0)
+void brownien2(
+	image_t image, int width, int height,
+	int iterations, int spread, int x0, int y0)
 {
-    /*Ajoute un mouvement brownien à l'image de longueur "iterations" et de point
+    /*Ajoute un mouvement brownien à l'image de longueur "iterations" et de 
+     *point
      *de départ (x0,y0).
      */
     uchar pixels[1][3] = { {0,0xFF,0} };
@@ -169,7 +173,10 @@ void brownien2(image_t image, int width, int height, int iterations, int spread,
             if(color == 1)
             {
                 delta = rand()%3-1;
-                pixels[0][color] = saturator(pixels[0][color] + delta ,SAT_MIN, SAT_MAX);
+                pixels[0][color] = saturator(
+			pixels[0][color] + delta ,
+			SAT_MIN,
+			SAT_MAX);
             }
         }
         delta = rand()%(2*spread + 1) - spread;
@@ -193,7 +200,8 @@ void brownien2(image_t image, int width, int height, int iterations, int spread,
 
 void barres1(image_t image, int width, int height, int spread)
 {
-    /*Ajoutes des barres blanches brouillées verticales à l'image. Elles sont espacées centre-à-centre
+    /*Ajoutes des barres blanches brouillées verticales à l'image.
+      Elles sont espacées centre-à-centre
      *de la distance "spread".
      */
     printf("Début du processus\n");
@@ -228,7 +236,8 @@ void barres1(image_t image, int width, int height, int spread)
 
 void barres2(image_t image, int width, int height, int spread)
 {
-    /*Ajoutes des barres verticales brouillées à l'image. Elles sont espacées centre-à-centre
+    /*Ajoutes des barres verticales brouillées à l'image.
+      Elles sont espacées centre-à-centre
      *de la distance "spread".
      */
     printf("Début du processus\n");
@@ -286,6 +295,7 @@ void freePoints(point_t** seq, int n)
         free(seq[i]);
     }
     free(seq);
+
 }
 
 
