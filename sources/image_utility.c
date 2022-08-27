@@ -12,15 +12,15 @@ image_t* initImage(int width, int height)
 
     unsigned int x;
     unsigned int y;
-    image_t *image = (image_t*) malloc(sizeof(image_t));
+    image_t* image = (image_t*) malloc(sizeof(image_t));
     image->width = width;
     image->height = height;
     image->image = (color_t**) malloc(width * sizeof(color_t*));
 
-    for (x = 0; x < width; ++x)
+    for(x = 0; x < width; ++x)
     {
         image->image[x] = (color_t*) malloc(height * sizeof(color_t));
-        if (NULL == image->image[x])
+        if(NULL == image->image[x])
         {
             exit(1);
         }
@@ -29,18 +29,18 @@ image_t* initImage(int width, int height)
     return image;
 }
 
-void setImage(image_t *image)
+void setImage(image_t* image)
 {
     //Turns the image black.
     unsigned int x;
     unsigned int y;
     unsigned int color;
 
-    for (x = 0; x < image->width; ++x)
+    for(x = 0; x < image->width; ++x)
     {
-        for (y = 0; y < image->height; ++y)
+        for(y = 0; y < image->height; ++y)
         {
-            for (color = 0; color < 3; ++color)
+            for(color = 0; color < 3; ++color)
             {
                 image->image[x][y][color] = 0x0;
             }
@@ -48,14 +48,14 @@ void setImage(image_t *image)
     }
 }
 
-void dispImage(image_t *image)
+void dispImage(image_t* image)
 {
     //Displays the values of the pixels. Line by line.
     int x;
     int y;
-    for (x = 0; x < image->width; ++x)
+    for(x = 0; x < image->width; ++x)
     {
-        for (y = 0; y < image->height; ++y)
+        for(y = 0; y < image->height; ++y)
         {
             printf("Point[%d,%d] = (%x,%x,%x)\n", x + 1, y + 1,
                     image->image[x][y][0], image->image[x][y][1],
@@ -65,17 +65,17 @@ void dispImage(image_t *image)
 }
 
 void drawRect(color_t color, int botLeftX, int botLeftY, int topRightX,
-        int topRightY, image_t *image)
+        int topRightY, image_t* image)
 {
     //Draws a colored rectangle in an image.
     int x;
     int y;
     int k;
-    for (x = botLeftX; x <= topRightX; ++x)
+    for(x = botLeftX; x <= topRightX; ++x)
     {
-        for (y = botLeftY; y <= topRightY; ++y)
+        for(y = botLeftY; y <= topRightY; ++y)
         {
-            for (k = 0; k < 3; ++k)
+            for(k = 0; k < 3; ++k)
             {
                 image->image[x][y][k] = color[k];
             }
@@ -83,25 +83,26 @@ void drawRect(color_t color, int botLeftX, int botLeftY, int topRightX,
     }
 }
 
-void drawPoints(point_t **seq, int nPoints, image_t *image)
+void drawPoints(point_t** seq, int nPoints, image_t* image)
 {
     // Draws a sequence of points into an image.
     unsigned int i;
     int x;
     int y;
     color_struct_t* point;
-    color_struct_t f_point = {0, 0, 0};
-    for (i = 0; i < nPoints; ++i)
+    color_struct_t f_point =
+    {0, 0, 0};
+    for(i = 0; i < nPoints; ++i)
     {
         x = seq[i]->x;
         y = seq[i]->y;
-        if ((x >= 0) && (x < image->width) && (y >= 0) && (y < image->height))
+        if((x >= 0) && (x < image->width) && (y >= 0) && (y < image->height))
         {
             /*
-            f_point.blue = seq[i]->blue;
-            f_point.green = seq[i]->green;
-            f_point.red = seq[i]->red;
-            */
+             f_point.blue = seq[i]->blue;
+             f_point.green = seq[i]->green;
+             f_point.red = seq[i]->red;
+             */
             point = (color_struct_t*) (image->image[x][y]);
             *point = *((color_struct_t*) seq[i]);
         }
@@ -111,7 +112,9 @@ void drawPoints(point_t **seq, int nPoints, image_t *image)
 point_t initPoint()
 {
     point_t point;
-    point.color = (color_struct_t) {0, 0, 0};
+    point.color = (color_struct_t
+            )
+            {0, 0, 0};
     point.x = 0;
     point.y = 0;
     point.z = 0;
@@ -127,21 +130,21 @@ figure_t initFigure(uint nombre_Point)
     figure.sequence = (point_t*) malloc(nombre_Point * sizeof(point_t));
 
     int i;
-    for (i = 0; i < nombre_Point; ++i)
+    for(i = 0; i < nombre_Point; ++i)
     {
         figure.sequence[i] = initPoint();
     }
     return figure;
 }
 
-void freeImage(image_t *image)
+void freeImage(image_t* image)
 {
     //Frees the memory the image occupies in memory.
     int x;
     int y;
-    for (x = 0; x < image->width; ++x)
+    for(x = 0; x < image->width; ++x)
     {
-        for (y = 0; y < image->height; ++y)
+        for(y = 0; y < image->height; ++y)
         {
             free(image->image[x][y]);
         }
@@ -152,7 +155,7 @@ void freeImage(image_t *image)
     image = NULL;
 }
 
-void brownien2(image_t *image, int iterations, int spread, int x0, int y0)
+void brownien2(image_t* image, int iterations, int spread, int x0, int y0)
 {
     /*Ajoute un mouvement brownien à l'image de longueur "iterations" et de
      *point
@@ -160,7 +163,7 @@ void brownien2(image_t *image, int iterations, int spread, int x0, int y0)
      */
     uchar pixels[1][3] =
     {
-    { 0, 0xFF, 0 } };
+    {0, 0xFF, 0}};
     int y = y0;
     int x = x0;
     int color = 0;
@@ -169,13 +172,13 @@ void brownien2(image_t *image, int iterations, int spread, int x0, int y0)
     iterations = 1000000;
     //Début du procesus.
     printf("Début du processus\n");
-    for (i = 0; i < iterations; ++i)
+    for(i = 0; i < iterations; ++i)
     {
-        for (color = 0; color < 3; ++color)
+        for(color = 0; color < 3; ++color)
         {
 
             image->image[x][y][color] = pixels[0][color];
-            if (color == 1)
+            if(color == 1)
             {
                 delta = rand() % 3 - 1;
                 pixels[0][color] = saturator(pixels[0][color] + delta,
@@ -191,7 +194,7 @@ void brownien2(image_t *image, int iterations, int spread, int x0, int y0)
         x += delta;
         x = modulo(x, image->width);
 
-        if ((i % 10000) == 0)
+        if((i % 10000) == 0)
         {
             printf("point (%d,%d)", x, y);
             ok(i);
@@ -201,7 +204,7 @@ void brownien2(image_t *image, int iterations, int spread, int x0, int y0)
     printf("Processus terminé\n");
 }
 
-void barres1(image_t *image, int spread)
+void barres1(image_t* image, int spread)
 {
     /*Ajoutes des barres blanches brouillées verticales à l'image.
      Elles sont espacées centre-à-centre
@@ -210,22 +213,22 @@ void barres1(image_t *image, int spread)
     printf("Début du processus\n");
 
     color_t pixel =
-    { 0xFF, 0xFF, 0xFF };
+    {0xFF, 0xFF, 0xFF};
     int i = 0;
     int y;
     int x;
     int xPrime;
     char bool = 1;
 
-    for (y = 0; y < image->height; ++y)
+    for(y = 0; y < image->height; ++y)
     {
         x = 2;
         xPrime = x;
         bool = 1;
-        while (bool)
+        while(bool)
         {
 
-            for (i = 0; i < 3; ++i)
+            for(i = 0; i < 3; ++i)
             {
                 image->image[xPrime][y][i] = pixel[i];
             }
@@ -238,7 +241,7 @@ void barres1(image_t *image, int spread)
 
 }
 
-void barres2(image_t *image, int spread)
+void barres2(image_t* image, int spread)
 {
     /*Ajoutes des barres verticales brouillées à l'image.
      Elles sont espacées centre-à-centre
@@ -247,28 +250,28 @@ void barres2(image_t *image, int spread)
     printf("Début du processus\n");
 
     color_t pixel =
-    { 0xFF, 0xFF, 0xFF };
+    {0xFF, 0xFF, 0xFF};
     int i = 0;
     int y;
     int x;
     uint xPrime[3];
     uchar bool;
 
-    for (y = 0; y < image->height; ++y)
+    for(y = 0; y < image->height; ++y)
     {
         x = 2;
-        for (i = 0; i < 3; ++i)
+        for(i = 0; i < 3; ++i)
             xPrime[i] = x;
         bool = 1;
-        while (bool)
+        while(bool)
         {
 
-            for (i = 0; i < 3; ++i)
+            for(i = 0; i < 3; ++i)
             {
                 image->image[xPrime[i]][y][i] = pixel[i];
             }
             x += spread;
-            for (i = 0; i < 3; ++i)
+            for(i = 0; i < 3; ++i)
                 xPrime[i] = x + (rand() % 5 - 2);
             bool = (xPrime[0] < image->width) & (xPrime[1] < image->width)
                     & (xPrime[2] < image->width);
@@ -278,7 +281,7 @@ void barres2(image_t *image, int spread)
 
 }
 
-void randCoord(point_t *m, int height, int width)
+void randCoord(point_t* m, int height, int width)
 {
     int randX = rand() % width;
     int randY = rand() % height;
@@ -286,7 +289,7 @@ void randCoord(point_t *m, int height, int width)
     m->y = randY;
 }
 
-void randDeltaPoint(point_t *m, int amplitude, int width, int height)
+void randDeltaPoint(point_t* m, int amplitude, int width, int height)
 {
     //Randomly moves a point.
     m->x += rand() % (2 * amplitude + 1) - amplitude;
@@ -295,10 +298,10 @@ void randDeltaPoint(point_t *m, int amplitude, int width, int height)
     modulo(m->y, height);
 }
 
-void freePoints(point_t **seq, int n)
+void freePoints(point_t** seq, int n)
 {
     int i;
-    for (i = 0; i < n; ++i)
+    for(i = 0; i < n; ++i)
     {
         free(seq[i]);
     }
@@ -306,7 +309,7 @@ void freePoints(point_t **seq, int n)
 
 }
 
-void initCamera(camera_t *camera_p, float origin_x, float origin_y,
+void initCamera(camera_t* camera_p, float origin_x, float origin_y,
         float origin_z, float destin_x, float destin_y, float destin_z,
         float distance)
 {
@@ -322,7 +325,7 @@ void initCamera(camera_t *camera_p, float origin_x, float origin_y,
     (*camera_p) = camera_loc;
 }
 
-void renderFigure(image_t *image, figure_t figure, camera_t camera)
+void renderFigure(image_t* image, figure_t figure, camera_t camera)
 {
 
     vector_t o;
@@ -370,7 +373,7 @@ void renderFigure(image_t *image, figure_t figure, camera_t camera)
     float op_v_scalaire;
     float op_w_scalaire;
 
-    for (int i = 0; i < figure.nombre_Point; ++i)
+    for(int i = 0; i < figure.nombre_Point; ++i)
     {
         p.x = figure.sequence[i].x;
         p.y = figure.sequence[i].y;
@@ -392,7 +395,7 @@ void renderFigure(image_t *image, figure_t figure, camera_t camera)
         y_image = 400 + distance * op_w_scalaire / op_u_scalaire;
 
         //		printf("%d,%d\n\n",x_image,y_image);
-        if ((x_image < 1280) && (x_image >= 0) && (y_image < 800)
+        if((x_image < 1280) && (x_image >= 0) && (y_image < 800)
                 && (y_image >= 0) && op_u_scalaire > 0)
         {
             point = (color_struct_t*) image->image[x_image][y_image];

@@ -19,5 +19,4 @@
 #include "file_utility.h"
 #include "filter.h"
 
-
 #endif /* MAIN_H_ */

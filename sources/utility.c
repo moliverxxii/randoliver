@@ -6,14 +6,23 @@
  */
 #include "main.h"
 
-int saturator(int input,int min, int max)
+int saturator(int input, int min, int max)
 {
     /* Ecrête le signal entre "min" et "max"
      *
      */
-    if(input<min) return min;
-    else if(input>max) return max;
-    else return input;
+    if(input < min)
+    {
+        return min;
+    }
+    else if(input > max)
+    {
+        return max;
+    }
+    else
+    {
+        return input;
+    }
 }
 
 int modulo(int input, int modulo)
@@ -22,12 +31,12 @@ int modulo(int input, int modulo)
     //modulo must be different to 0;
     int output = input;
     int multiplier = modulo;
-    if( ((modulo>0) & (input>0)) | ((modulo<0) & (input<0)) )
+    if(((modulo > 0) & (input > 0)) | ((modulo < 0) & (input < 0)))
     {
         multiplier *= -1;
     }
 
-    while(output>=modulo | output<0)
+    while(output >= modulo | output < 0)
     {
         output += multiplier;
     }
@@ -38,7 +47,7 @@ int modulo(int input, int modulo)
 void ok(int num)
 {
     //Affiche un signal ok numéroté.
-    printf("OK n°%d\n",num);
+    printf("OK n°%d\n", num);
 }
 
 void okP(int num, void* pointer)
@@ -49,7 +58,10 @@ void okP(int num, void* pointer)
 
     if(pointer == NULL)
     {
-        printf("merde n°%d\n",num);
+        printf("merde n°%d\n", num);
     }
-    else ok(num);
+    else
+    {
+        ok(num);
+    }
 }

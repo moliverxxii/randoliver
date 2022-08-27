@@ -12,5 +12,4 @@
 
 void flou(image_t* image);
 
-
 #endif /* FILTER_H_ */
