@@ -6,6 +6,8 @@
  */
 #include "main.h"
 
+#define OLI_3D
+
 int main(int argc, char* argv[])
 {
     //Paramètres de base.
@@ -17,7 +19,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-        strcpy(nom, "Fantôme V7");
+        strcpy(nom, "sans titre");
     }
     int width = 1280;
     int height = 800;
@@ -29,15 +31,16 @@ int main(int argc, char* argv[])
     //Initialisation des particules
     srand(time(NULL));
 
+
+
+#ifdef OLI_3D
     uint nb = 400;
     int distX = 100;
-
     figure_t test = initFigure(nb);
     color_t color =
     {0x0, 0x0, 0xFF};
     camera_t camera;
     initCamera(&camera, 350, 0, 100, 350, 10, 100, 100);
-
     for(int i = 0; i < nb; ++i)
     {
         test.sequence[i].x = (i % 8) * distX;
@@ -52,6 +55,10 @@ int main(int argc, char* argv[])
     ok(1);
     for(int i = 0; i < 5; ++i)
         flou(image);
+#else
+    brownien1(image, 30000, 1, width/2, height/2);
+#endif /* OLI_3D */
+
     writeImage(image, fichier);
 
     return EXIT_SUCCESS;

@@ -155,7 +155,7 @@ void freeImage(image_t* image)
     image = NULL;
 }
 
-void brownien2(image_t* image, int iterations, int spread, int x0, int y0)
+void brownien1(image_t* image, int iterations, int spread, int x0, int y0)
 {
     /*Ajoute un mouvement brownien à l'image de longueur "iterations" et de
      *point
@@ -193,13 +193,6 @@ void brownien2(image_t* image, int iterations, int spread, int x0, int y0)
         delta = rand() % (2 * spread + 1) - spread;
         x += delta;
         x = modulo(x, image->width);
-
-        if((i % 10000) == 0)
-        {
-            printf("point (%d,%d)", x, y);
-            ok(i);
-        }
-
     }
     printf("Processus terminé\n");
 }
