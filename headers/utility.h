@@ -13,11 +13,16 @@
 
 typedef unsigned char uchar;
 typedef unsigned int uint;
-typedef struct vector_t{float x; float y; float z;} vector_t;
+typedef struct
+{
+    float x;
+    float y;
+    float z;
+} vector_t;
 
-int saturator(int input,int satMin,int satMax);
+int saturator(int input, int satMin, int satMax);
 int modulo(int input, int modulo);
 void ok(int num);
-void okP(int num, void* pointer);
+void okP(int num, void *pointer);
 
 #endif /* UTIL_H_ */

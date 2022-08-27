@@ -86,25 +86,32 @@ void drawRect(color_t color, int botLeftX, int botLeftY, int topRightX,
 void drawPoints(point_t **seq, int nPoints, image_t *image)
 {
     // Draws a sequence of points into an image.
-    int i;
+    unsigned int i;
     int x;
     int y;
+    color_struct_t* point;
+    color_struct_t f_point = {0, 0, 0};
     for (i = 0; i < nPoints; ++i)
     {
         x = seq[i]->x;
         y = seq[i]->y;
-        image->image[x][y][0] = seq[i]->blue;
-        image->image[x][y][1] = seq[i]->green;
-        image->image[x][y][2] = seq[i]->red;
+        if ((x >= 0) && (x < image->width) && (y >= 0) && (y < image->height))
+        {
+            /*
+            f_point.blue = seq[i]->blue;
+            f_point.green = seq[i]->green;
+            f_point.red = seq[i]->red;
+            */
+            point = (color_struct_t*) (image->image[x][y]);
+            *point = *((color_struct_t*) seq[i]);
+        }
     }
 }
 
 point_t initPoint()
 {
     point_t point;
-    point.blue = 0;
-    point.green = 0;
-    point.red = 0;
+    point.color = (color_struct_t) {0, 0, 0};
     point.x = 0;
     point.y = 0;
     point.z = 0;
@@ -315,8 +322,7 @@ void initCamera(camera_t *camera_p, float origin_x, float origin_y,
     (*camera_p) = camera_loc;
 }
 
-void renderFigure(image_t *image, figure_t figure, camera_t camera,
-        color_t color)
+void renderFigure(image_t *image, figure_t figure, camera_t camera)
 {
 
     vector_t o;
@@ -330,6 +336,7 @@ void renderFigure(image_t *image, figure_t figure, camera_t camera,
 
     int x_image;
     int y_image;
+    color_struct_t* point;
 
     float distance = camera.distance;
 
@@ -388,9 +395,8 @@ void renderFigure(image_t *image, figure_t figure, camera_t camera,
         if ((x_image < 1280) && (x_image >= 0) && (y_image < 800)
                 && (y_image >= 0) && op_u_scalaire > 0)
         {
-            image->image[x_image][y_image][0] = color[0];
-            image->image[x_image][y_image][1] = color[1];
-            image->image[x_image][y_image][2] = color[2];
+            point = (color_struct_t*) image->image[x_image][y_image];
+            *point = figure.sequence[i].color;
         }
     }
 }

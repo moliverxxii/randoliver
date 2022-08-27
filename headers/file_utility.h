@@ -21,4 +21,5 @@ int getHeight(FILE* imageFile);
 char* bmpExtension(char*  input);
 char* numExtension(char* input, int number);
 
+
 #endif /* FILEUTIL_H_ */
