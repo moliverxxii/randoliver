@@ -6,17 +6,17 @@
  */
 #include "main.h"
 
-FILE* initImageFile(char* name, int width, int height,image_t image)
+FILE* initImageFile(char* name, image_t* image)
 {
     //FILE CREATION AND NAME
     char* fileName = bmpExtension(name);
     FILE* imageFile = fopen(fileName,"wb+");
 
     //HEADER
-    initHeader(imageFile,width,height);
+    initHeader(imageFile,image->width,image->height);
 
     //DATA
-    writeImage(image,width,height,imageFile);
+    writeImage(image, imageFile);
     printf("fichier à : %p\n",imageFile);
     return imageFile;
 }
@@ -61,18 +61,18 @@ void initHeader(FILE* file,int width, int height)
 
 }
 
-void writeImage(image_t image, int width, int height, FILE* imageFile)
+void writeImage(image_t* image, FILE* imageFile)
 {
     //Writes an image into a windows BITMAP stream.
     fseek(imageFile,HEADER_SIZE,SEEK_SET);
     int x;
     int y;
     size_t feedback;
-    for(y=0;y<height;++y)
+    for(y=0;y<image->height;++y)
     {
-        for(x=0; x<width; ++x)
+        for(x=0; x<image->width; ++x)
         {
-            feedback = fwrite(image[x][y],sizeof(uchar),3,imageFile);
+            feedback = fwrite(image->image[x][y],sizeof(uchar),3,imageFile);
         }
     }
     printf("Image written into file.\n");
