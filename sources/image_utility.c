@@ -25,7 +25,6 @@ image_t* initImage(int width, int height)
             exit(1);
         }
     }
-    printf("image à : %p\n", image);
     return image;
 }
 

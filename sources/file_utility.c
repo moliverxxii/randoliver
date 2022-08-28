@@ -17,7 +17,7 @@ FILE* initImageFile(char* name, image_t* image)
 
     //DATA
     writeImage(image, imageFile);
-    printf("fichier à : %p\n", imageFile);
+    printf("Fichier à : %p\n", imageFile);
     return imageFile;
 }
 
@@ -125,9 +125,11 @@ char* numExtension(char* input, int number)
     // Creates a string with a number appended to the end of the input.
     char* output = NULL;
     int length = strlen(input);
-    length += 4;
+    int extension;
+    char empty[0x100] = {0};
+    length += 2 + sprintf(empty,"%d",number);
     output = malloc(length);
-    sprintf(output, "%s%d", input, number);
+    sprintf(output, "%s %d", input, number);
     free(input);
     return output;
 }

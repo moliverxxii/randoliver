@@ -23,6 +23,7 @@ int main(int argc, char* argv[])
     }
     int width = 1280;
     int height = 800;
+    nom = numExtension(nom, height);
 
     //Initialisation de l'image.
     image_t* image = initImage(width, height);
@@ -50,11 +51,11 @@ int main(int argc, char* argv[])
         //		printf("x,y = %d,%d\n",test.sequence[i].x,test.sequence[i].y);
     }
 
-    ok(0);
     renderFigure(image, test, camera);
-    ok(1);
     for(int i = 0; i < 5; ++i)
+    {
         flou(image);
+    }
 #else
     brownien1(image, 30000, 1, width/2, height/2);
 #endif /* OLI_3D */
