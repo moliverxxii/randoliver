@@ -23,12 +23,13 @@ int main(int argc, char* argv[])
         strcpy(nom, "sans titre");
     }
     int width = 1280;
-    int height = 800;
-    nom = numExtension(nom, height);
+    int height = 720;
+
+    char* nom_etendu;
+    FILE* fichier;
 
     //Initialisation de l'image.
     image_t* image = initImage(width, height);
-    FILE* fichier = initImageFile(nom, image);
 
     //Initialisation des particules
     srand(time(NULL));
@@ -68,13 +69,28 @@ int main(int argc, char* argv[])
          randCoord(&fig.sequence[i], image->height, image->width);
          fig.sequence[i].color = (color_struct_t) {0xFF, 0xFF, 0xFF};
     }
-    drawFigure(image, &fig);
+
+    for(int j=0; j<2000; ++j)
+    {
+        for(int i=0; i<fig.nombre_Point;++i)
+        {
+        randDeltaPoint(&fig.sequence[i],
+                1, image->width,
+                image->height);
+        }
+        nom_etendu = numExtension(nom, j);
+
+        fichier = initImageFile(nom_etendu, image);
+        drawFigure(image, &fig);
+        writeImage(image, fichier);
+        free(nom_etendu);
+        setImage(image);
+    }
 #endif
 
 
 
 
-    writeImage(image, fichier);
 
     return EXIT_SUCCESS;
 }

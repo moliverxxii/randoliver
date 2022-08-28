@@ -130,6 +130,5 @@ char* numExtension(char* input, int number)
     length += 2 + sprintf(empty,"%d",number);
     output = malloc(length);
     sprintf(output, "%s %d", input, number);
-    free(input);
     return output;
 }
