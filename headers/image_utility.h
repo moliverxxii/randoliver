@@ -12,15 +12,15 @@
 
 #define RES 2835
 
+/** Couleur en données brutes BVR.
+ *
+ */
 typedef uchar color_t[3];
 
-typedef struct
-{
-    unsigned int width;
-    unsigned int height;
-    color_t** image;
-} image_t;
-
+/** Couleur sous formes de champs lisibles par un humain.
+ *  Compatible pour la conversion avec color_t
+ *
+ */
 typedef struct
 {
     uchar blue;
@@ -28,6 +28,19 @@ typedef struct
     uchar red;
 } color_struct_t;
 
+/** Conteneur avec les donnees de bases d'une image.
+ *  Doit être utilisé pour tous les traitements d'images.
+ */
+typedef struct
+{
+    unsigned int width;
+    unsigned int height;
+    color_t** image;
+} image_t;
+
+/** Un point dans l'espace
+ *
+ */
 typedef struct
 {
     color_struct_t color;
@@ -36,6 +49,18 @@ typedef struct
     int z;
 } point_t;
 
+/** Une sequence de points
+ *
+ */
+typedef struct
+{
+    uint nombre_Point;
+    point_t* sequence;
+} figure_t;
+
+/** Une camera a utiliser pour le rendu 3D
+ *
+ */
 typedef struct
 {
     vector_t origine;
@@ -43,11 +68,6 @@ typedef struct
     float distance;
 } camera_t;
 
-typedef struct
-{
-    uint nombre_Point;
-    point_t* sequence;
-} figure_t;
 
 /* Elementaires */
 image_t* initImage(int width, int height);
