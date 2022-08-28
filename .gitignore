@@ -3,4 +3,5 @@
 .cproject
 .project
 .settings
+*.bmp
 bmp-generator
