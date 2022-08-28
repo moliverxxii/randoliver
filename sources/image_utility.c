@@ -82,32 +82,6 @@ void drawRect(color_t color, int botLeftX, int botLeftY, int topRightX,
     }
 }
 
-void drawPoints(point_t** seq, int nPoints, image_t* image)
-{
-    // Draws a sequence of points into an image.
-    unsigned int i;
-    int x;
-    int y;
-    color_struct_t* point;
-    color_struct_t f_point =
-    {0, 0, 0};
-    for(i = 0; i < nPoints; ++i)
-    {
-        x = seq[i]->x;
-        y = seq[i]->y;
-        if((x >= 0) && (x < image->width) && (y >= 0) && (y < image->height))
-        {
-            /*
-             f_point.blue = seq[i]->blue;
-             f_point.green = seq[i]->green;
-             f_point.red = seq[i]->red;
-             */
-            point = (color_struct_t*) (image->image[x][y]);
-            *point = *((color_struct_t*) seq[i]);
-        }
-    }
-}
-
 point_t initPoint()
 {
     point_t point;
@@ -135,6 +109,27 @@ figure_t initFigure(uint nombre_Point)
     }
     return figure;
 }
+
+void drawFigure(image_t* image, figure_t* figure)
+{
+    // Draws a sequence of points into an image.
+    unsigned int i;
+    int x;
+    int y;
+    color_struct_t* point;
+    color_struct_t f_point = {0, 0, 0};
+    for(i = 0; i < figure->nombre_Point; ++i)
+    {
+        x = figure->sequence[i].x;
+        y = figure->sequence[i].y;
+        if((x >= 0) && (x < image->width) && (y >= 0) && (y < image->height))
+        {
+            point = (color_struct_t*) (image->image[x][y]);
+            *point = *((color_struct_t*) &figure->sequence[i]);
+        }
+    }
+}
+
 
 void freeImage(image_t* image)
 {

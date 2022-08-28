@@ -6,7 +6,8 @@
  */
 #include "main.h"
 
-#define OLI_3D
+//#define OLI_3D
+#define OLI_FIG
 
 int main(int argc, char* argv[])
 {
@@ -56,9 +57,22 @@ int main(int argc, char* argv[])
     {
         flou(image);
     }
-#else
-    brownien1(image, 30000, 1, width/2, height/2);
 #endif /* OLI_3D */
+#ifdef OLI_BROWN
+    brownien1(image, 30000, 1, width/2, height/2);
+#endif /* OLI_BROWN */
+#ifdef OLI_FIG
+    figure_t fig = initFigure(1000);
+    for(int i=0; i<fig.nombre_Point;++i)
+    {
+         randCoord(&fig.sequence[i], image->height, image->width);
+         fig.sequence[i].color = (color_struct_t) {0xFF, 0xFF, 0xFF};
+    }
+    drawFigure(image, &fig);
+#endif
+
+
+
 
     writeImage(image, fichier);
 

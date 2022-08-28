@@ -76,9 +76,9 @@ void dispImage(image_t* image);
 void drawRect(color_t color, int botLeftX, int botLeftY, int topRightX,
         int topRightY, image_t* image);
 void freeImage(image_t* image);
-void drawPoints(point_t** seq, int nPoints, image_t* image);
 figure_t initFigure(uint nombre_point);
 point_t initPoint(void);
+void drawFigure(image_t* image, figure_t* figure);
 
 /* Processus */
 void brownien1(image_t* image, int iterations, int spread, int x0, int y0);
