@@ -11,7 +11,7 @@ PROJECT = bmp-generator
 
 all: $(PROJECT)
 
-bmp-generator: $(OBJECTS)
+$(PROJECT): $(OBJECTS)
 	$(CC) -o $@ $^ -lm
 
 $(OBJECTS): $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c $(HEADER_DIR)/main.h
@@ -24,4 +24,8 @@ $(HEADER_DIR)/main.h: $(HEADERS)
 clean:
 	rm -fr $(OBJECT_DIR) $(PROJECT) 
 	
-.PHONY: clean
+ANALYZER = $(shell brew --prefix llvm)/bin/scan-build
+test:
+	$(ANALYZER) -v -v -v -o $(PROJECT)-analysis make $(PROJECT)
+
+.PHONY: clean test
