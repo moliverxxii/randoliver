@@ -12,30 +12,6 @@
 
 #define RES 2835
 
-typedef enum
-{
-	COLOUR_BLUE = 0,
-	COLOUR_GREEN,
-	COLOUR_RED,
-	COLOUR_COUNT
-} pixel_colour_t;
-
-/** Couleur en données brutes BVR.
- *
- */
-typedef uchar colour_t[COLOUR_COUNT];
-
-/** Couleur sous formes de champs lisibles par un humain.
- *  Compatible pour la conversion avec color_t
- *
- */
-typedef struct
-{
-    uchar blue;
-    uchar green;
-    uchar red;
-} colour_struct_t;
-
 
 /** Conteneur avec les donnees de bases d'une image.
  *  Doit être utilisé pour tous les traitements d'images.

@@ -15,6 +15,7 @@
 #include <math.h>
 
 #include "utility.h"
+#include "colours.h"
 #include "image_utility.h"
 #include "file_utility.h"
 #include "filter.h"
