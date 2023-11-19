@@ -12,10 +12,18 @@
 
 #define RES 2835
 
+typedef enum
+{
+	COLOUR_BLUE = 0,
+	COLOUR_GREEN,
+	COLOUR_RED,
+	COLOUR_COUNT
+} pixel_colour_t;
+
 /** Couleur en données brutes BVR.
  *
  */
-typedef uchar colour_t[3];
+typedef uchar colour_t[COLOUR_COUNT];
 
 /** Couleur sous formes de champs lisibles par un humain.
  *  Compatible pour la conversion avec color_t
@@ -27,6 +35,7 @@ typedef struct
     uchar green;
     uchar red;
 } colour_struct_t;
+
 
 /** Conteneur avec les donnees de bases d'une image.
  *  Doit être utilisé pour tous les traitements d'images.
@@ -43,7 +52,7 @@ typedef struct
  */
 typedef struct
 {
-    colour_struct_t color;
+    colour_struct_t colour;
     int x;
     int y;
     int z;
@@ -74,7 +83,7 @@ image_t* init_image(int width, int height);
 void set_image(image_t* image);
 void disp_image(image_t* image);
 void draw_rect(colour_t color, int botLeftX, int botLeftY, int topRightX,
-        int topRightY, image_t* image);
+			   int topRightY, image_t* image);
 void free_image(image_t* image);
 figure_t init_figure(uint nombre_point);
 point_t init_point(void);

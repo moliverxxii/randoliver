@@ -41,7 +41,7 @@ set_image(image_t* image)
     {
         for(y = 0; y < image->height; ++y)
         {
-            for(color = 0; color < 3; ++color)
+            for(color = 0; color < COLOUR_COUNT; ++color)
             {
                 image->image[x][y][color] = 0x0;
             }
@@ -90,7 +90,7 @@ point_t
 init_point()
 {
     point_t point;
-    point.color = (colour_struct_t
+    point.colour = (colour_struct_t
             )
             {0, 0, 0};
     point.x = 0;
@@ -402,7 +402,7 @@ render_figure(image_t* image, figure_t figure, camera_t camera)
                 && (y_image >= 0) && op_u_scalaire > 0)
         {
             point = (colour_struct_t*) image->image[x_image][y_image];
-            *point = figure.sequence[i].color;
+            *point = figure.sequence[i].colour;
         }
     }
 }
