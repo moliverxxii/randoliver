@@ -7,14 +7,15 @@
 
 #include "main.h"
 
-void flou(image_t* image)
+void
+flou(image_t* image)
 {
-    image_t* image2 = initImage(image->width, image->height);
+    image_t* image2 = init_image(image->width, image->height);
 
     int x;
     int y;
     int tmp;
-    color_struct_t* point;
+    colour_struct_t* point;
     for(x = 1; x < image->width - 1; ++x)
     {
         for(y = 1; y < image->height - 1; ++y)
@@ -44,8 +45,8 @@ void flou(image_t* image)
     {
         for(y = 0; y < image->height; ++y)
         {
-            point = (color_struct_t*) image->image[x][y];
-            *point = *((color_struct_t*) (image2->image[x][y]));
+            point = (colour_struct_t*) image->image[x][y];
+            *point = *((colour_struct_t*) (image2->image[x][y]));
 
         }
     }

@@ -12,13 +12,13 @@
 
 #define HEADER_SIZE 54
 
-FILE* initImageFile(char* name, image_t* image);
-void initHeader(FILE* file, int width, int height);
-void writeImage(image_t* image, FILE* imageFile);
-int getInt(FILE* file);
-int getWidth(FILE* imageFile);
-int getHeight(FILE* imageFile);
-char* bmpExtension(char* input);
-char* numExtension(char* input, int number);
+FILE* init_image_file(char* name, image_t* image);
+void init_header(FILE* file, int width, int height);
+void write_image(const image_t* image, FILE* imageFile);
+int get_int(FILE* file);
+int get_width(FILE* imageFile);
+int get_height(FILE* imageFile);
+char* bmp_extension(const char* input);
+char* num_extension(const char* input, int number);
 
 #endif /* FILEUTIL_H_ */

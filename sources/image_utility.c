@@ -6,7 +6,8 @@
  */
 #include "main.h"
 
-image_t* initImage(int width, int height)
+image_t*
+init_image(int width, int height)
 {
     //Returns a pointer to an image.
 
@@ -15,11 +16,11 @@ image_t* initImage(int width, int height)
     image_t* image = (image_t*) malloc(sizeof(image_t));
     image->width = width;
     image->height = height;
-    image->image = (color_t**) malloc(width * sizeof(color_t*));
+    image->image = (colour_t**) malloc(width * sizeof(colour_t*));
 
     for(x = 0; x < width; ++x)
     {
-        image->image[x] = (color_t*) malloc(height * sizeof(color_t));
+        image->image[x] = (colour_t*) malloc(height * sizeof(colour_t));
         if(NULL == image->image[x])
         {
             exit(1);
@@ -28,7 +29,8 @@ image_t* initImage(int width, int height)
     return image;
 }
 
-void setImage(image_t* image)
+void
+set_image(image_t* image)
 {
     //Turns the image black.
     unsigned int x;
@@ -47,7 +49,8 @@ void setImage(image_t* image)
     }
 }
 
-void dispImage(image_t* image)
+void
+disp_image(image_t* image)
 {
     //Displays the values of the pixels. Line by line.
     int x;
@@ -63,8 +66,9 @@ void dispImage(image_t* image)
     }
 }
 
-void drawRect(color_t color, int botLeftX, int botLeftY, int topRightX,
-        int topRightY, image_t* image)
+void
+draw_rect(colour_t color, int botLeftX, int botLeftY, int topRightX,
+          int topRightY, image_t* image)
 {
     //Draws a colored rectangle in an image.
     int x;
@@ -82,10 +86,11 @@ void drawRect(color_t color, int botLeftX, int botLeftY, int topRightX,
     }
 }
 
-point_t initPoint()
+point_t
+init_point()
 {
     point_t point;
-    point.color = (color_struct_t
+    point.color = (colour_struct_t
             )
             {0, 0, 0};
     point.x = 0;
@@ -94,44 +99,47 @@ point_t initPoint()
     return point;
 }
 
-figure_t initFigure(uint nombre_Point)
+figure_t
+init_figure(uint nombre_Point)
 {
     //Initialise une sequence de nombre_Point point_t.
     figure_t figure;
 
-    figure.nombre_Point = nombre_Point;
+    figure.amount = nombre_Point;
     figure.sequence = (point_t*) malloc(nombre_Point * sizeof(point_t));
 
     int i;
     for(i = 0; i < nombre_Point; ++i)
     {
-        figure.sequence[i] = initPoint();
+        figure.sequence[i] = init_point();
     }
     return figure;
 }
 
-void drawFigure(image_t* image, figure_t* figure)
+void
+draw_figure(image_t* image, figure_t* figure)
 {
     // Draws a sequence of points into an image.
     unsigned int i;
     int x;
     int y;
-    color_struct_t* point;
-    color_struct_t f_point = {0, 0, 0};
-    for(i = 0; i < figure->nombre_Point; ++i)
+    colour_struct_t* point;
+    colour_struct_t f_point = {0, 0, 0};
+    for(i = 0; i < figure->amount; ++i)
     {
         x = figure->sequence[i].x;
         y = figure->sequence[i].y;
         if((x >= 0) && (x < image->width) && (y >= 0) && (y < image->height))
         {
-            point = (color_struct_t*) (image->image[x][y]);
-            *point = *((color_struct_t*) &figure->sequence[i]);
+            point = (colour_struct_t*) (image->image[x][y]);
+            *point = *((colour_struct_t*) &figure->sequence[i]);
         }
     }
 }
 
 
-void freeImage(image_t* image)
+void
+free_image(image_t* image)
 {
     //Frees the memory the image occupies in memory.
     int x;
@@ -149,7 +157,8 @@ void freeImage(image_t* image)
     image = NULL;
 }
 
-void brownien1(image_t* image, int iterations, int spread, int x0, int y0)
+void
+brownien1(image_t* image, int iterations, int spread, int x0, int y0)
 {
     /*Ajoute un mouvement brownien à l'image de longueur "iterations" et de
      *point
@@ -191,7 +200,8 @@ void brownien1(image_t* image, int iterations, int spread, int x0, int y0)
     printf("Processus terminé\n");
 }
 
-void barres1(image_t* image, int spread)
+void
+barres1(image_t* image, int spread)
 {
     /*Ajoutes des barres blanches brouillées verticales à l'image.
      Elles sont espacées centre-à-centre
@@ -199,7 +209,7 @@ void barres1(image_t* image, int spread)
      */
     printf("Début du processus\n");
 
-    color_t pixel =
+    colour_t pixel =
     {0xFF, 0xFF, 0xFF};
     int i = 0;
     int y;
@@ -228,7 +238,8 @@ void barres1(image_t* image, int spread)
 
 }
 
-void barres2(image_t* image, int spread)
+void
+barres2(image_t* image, int spread)
 {
     /*Ajoutes des barres verticales brouillées à l'image.
      Elles sont espacées centre-à-centre
@@ -236,7 +247,7 @@ void barres2(image_t* image, int spread)
      */
     printf("Début du processus\n");
 
-    color_t pixel =
+    colour_t pixel =
     {0xFF, 0xFF, 0xFF};
     int i = 0;
     int y;
@@ -268,7 +279,8 @@ void barres2(image_t* image, int spread)
 
 }
 
-void randCoord(point_t* m, int height, int width)
+void
+rand_coord(point_t* m, int height, int width)
 {
     int randX = rand() % width;
     int randY = rand() % height;
@@ -276,7 +288,8 @@ void randCoord(point_t* m, int height, int width)
     m->y = randY;
 }
 
-void randDeltaPoint(point_t* m, int amplitude, int width, int height)
+void
+rand_delta_point(point_t* m, int amplitude, int width, int height)
 {
     //Randomly moves a point.
     m->x += rand() % (2 * amplitude + 1) - amplitude;
@@ -285,7 +298,8 @@ void randDeltaPoint(point_t* m, int amplitude, int width, int height)
     modulo(m->y, height);
 }
 
-void freePoints(point_t** seq, int n)
+void
+free_points(point_t** seq, int n)
 {
     int i;
     for(i = 0; i < n; ++i)
@@ -296,14 +310,15 @@ void freePoints(point_t** seq, int n)
 
 }
 
-void initCamera(camera_t* camera_p, float origin_x, float origin_y,
+void
+init_camera(camera_t* camera_p, float origin_x, float origin_y,
         float origin_z, float destin_x, float destin_y, float destin_z,
         float distance)
 {
     camera_t camera_loc;
-    camera_loc.origine.x = origin_x;
-    camera_loc.origine.y = origin_y;
-    camera_loc.origine.z = origin_z;
+    camera_loc.origin.x = origin_x;
+    camera_loc.origin.y = origin_y;
+    camera_loc.origin.z = origin_z;
     camera_loc.direction.x = destin_x;
     camera_loc.direction.y = destin_y;
     camera_loc.direction.z = destin_z;
@@ -312,7 +327,8 @@ void initCamera(camera_t* camera_p, float origin_x, float origin_y,
     (*camera_p) = camera_loc;
 }
 
-void renderFigure(image_t* image, figure_t figure, camera_t camera)
+void
+render_figure(image_t* image, figure_t figure, camera_t camera)
 {
 
     vector_t o;
@@ -326,13 +342,13 @@ void renderFigure(image_t* image, figure_t figure, camera_t camera)
 
     int x_image;
     int y_image;
-    color_struct_t* point;
+    colour_struct_t* point;
 
     float distance = camera.distance;
 
-    o.x = camera.origine.x;
-    o.y = camera.origine.y;
-    o.z = camera.origine.z;
+    o.x = camera.origin.x;
+    o.y = camera.origin.y;
+    o.z = camera.origin.z;
 
     f.x = camera.direction.x;
     f.y = camera.direction.y;
@@ -360,7 +376,7 @@ void renderFigure(image_t* image, figure_t figure, camera_t camera)
     float op_v_scalaire;
     float op_w_scalaire;
 
-    for(int i = 0; i < figure.nombre_Point; ++i)
+    for(int i = 0; i < figure.amount; ++i)
     {
         p.x = figure.sequence[i].x;
         p.y = figure.sequence[i].y;
@@ -385,7 +401,7 @@ void renderFigure(image_t* image, figure_t figure, camera_t camera)
         if((x_image < 1280) && (x_image >= 0) && (y_image < 800)
                 && (y_image >= 0) && op_u_scalaire > 0)
         {
-            point = (color_struct_t*) image->image[x_image][y_image];
+            point = (colour_struct_t*) image->image[x_image][y_image];
             *point = figure.sequence[i].color;
         }
     }
