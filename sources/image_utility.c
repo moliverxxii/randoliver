@@ -13,18 +13,18 @@ init_image(int width, int height)
 
     unsigned int x;
     unsigned int y;
+    colour_t* image_data_p = malloc(width*height*sizeof(colour_t));
+
     image_t* image = (image_t*) malloc(sizeof(image_t));
     image->width = width;
     image->height = height;
     image->image = (colour_t**) malloc(width * sizeof(colour_t*));
 
+	colour_t * column_p = image_data_p;
     for(x = 0; x < width; ++x)
     {
-        image->image[x] = (colour_t*) malloc(height * sizeof(colour_t));
-        if(NULL == image->image[x])
-        {
-            exit(1);
-        }
+        image->image[x] = column_p;
+        column_p += height;
     }
     return image;
 }
@@ -144,14 +144,7 @@ free_image(image_t* image)
     //Frees the memory the image occupies in memory.
     int x;
     int y;
-    for(x = 0; x < image->width; ++x)
-    {
-        for(y = 0; y < image->height; ++y)
-        {
-            free(image->image[x][y]);
-        }
-        free(image->image[x]);
-    }
+    free(*(image->image));
     free(image->image);
     free(image);
     image = NULL;

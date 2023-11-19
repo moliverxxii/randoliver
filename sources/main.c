@@ -68,7 +68,7 @@ main(int argc, char* argv[])
     for(int i=0; i<fig.amount;++i)
     {
          rand_coord(&fig.sequence[i], image->height, image->width);
-         fig.sequence[i].color = (colour_struct_t) {0xFF, 0xFF, 0xFF};
+         fig.sequence[i].colour = (colour_struct_t) {0xFF, 0xFF, 0xFF};
     }
 
     for(int j=0; j<2000; ++j)
