@@ -64,7 +64,6 @@ main(int argc, char* argv[])
     brownien1(image, 30000, 1, width/2, height/2);
 #endif /* OLI_BROWN */
 #ifdef OLI_FIG
-<<<<<<< HEAD
     unsigned int num_points = 20000000;
     figure_t fig = init_figure(num_points);
     for(int i=0; i<fig.amount; ++i)
