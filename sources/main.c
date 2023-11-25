@@ -64,7 +64,7 @@ main(int argc, char* argv[])
     brownien1(image, 30000, 1, width/2, height/2);
 #endif /* OLI_BROWN */
 #ifdef OLI_FIG
-    unsigned int num_points = 20000000;
+    unsigned int num_points = 2000000;
     figure_t fig = init_figure(num_points);
     for(int i=0; i<fig.amount; ++i)
     {
@@ -76,18 +76,22 @@ main(int argc, char* argv[])
 
     for(int j=0; j<2000; ++j)
     {
+    	printf("Image %u\n", j);
         for(int i=0; i<fig.amount;++i)
         {
-        rand_delta_point(&fig.sequence[i],
-                1, image->width,
-                image->height);
+			rand_delta_point(&fig.sequence[i],
+							 1,
+							 image->width,
+							 image->height);
         }
         nom_etendu = num_extension(nom, j);
 
         fichier = init_image_file(nom_etendu, image);
+
         draw_figure(image, &fig);
         write_image(image, fichier);
         free(nom_etendu);
+    	fclose(fichier);
         set_image(image);
     }
 #endif

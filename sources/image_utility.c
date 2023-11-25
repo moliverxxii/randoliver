@@ -20,11 +20,11 @@ init_image(int width, int height)
     image->height = height;
     image->image = (colour_t**) malloc(width * sizeof(colour_t*));
 
-	colour_t * column_p = image_data_p;
-    for(x = 0; x < width; ++x)
+	colour_t * row_p = image_data_p;
+    for(y = 0; y < height; ++y)
     {
-        image->image[x] = column_p;
-        column_p += height;
+        image->image[y] = row_p;
+        row_p += width;
     }
     return image;
 }
@@ -43,7 +43,7 @@ set_image(image_t* image)
         {
             for(color = 0; color < COLOUR_COUNT; ++color)
             {
-                image->image[x][y][color] = 0x0;
+                image->image[y][x][color] = 0x0;
             }
         }
     }
@@ -60,8 +60,8 @@ disp_image(image_t* image)
         for(y = 0; y < image->height; ++y)
         {
             printf("Point[%d,%d] = (%x,%x,%x)\n", x + 1, y + 1,
-                    image->image[x][y][0], image->image[x][y][1],
-                    image->image[x][y][2]);
+                    image->image[y][x][0], image->image[y][x][1],
+                    image->image[y][x][2]);
         }
     }
 }
@@ -80,7 +80,7 @@ draw_rect(colour_t color, int botLeftX, int botLeftY, int topRightX,
         {
             for(k = 0; k < 3; ++k)
             {
-                image->image[x][y][k] = color[k];
+                image->image[y][x][k] = color[k];
             }
         }
     }
@@ -131,7 +131,7 @@ draw_figure(image_t* image, figure_t* figure)
         y = figure->sequence[i].y;
         if((x >= 0) && (x < image->width) && (y >= 0) && (y < image->height))
         {
-            point = (colour_struct_t*) (image->image[x][y]);
+            point = (colour_struct_t*) (image->image[y][x]);
             *point = *((colour_struct_t*) &figure->sequence[i]);
         }
     }
@@ -173,7 +173,7 @@ brownien1(image_t* image, int iterations, int spread, int x0, int y0)
         for(color = 0; color < 3; ++color)
         {
 
-            image->image[x][y][color] = pixels[0][color];
+            image->image[y][x][color] = pixels[0][color];
             if(color == 1)
             {
                 delta = rand() % 3 - 1;

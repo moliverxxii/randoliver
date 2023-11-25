@@ -11,7 +11,16 @@ init_image_file(char* name, image_t* image)
 {
     //FILE CREATION AND NAME
     char* file_name = bmp_extension(name);
+    if(!file_name)
+    {
+    	printf("file name error\n");
+    }
     FILE* image_file = fopen(file_name, "wb+");
+    if(!image_file)
+    {
+    	printf("image file error\n");
+    }
+
 
     //HEADER
     init_header(image_file, image->width, image->height);
@@ -21,46 +30,30 @@ init_image_file(char* name, image_t* image)
     return image_file;
 }
 
+
 void
 init_header(FILE* file, int width, int height)
 {
     fseek(file, 0, SEEK_SET);
+    bmp_header_t header =
+    {
+    	    {0x42, 0x4D},
+    	    HEADER_SIZE + 3* width * height,
+    	    0X32326F6D,
+    	    HEADER_SIZE,
 
-    //File info
-    char magic_number[2] =
-    {0x42, 0x4D};
-    int app_signature = 0X32326F6D;
-    uint data_offset = HEADER_SIZE;
-    uint dib_header_size = 40;
-    uint image_size = 3 * width * height;
-    uint file_size = data_offset + image_size;
-
-    //Image info
-    int compression = 0;
-    uint depth = 0x00180001;
-    int res_x = RES;
-    int res_y = RES;
-    int color_number = 0;
-    int important_colours = 0;
-
-    //FormatHeader
-    fwrite(magic_number, 1, 2, file);
-    fwrite(&file_size, 4, 1, file);
-    fwrite(&app_signature, 4, 1, file);
-    fwrite(&data_offset, 4, 1, file);
-
-    //DIBHeader
-    fwrite(&dib_header_size, 4, 1, file);
-    fwrite(&width, 4, 1, file);
-    fwrite(&height, 4, 1, file);
-    fwrite(&depth, 4, 1, file);
-    fwrite(&compression, 4, 1, file);
-    fwrite(&image_size, 4, 1, file);
-    fwrite(&res_x, 4, 1, file);
-    fwrite(&res_y, 4, 1, file);
-    fwrite(&color_number, 4, 1, file);
-    fwrite(&important_colours, 4, 1, file);
-
+    	    40,
+			width,
+			height,
+    	    0x00180001,
+    	    0,
+    	    3 * width * height,
+    	    RES,
+    	    RES,
+    	    0,
+    	    0
+    };
+    fwrite(&header, sizeof(header), 1, file);
 }
 
 void
@@ -70,13 +63,7 @@ write_image(const image_t* image, FILE* image_file)
     fseek(image_file, HEADER_SIZE, SEEK_SET);
     int x;
     int y;
-    for(y = 0; y < image->height; ++y)
-    {
-        for(x = 0; x < image->width; ++x)
-        {
-            fwrite(image->image[x][y], sizeof(uchar), 3, image_file);
-        }
-    }
+    fwrite(*image->image, image->height * image->width * sizeof(colour_t), 1, image_file);
 }
 
 int

@@ -6,6 +6,8 @@
  */
 #include "main.h"
 
+char marker_g = 0;
+
 int saturator(int input, int min, int max)
 {
     /* Ecrête le signal entre "min" et "max"
@@ -64,4 +66,15 @@ void okP(int num, void* pointer)
     {
         ok(num);
     }
+}
+
+void print_memory(void* pointer, size_t size)
+{
+	uchar* byte_p;
+	for(byte_p = pointer; byte_p < (uchar*) pointer + size; ++byte_p)
+	{
+		printf("%02X ", *byte_p);
+
+	}
+	printf("\n");
 }

@@ -26,9 +26,9 @@ flou(image_t* image)
                 {
                     for(int col = 0; col < 3; col++)
                     {
-                        tmp = image2->image[x][y][col];
+                        tmp = image2->image[y][x][col];
 
-                        image2->image[x][y][col] =
+                        image2->image[y][x][col] =
                                 saturator(
                                         tmp
                                                 + ((int) image->image[x + i][y
@@ -45,8 +45,8 @@ flou(image_t* image)
     {
         for(y = 0; y < image->height; ++y)
         {
-            point = (colour_struct_t*) image->image[x][y];
-            *point = *((colour_struct_t*) (image2->image[x][y]));
+            point = (colour_struct_t*) image->image[y][x];
+            *point = *((colour_struct_t*) (image2->image[y][x]));
 
         }
     }

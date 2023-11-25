@@ -21,9 +21,12 @@ typedef struct
     float z;
 } vector_t;
 
+extern char marker_g;
+
 int saturator(int input, int satMin, int satMax);
 int modulo(int input, int modulo);
 void ok(int num);
 void okP(int num, void* pointer);
 
+void print_memory(void* pointer, size_t size);
 #endif /* UTIL_H_ */
