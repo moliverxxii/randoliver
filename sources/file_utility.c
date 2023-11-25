@@ -18,7 +18,6 @@ init_image_file(char* name, image_t* image)
 
     //DATA
     write_image(image, image_file);
-    printf("Fichier à : %p\n", image_file);
     return image_file;
 }
 
@@ -78,7 +77,6 @@ write_image(const image_t* image, FILE* image_file)
             fwrite(image->image[x][y], sizeof(uchar), 3, image_file);
         }
     }
-    printf("Image written into file.\n");
 }
 
 int
