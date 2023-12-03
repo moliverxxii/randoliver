@@ -70,8 +70,8 @@ void okP(int num, void* pointer)
 
 void print_memory(void* pointer, size_t size)
 {
-	uchar* byte_p;
-	for(byte_p = pointer; byte_p < (uchar*) pointer + size; ++byte_p)
+	uint8_t* byte_p;
+	for(byte_p = pointer; byte_p < (uint8_t*) pointer + size; ++byte_p)
 	{
 		printf("%02X ", *byte_p);
 

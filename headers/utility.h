@@ -11,8 +11,6 @@
 #define SAT_MIN 0
 #define SAT_MAX 255
 
-typedef unsigned char uchar;
-typedef unsigned int uint;
 
 typedef struct
 {

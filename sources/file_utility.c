@@ -61,8 +61,6 @@ write_image(const image_t* image, FILE* image_file)
 {
     //Writes an image into a windows BITMAP stream.
     fseek(image_file, HEADER_SIZE, SEEK_SET);
-    int x;
-    int y;
     fwrite(*image->image, image->height * image->width * sizeof(colour_t), 1, image_file);
 }
 
@@ -117,7 +115,6 @@ num_extension(const char* input, int number)
     // Creates a string with a number appended to the end of the input.
     char* output = NULL;
     int length = strlen(input);
-    int extension;
     char empty[0x100] = {0};
     length += 2 + sprintf(empty,"%d",number);
     output = malloc(length);

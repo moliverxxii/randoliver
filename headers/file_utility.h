@@ -15,22 +15,22 @@
 typedef struct __attribute__((packed))
 {
     //FormatHeader
-    char magic_number[2];
-    uint file_size;
-    int app_signature;
-    uint data_offset;
+    char     magic_number[2];
+    uint32_t file_size;
+    uint32_t app_signature;
+    uint32_t data_offset;
 
     //DIBHeader
-    uint dib_header_size;
-    uint width;
-    uint height;
-    uint depth;
-    int compression;
-    uint image_size;
-    int res_x;
-    int res_y;
-    int color_number;
-    int important_colours;
+    uint32_t dib_header_size;
+    uint32_t width;
+    uint32_t height;
+    uint32_t depth;
+    uint32_t compression;
+    uint32_t image_size;
+    uint32_t res_x;
+    uint32_t res_y;
+    uint32_t color_number;
+    uint32_t important_colours;
 } bmp_header_t;
 
 

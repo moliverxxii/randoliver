@@ -21,7 +21,7 @@ typedef enum
 /** Couleur en données brutes BVR.
  *
  */
-typedef uchar colour_t[COLOUR_COUNT];
+typedef uint8_t colour_t[COLOUR_COUNT];
 
 /** Couleur sous formes de champs lisibles par un humain.
  *  Compatible pour la conversion avec color_t
@@ -29,9 +29,9 @@ typedef uchar colour_t[COLOUR_COUNT];
  */
 typedef struct
 {
-    uchar blue;
-    uchar green;
-    uchar red;
+    uint8_t blue;
+    uint8_t green;
+    uint8_t red;
 } colour_struct_t;
 
 extern const colour_struct_t BLACK;

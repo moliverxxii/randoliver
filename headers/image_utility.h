@@ -12,6 +12,7 @@
 
 #define RES 2835
 
+typedef colour_t* row_t;
 
 /** Conteneur avec les donnees de bases d'une image.
  *  Doit être utilisé pour tous les traitements d'images.
@@ -20,7 +21,7 @@ typedef struct
 {
     unsigned int width;
     unsigned int height;
-    colour_t** image;
+    row_t*       image;
 } image_t;
 
 /** Un point dans l'espace
@@ -39,7 +40,7 @@ typedef struct
  */
 typedef struct
 {
-    uint amount;
+    uint32_t amount;
     point_t* sequence;
 } figure_t;
 
@@ -61,7 +62,7 @@ void disp_image(image_t* image);
 void draw_rect(colour_t color, int botLeftX, int botLeftY, int topRightX,
 			   int topRightY, image_t* image);
 void free_image(image_t* image);
-figure_t init_figure(uint nombre_point);
+figure_t init_figure(uint32_t nombre_point);
 point_t init_point(void);
 void draw_figure(image_t* image, figure_t* figure);
 

@@ -11,16 +11,15 @@ init_image(int width, int height)
 {
     //Returns a pointer to an image.
 
-    unsigned int x;
-    unsigned int y;
-    colour_t* image_data_p = malloc(width*height*sizeof(colour_t));
+    colour_t* image_data_p = malloc(height * width * sizeof(colour_t));
 
     image_t* image = (image_t*) malloc(sizeof(image_t));
-    image->width = width;
-    image->height = height;
-    image->image = (colour_t**) malloc(width * sizeof(colour_t*));
+    image->width   = width;
+    image->height  = height;
+    image->image   = (row_t*) malloc(height * sizeof(row_t));
 
-	colour_t * row_p = image_data_p;
+    uint32_t y;
+	row_t row_p = image_data_p;
     for(y = 0; y < height; ++y)
     {
         image->image[y] = row_p;
@@ -33,20 +32,7 @@ void
 set_image(image_t* image)
 {
     //Turns the image black.
-    unsigned int x;
-    unsigned int y;
-    unsigned int color;
-
-    for(x = 0; x < image->width; ++x)
-    {
-        for(y = 0; y < image->height; ++y)
-        {
-            for(color = 0; color < COLOUR_COUNT; ++color)
-            {
-                image->image[y][x][color] = 0x0;
-            }
-        }
-    }
+    memset(*image->image, 0, image->width * image->height * sizeof(colour_t) );
 }
 
 void
@@ -100,7 +86,7 @@ init_point()
 }
 
 figure_t
-init_figure(uint nombre_Point)
+init_figure(uint32_t nombre_Point)
 {
     //Initialise une sequence de nombre_Point point_t.
     figure_t figure;
@@ -124,7 +110,6 @@ draw_figure(image_t* image, figure_t* figure)
     int x;
     int y;
     colour_struct_t* point;
-    colour_struct_t f_point = {0, 0, 0};
     for(i = 0; i < figure->amount; ++i)
     {
         x = figure->sequence[i].x;
@@ -142,12 +127,9 @@ void
 free_image(image_t* image)
 {
     //Frees the memory the image occupies in memory.
-    int x;
-    int y;
     free(*(image->image));
     free(image->image);
     free(image);
-    image = NULL;
 }
 
 void
@@ -157,9 +139,10 @@ brownien1(image_t* image, int iterations, int spread, int x0, int y0)
      *point
      *de départ (x0,y0).
      */
-    uchar pixels[1][3] =
+    uint8_t pixels[1][3] =
     {
-    {0, 0xFF, 0}};
+        {0, 0xFF, 0}
+    };
     int y = y0;
     int x = x0;
     int color = 0;
@@ -245,8 +228,8 @@ barres2(image_t* image, int spread)
     int i = 0;
     int y;
     int x;
-    uint xPrime[3];
-    uchar bool;
+    uint32_t xPrime[3];
+    uint8_t bool;
 
     for(y = 0; y < image->height; ++y)
     {

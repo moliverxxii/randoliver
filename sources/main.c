@@ -64,14 +64,14 @@ main(int argc, char* argv[])
     brownien1(image, 30000, 1, width/2, height/2);
 #endif /* OLI_BROWN */
 #ifdef OLI_FIG
-    unsigned int num_points = 2000000;
+    unsigned int num_points = 20000;
     figure_t fig = init_figure(num_points);
     for(int i=0; i<fig.amount; ++i)
     {
          fig.sequence[i].x = image->width/2;
          fig.sequence[i].y = image->height/2;
          unsigned int colour = rand();
-         fig.sequence[i].colour = *((colour_struct_t*) &colour);
+         fig.sequence[i].colour = *(colour_struct_t*) &colour;
     }
 
     for(int j=0; j<2000; ++j)
@@ -89,6 +89,7 @@ main(int argc, char* argv[])
         fichier = init_image_file(nom_etendu, image);
 
         draw_figure(image, &fig);
+        flou(image);
         write_image(image, fichier);
         free(nom_etendu);
     	fclose(fichier);
