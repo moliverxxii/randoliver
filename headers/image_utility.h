@@ -54,6 +54,9 @@ typedef struct
     float distance;
 } camera_t;
 
+typedef void (*point_renderer)(const point_t, image_t*);
+
+extern point_renderer public_point_renderer;
 
 /* Elementaires */
 image_t* init_image(int width, int height);
@@ -64,6 +67,8 @@ void draw_rect(colour_t color, int botLeftX, int botLeftY, int topRightX,
 void free_image(image_t* image);
 figure_t init_figure(uint32_t nombre_point);
 point_t init_point(void);
+void draw_point(const point_t point, image_t* image_p);
+void xor_point(const point_t point, image_t* image_p);
 void draw_figure(image_t* image, figure_t* figure);
 
 /* Processus */

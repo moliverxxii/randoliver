@@ -89,7 +89,6 @@ main(int argc, char* argv[])
         fichier = init_image_file(nom_etendu, image);
 
         draw_figure(image, &fig);
-        flou(image);
         write_image(image, fichier);
         free(nom_etendu);
     	fclose(fichier);

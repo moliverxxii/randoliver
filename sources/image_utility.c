@@ -102,23 +102,45 @@ init_figure(uint32_t nombre_Point)
     return figure;
 }
 
+point_renderer public_point_renderer = &xor_point;
+
+void
+draw_point(const point_t point, image_t* image_p)
+{
+    int x;
+    int y;
+    x = point.x;
+    y = point.y;
+    if((x >= 0) && (x < image_p->width) && (y >= 0) && (y < image_p->height))
+    {
+        *(colour_struct_t*) image_p->image[y][x] = *(colour_struct_t*) &point.colour;
+    }
+}
+
+void
+xor_point(const point_t point, image_t* image_p)
+{
+    int x;
+    int y;
+    x = point.x;
+    y = point.y;
+    if((x >= 0) && (x < image_p->width) && (y >= 0) && (y < image_p->height))
+    {
+
+    	uint32_t buffer = *(uint32_t*) image_p->image[y][x];
+		buffer ^= *(uint32_t*) &point.colour;
+        *(colour_struct_t*) image_p->image[y][x] = *(colour_struct_t*) &buffer;
+    }
+
+}
 void
 draw_figure(image_t* image, figure_t* figure)
 {
     // Draws a sequence of points into an image.
     unsigned int i;
-    int x;
-    int y;
-    colour_struct_t* point;
     for(i = 0; i < figure->amount; ++i)
     {
-        x = figure->sequence[i].x;
-        y = figure->sequence[i].y;
-        if((x >= 0) && (x < image->width) && (y >= 0) && (y < image->height))
-        {
-            point = (colour_struct_t*) (image->image[y][x]);
-            *point = *((colour_struct_t*) &figure->sequence[i]);
-        }
+    	(*public_point_renderer)(figure->sequence[i],image);
     }
 }
 
