@@ -46,8 +46,7 @@ void disp_image(image_t* image);
 void draw_rect(colour_t color, int botLeftX, int botLeftY, int topRightX,
 			   int topRightY, image_t* image);
 void free_image(image_t* image);
-figure_t init_figure(uint32_t nombre_point);
-point_t init_point(void);
+
 void draw_point(const point_t point, image_t* image_p);
 void or_point(const point_t point, image_t* image_p);
 void xor_point(const point_t point, image_t* image_p);
