@@ -29,6 +29,7 @@ typedef struct
     point_t* sequence;
 } figure_t;
 
+
 figure_t init_figure(uint32_t nombre_point);
 point_t init_point(void);
 

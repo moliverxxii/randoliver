@@ -9,7 +9,6 @@
 image_t*
 init_image(int width, int height)
 {
-    //Returns a pointer to an image.
 
     colour_t* image_data_p = malloc(height * width * sizeof(colour_t));
 
@@ -31,14 +30,12 @@ init_image(int width, int height)
 void
 set_image(image_t* image)
 {
-    //Turns the image black.
     memset(*image->image, 0, image->width * image->height * sizeof(colour_t) );
 }
 
 void
 disp_image(image_t* image)
 {
-    //Displays the values of the pixels. Line by line.
     int x;
     int y;
     for(x = 0; x < image->width; ++x)
@@ -56,7 +53,6 @@ void
 draw_rect(colour_t color, int botLeftX, int botLeftY, int topRightX,
           int topRightY, image_t* image)
 {
-    //Draws a colored rectangle in an image.
     int x;
     int y;
     int k;
@@ -145,7 +141,6 @@ average_point(const point_t point, image_t* image_p)
 void
 draw_figure(image_t* image, figure_t* figure)
 {
-    // Draws a sequence of points into an image.
     unsigned int i;
     for(i = 0; i < figure->amount; ++i)
     {
@@ -157,7 +152,6 @@ draw_figure(image_t* image, figure_t* figure)
 void
 free_image(image_t* image)
 {
-    //Frees the memory the image occupies in memory.
     free(*(image->image));
     free(image->image);
     free(image);
@@ -166,10 +160,6 @@ free_image(image_t* image)
 void
 brownien1(image_t* image, int iterations, int spread, int x0, int y0)
 {
-    /*Ajoute un mouvement brownien à l'image de longueur "iterations" et de
-     *point
-     *de départ (x0,y0).
-     */
     uint8_t pixels[1][3] =
     {
         {0, 0xFF, 0}
@@ -210,10 +200,6 @@ brownien1(image_t* image, int iterations, int spread, int x0, int y0)
 void
 barres1(image_t* image, int spread)
 {
-    /*Ajoutes des barres blanches brouillées verticales à l'image.
-     Elles sont espacées centre-à-centre
-     *de la distance "spread".
-     */
     printf("Début du processus\n");
 
     colour_t pixel =
@@ -248,10 +234,6 @@ barres1(image_t* image, int spread)
 void
 barres2(image_t* image, int spread)
 {
-    /*Ajoutes des barres verticales brouillées à l'image.
-     Elles sont espacées centre-à-centre
-     *de la distance "spread".
-     */
     printf("Début du processus\n");
 
     colour_t pixel =
@@ -283,7 +265,6 @@ barres2(image_t* image, int spread)
         }
     }
     printf("Processus terminé\n");
-
 }
 
 
@@ -305,17 +286,23 @@ init_camera(camera_t* camera_p,
 			float destin_x, float destin_y, float destin_z,
 			float distance)
 {
-    camera_t camera_loc;
-    camera_loc.origin.x = origin_x;
-    camera_loc.origin.y = origin_y;
-    camera_loc.origin.z = origin_z;
-    camera_loc.direction.x = destin_x;
-    camera_loc.direction.y = destin_y;
-    camera_loc.direction.z = destin_z;
-    camera_loc.distance = distance;
-
+	camera_t camera_loc =
+	{
+		{
+			origin_x,
+			origin_y,
+			origin_z
+		},
+		{
+			destin_x,
+			destin_y,
+			destin_z
+		},
+		distance
+	};
     (*camera_p) = camera_loc;
 }
+
 
 void
 render_figure(image_t* image_p, figure_t figure, camera_t camera)
@@ -336,13 +323,8 @@ render_figure(image_t* image_p, figure_t figure, camera_t camera)
 
     float distance = camera.distance;
 
-    o.x = camera.origin.x;
-    o.y = camera.origin.y;
-    o.z = camera.origin.z;
-
-    f.x = camera.direction.x;
-    f.y = camera.direction.y;
-    f.z = camera.direction.z;
+    o = camera.origin;
+    f = camera.direction;
 
     float norme_of = sqrt(
             pow(f.x - o.x, 2) + pow(f.y - o.y, 2) + pow(f.z - o.z, 2));
@@ -377,9 +359,9 @@ render_figure(image_t* image_p, figure_t figure, camera_t camera)
         op.z = p.z - o.z;
         //		printf("op %f , %f , %f\n",op.x,op.y, op.z);
 
-        op_u_scalaire = op.x * u.x + op.y * u.y + op.z * u.z;
-        op_v_scalaire = op.x * v.x + op.y * v.y;
-        op_w_scalaire = op.x * w.x + op.y + w.y + op.z * w.z;
+        op_u_scalaire = scalar_vector(op, u);
+        op_v_scalaire = scalar_vector(op, v);
+        op_w_scalaire = scalar_vector(op, w);
         //		printf("op u %f\n",op_u_scalaire);
         //		printf("op v %f\n",op_v_scalaire);
         //		printf("op w %f\n",op_w_scalaire);
@@ -393,7 +375,7 @@ render_figure(image_t* image_p, figure_t figure, camera_t camera)
         {
             point_t render_point =
             {
-                *(colour_struct_t*) &figure.sequence[i].colour,
+                figure.sequence[i].colour,
             	x_image,
 				y_image,
 				0

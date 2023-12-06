@@ -8,6 +8,17 @@
 
 char marker_g = 0;
 
+float norm_vector(vector_t vector_p)
+{
+	return (float) sqrt(scalar_vector(vector_p, vector_p));
+}
+
+float scalar_vector(vector_t vector_a, vector_t vector_b)
+{
+	return vector_a.x*vector_b.x + vector_a.y*vector_b.y + vector_a.z*vector_b.z;
+}
+
+
 int saturator(int input, int min, int max)
 {
     /* Ecrête le signal entre "min" et "max"

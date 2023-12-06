@@ -21,6 +21,17 @@ typedef struct
 
 extern char marker_g;
 
+/**
+ * ||point_p||
+ */
+float norm_vector(vector_t vector_p);
+
+/**
+ * <point_a|point_b>
+ */
+float scalar_vector(vector_t vector_a, vector_t vector_b);
+
+
 int saturator(int input, int satMin, int satMax);
 int modulo(int input, int modulo);
 void ok(int num);
