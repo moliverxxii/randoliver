@@ -24,25 +24,6 @@ typedef struct
     row_t*       image;
 } image_t;
 
-/** Un point dans l'espace
- *
- */
-typedef struct
-{
-    colour_struct_t colour;
-    int x;
-    int y;
-    int z;
-} point_t;
-
-/** Une sequence de points
- *
- */
-typedef struct
-{
-    uint32_t amount;
-    point_t* sequence;
-} figure_t;
 
 /** Une camera a utiliser pour le rendu 3D
  *
@@ -68,7 +49,10 @@ void free_image(image_t* image);
 figure_t init_figure(uint32_t nombre_point);
 point_t init_point(void);
 void draw_point(const point_t point, image_t* image_p);
+void or_point(const point_t point, image_t* image_p);
 void xor_point(const point_t point, image_t* image_p);
+void average_point(const point_t point, image_t* image_p);
+
 void draw_figure(image_t* image, figure_t* figure);
 
 /* Processus */
@@ -76,14 +60,12 @@ void brownien1(image_t* image, int iterations, int spread, int x0, int y0);
 void barres1(image_t* image, int spread);
 void barres2(image_t* image, int spread);
 void init_points(point_t** seq, int n);
-void rand_coord(point_t* m, int width, int height);
-void rand_delta_point(point_t* m, int amplitude, int width, int height);
 void free_points(point_t** seq, int n);
 
 /* Rendu */
 void init_camera(camera_t* camera_p, float origin_x, float origin_y,
         float origin_z, float destin_x, float destin_y, float destin_z,
         float distance);
-void render_figure(image_t* image, figure_t figure, camera_t camera);
+void render_figure(image_t* image_p, figure_t figure, camera_t camera);
 
 #endif /* IMGUTIL_H_ */

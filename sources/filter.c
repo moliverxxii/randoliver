@@ -25,11 +25,11 @@ flou(image_t* image)
                 for(int j = -1; j < 2; ++j)
                 {
                 	tmp = *(colour_struct_t*) image2->image[y][x];
-                    for(int col = 0; col < 3; col++)
+                    for(int colour = 0; colour < 3; colour++)
                     {
 
-                        image2->image[y][x][col] =
-                                saturator(  ( (uint8_t*) &tmp)[col] + (int) image->image[y + j][x + i][col] / 5,
+                        image2->image[y][x][colour] =
+                                saturator(  ( (uint8_t*) &tmp)[colour] + (int) image->image[y + j][x + i][colour] / 5,
 										  SAT_MIN,
                                           SAT_MAX);
                     }

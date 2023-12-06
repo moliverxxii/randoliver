@@ -52,7 +52,7 @@ void ok(int num)
     printf("OK n°%d\n", num);
 }
 
-void okP(int num, void* pointer)
+void ok_p(int num, void* pointer)
 {
     /*Affiche un signal ok numéroté, tout en vérifiant la disponibilité en mémoire
      * du pointeur.

@@ -6,8 +6,8 @@
  */
 #include "main.h"
 
-//#define OLI_3D
-#define OLI_FIG
+#define OLI_3D
+//#define OLI_FIG
 
 int
 main(int argc, char* argv[])
@@ -38,28 +38,33 @@ main(int argc, char* argv[])
 
 
 #ifdef OLI_3D
-    uint nb = 400;
-    int distX = 100;
+    uint32_t nb = 400000;
+    int dist_x = 100;
     figure_t test = init_figure(nb);
-    color_t color =
-    {0x0, 0x0, 0xFF};
+    colour_t colour;
+    *(colour_struct_t*) &colour = RED;
     camera_t camera;
-    initCamera(&camera, 350, 0, 100, 350, 10, 100, 100);
+    init_camera(&camera, 350, 0, 100, 350, 10, 100, 100);
     for(int i = 0; i < nb; ++i)
     {
-        test.sequence[i].x = (i % 8) * distX;
-        test.sequence[i].y = distX * (i - i % 8) / 8 - 100;
+        test.sequence[i].x = (i % 8) * dist_x;
+        test.sequence[i].y = dist_x * (i - i % 8) / 8 - 100;
         test.sequence[i].z = 0;
-        test.sequence[i].color = *((colour_struct_t*) color);
-        //		printf("x,y = %d,%d\n",test.sequence[i].x,test.sequence[i].y);
+        unsigned int colour = rand();
+        test.sequence[i].colour = *(colour_struct_t*) &colour;
+        //test.sequence[i].colour = *(colour_struct_t*) colour;
+        printf("x,y = %d,%d\n",test.sequence[i].x,test.sequence[i].y);
     }
 
-    renderFigure(image, test, camera);
-    for(int i = 0; i < 5; ++i)
-    {
-        flou(image);
-    }
+    render_figure(image, test, camera);
+//    for(int i = 0; i < 5; ++i)
+//    {
+//        flou(image);
+//    }
+    FILE* file = init_image_file("a.bmp", image);
+    fclose(file);
 #endif /* OLI_3D */
+
 #ifdef OLI_BROWN
     brownien1(image, 30000, 1, width/2, height/2);
 #endif /* OLI_BROWN */

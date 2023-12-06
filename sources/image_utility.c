@@ -86,23 +86,23 @@ init_point()
 }
 
 figure_t
-init_figure(uint32_t nombre_Point)
+init_figure(uint32_t nombre_point)
 {
     //Initialise une sequence de nombre_Point point_t.
     figure_t figure;
 
-    figure.amount = nombre_Point;
-    figure.sequence = (point_t*) malloc(nombre_Point * sizeof(point_t));
+    figure.amount = nombre_point;
+    figure.sequence = (point_t*) malloc(nombre_point * sizeof(point_t));
 
     int i;
-    for(i = 0; i < nombre_Point; ++i)
+    for(i = 0; i < nombre_point; ++i)
     {
         figure.sequence[i] = init_point();
     }
     return figure;
 }
 
-point_renderer public_point_renderer = &xor_point;
+point_renderer public_point_renderer = &or_point;
 
 void
 draw_point(const point_t point, image_t* image_p)
@@ -118,21 +118,59 @@ draw_point(const point_t point, image_t* image_p)
 }
 
 void
+or_point(const point_t point, image_t* image_p)
+{
+    int x;
+    int y;
+    x = point.x;
+    y = point.y;
+    if((x < 0) || (x >= image_p->width) || (y < 0) || (y >= image_p->height))
+    {
+    	return;
+    }
+    uint32_t buffer = *(uint32_t*) image_p->image[y][x];
+    buffer ^= *(uint32_t*) &point.colour;
+    *(colour_struct_t*) image_p->image[y][x] = *(colour_struct_t*) &buffer;
+
+}
+
+
+void
 xor_point(const point_t point, image_t* image_p)
 {
     int x;
     int y;
     x = point.x;
     y = point.y;
-    if((x >= 0) && (x < image_p->width) && (y >= 0) && (y < image_p->height))
+    if((x < 0) || (x >= image_p->width) || (y < 0) || (y >= image_p->height))
     {
-
-    	uint32_t buffer = *(uint32_t*) image_p->image[y][x];
-		buffer ^= *(uint32_t*) &point.colour;
-        *(colour_struct_t*) image_p->image[y][x] = *(colour_struct_t*) &buffer;
+    	return;
     }
+    uint32_t buffer = *(uint32_t*) image_p->image[y][x];
+    buffer ^= *(uint32_t*) &point.colour;
+    *(colour_struct_t*) image_p->image[y][x] = *(colour_struct_t*) &buffer;
 
 }
+
+void
+average_point(const point_t point, image_t* image_p)
+{
+    int x;
+    int y;
+    x = point.x;
+    y = point.y;
+    if((x < 0) || (x >= image_p->width) || (y < 0) || (y >= image_p->height))
+    {
+    	return;
+    }
+    for(int colour=0; colour<COLOUR_COUNT; ++colour)
+    {
+    	image_p->image[y][x][colour] = (uint8_t) ((
+    												(uint32_t) image_p->image[y][x][colour]
+												  + (uint32_t) ((uint8_t*) &point.colour)[colour])/2);
+    }
+}
+
 void
 draw_figure(image_t* image, figure_t* figure)
 {
@@ -277,24 +315,6 @@ barres2(image_t* image, int spread)
 
 }
 
-void
-rand_coord(point_t* m, int height, int width)
-{
-    int randX = rand() % width;
-    int randY = rand() % height;
-    m->x = randX;
-    m->y = randY;
-}
-
-void
-rand_delta_point(point_t* m, int amplitude, int width, int height)
-{
-    //Randomly moves a point.
-    m->x += rand() % (2 * amplitude + 1) - amplitude;
-    modulo(m->x, width);
-    m->y += rand() % (2 * amplitude + 1) - amplitude;
-    modulo(m->y, height);
-}
 
 void
 free_points(point_t** seq, int n)
@@ -309,9 +329,10 @@ free_points(point_t** seq, int n)
 }
 
 void
-init_camera(camera_t* camera_p, float origin_x, float origin_y,
-        float origin_z, float destin_x, float destin_y, float destin_z,
-        float distance)
+init_camera(camera_t* camera_p,
+		    float origin_x, float origin_y, float origin_z,
+			float destin_x, float destin_y, float destin_z,
+			float distance)
 {
     camera_t camera_loc;
     camera_loc.origin.x = origin_x;
@@ -326,8 +347,9 @@ init_camera(camera_t* camera_p, float origin_x, float origin_y,
 }
 
 void
-render_figure(image_t* image, figure_t figure, camera_t camera)
+render_figure(image_t* image_p, figure_t figure, camera_t camera)
 {
+	printf("Render start.\n");
 
     vector_t o;
     vector_t f;
@@ -340,7 +362,6 @@ render_figure(image_t* image, figure_t figure, camera_t camera)
 
     int x_image;
     int y_image;
-    colour_struct_t* point;
 
     float distance = camera.distance;
 
@@ -399,8 +420,17 @@ render_figure(image_t* image, figure_t figure, camera_t camera)
         if((x_image < 1280) && (x_image >= 0) && (y_image < 800)
                 && (y_image >= 0) && op_u_scalaire > 0)
         {
-            point = (colour_struct_t*) image->image[x_image][y_image];
-            *point = figure.sequence[i].colour;
+            point_t render_point =
+            {
+                *(colour_struct_t*) &figure.sequence[i].colour,
+            	x_image,
+				y_image,
+				0
+            };
+
+			(*public_point_renderer)(render_point, image_p);
         }
     }
+	printf("Render end.\n");
+
 }

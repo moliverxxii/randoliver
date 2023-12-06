@@ -17,6 +17,8 @@
 
 #include "utility.h"
 #include "colours.h"
+#include "figure.h"
+#include "transform.h"
 #include "image_utility.h"
 #include "file_utility.h"
 #include "filter.h"
