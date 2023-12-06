@@ -45,7 +45,7 @@ disp_image(image_t* image)
     {
         for(y = 0; y < image->height; ++y)
         {
-            printf("Point[%d,%d] = (%x,%x,%x)\n", x + 1, y + 1,
+            printf("Point[%5d,%5d] = (%x,%x,%x)\n", x + 1, y + 1,
                     image->image[y][x][0], image->image[y][x][1],
                     image->image[y][x][2]);
         }
