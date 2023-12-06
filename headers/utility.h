@@ -35,7 +35,7 @@ float scalar_vector(vector_t vector_a, vector_t vector_b);
 int saturator(int input, int satMin, int satMax);
 int modulo(int input, int modulo);
 void ok(int num);
-void okP(int num, void* pointer);
+void ok_p(int num, void* pointer);
 
 void print_memory(void* pointer, size_t size);
 #endif /* UTIL_H_ */
