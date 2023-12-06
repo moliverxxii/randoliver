@@ -29,14 +29,6 @@ subtract_points(point_t* point_r_p, point_t point_a, point_t point_b)
 	return add_points(point_r_p, point_a, *negative_point(&minus_point_b, point_b));
 }
 
-
-point_t*
-negative_point(point_t* point_r_p, point_t point)
-{
-	return scale_point(point_r_p, point, -1);
-}
-
-
 point_t*
 scale_point(point_t* point_r_p, point_t point, float scale)
 {
@@ -50,6 +42,12 @@ scale_point(point_t* point_r_p, point_t point, float scale)
 	point_r_p->z *= scale;
 	return point_r_p;
 
+}
+
+point_t*
+negative_point(point_t* point_r_p, point_t point)
+{
+	return scale_point(point_r_p, point, -1);
 }
 
 
