@@ -36,16 +36,28 @@ void transform_figure(figure_t* figure_p, point_transformer_t transformer_p);
 void translate_point(point_t* point_p, point_t direction);
 void rotate_point(point_t* point_p, point_t axis_a, point_t axis_b, float angle);
 
-void radial_scale_point(point_t* point_p, point_t reference, float scale);
-void planar_scale_point(point_t* point, point_t plane_a, point_t normal_b, float scale);
-void axial_scale_point(point_t* point, point_t axis_a, point_t axis_b, float scale);
+/**
+ * ||point_p||
+ */
+float norm_point(point_t point_p);
 
-void rand_coord(point_t* m, int width, int height);
+/**
+ * <point_a|point_b>
+ */
+float scalar(point_t point_a, point_t point_b);
+
+void project_point(point_t* point_p, point_t axis_a, point_t axis_b);
+
+void radial_scale_point(point_t* point_p, point_t reference, float scale);
+void axial_scale_point(point_t* point_p, point_t axis_a, point_t axis_b, float scale);
+void planar_scale_point(point_t* point_p, point_t plane_a, point_t normal_b, float scale);
+
+void rand_coord(point_t* point_p, int width, int height);
 
 /**
  * Randomly moves a point.
  */
-void rand_delta_point(point_t* m, int amplitude, int width, int height);
+void rand_delta_point(point_t* point_p, int amplitude, int width, int height);
 
 
 #endif /* HEADERS_TRANSFORM_H_ */
