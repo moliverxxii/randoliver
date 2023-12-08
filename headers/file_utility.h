@@ -36,11 +36,23 @@ typedef struct __attribute__((packed))
 
 FILE* init_image_file(char* name, image_t* image);
 void init_header(FILE* file, int width, int height);
+
+//Writes an image into a windows BITMAP stream.
 void write_image(const image_t* image, FILE* imageFile);
+
+//Returns an int from the current file.
 int get_int(FILE* file);
+
+//Gets the width of the BITMAP array from a WINDOWS BITMAP stream.
 int get_width(FILE* imageFile);
+
+//Gets the height of the BITMAP array from a WINDOWS BITMAP stream.
 int get_height(FILE* imageFile);
+
+//Returns the name for BMP file with the ".bmp" extension
 char* bmp_extension(const char* input);
+
+// Creates a string with a number appended to the end of the input.
 char* num_extension(const char* input, int number);
 
 #endif /* FILEUTIL_H_ */

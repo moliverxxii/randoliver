@@ -8,22 +8,26 @@
 
 char marker_g = 0;
 
-float norm_vector(vector_t vector_p)
+const vector_t VECTOR_X = {1, 0, 0};
+const vector_t VECTOR_Y = {0, 1, 0};
+const vector_t VECTOR_Z = {0, 0, 1};
+
+float
+norm_vector(vector_t vector_p)
 {
 	return (float) sqrt(scalar_vector(vector_p, vector_p));
 }
 
-float scalar_vector(vector_t vector_a, vector_t vector_b)
+float
+scalar_vector(vector_t vector_a, vector_t vector_b)
 {
 	return vector_a.x*vector_b.x + vector_a.y*vector_b.y + vector_a.z*vector_b.z;
 }
 
 
-int saturator(int input, int min, int max)
+int
+saturator(int input, int min, int max)
 {
-    /* Ecrête le signal entre "min" et "max"
-     *
-     */
     if(input < min)
     {
         return min;
@@ -38,10 +42,9 @@ int saturator(int input, int min, int max)
     }
 }
 
-int modulo(int input, int modulo)
+int
+modulo(int input, int modulo)
 {
-    // Renvoie le VRAI reste de la division euclidienne de "input" par "modulo".
-    //modulo must be different to 0;
     int output = input;
     int multiplier = modulo;
     if(((modulo > 0) & (input > 0)) | ((modulo < 0) & (input < 0)))
@@ -57,17 +60,15 @@ int modulo(int input, int modulo)
 
 }
 
-void ok(int num)
+void
+ok(int num)
 {
-    //Affiche un signal ok numéroté.
     printf("OK n°%d\n", num);
 }
 
-void ok_p(int num, void* pointer)
+void
+ok_p(int num, void* pointer)
 {
-    /*Affiche un signal ok numéroté, tout en vérifiant la disponibilité en mémoire
-     * du pointeur.
-     */
 
     if(pointer == NULL)
     {
@@ -79,7 +80,8 @@ void ok_p(int num, void* pointer)
     }
 }
 
-void print_memory(void* pointer, size_t size)
+void
+print_memory(void* pointer, size_t size)
 {
 	uint8_t* byte_p;
 	for(byte_p = pointer; byte_p < (uint8_t*) pointer + size; ++byte_p)

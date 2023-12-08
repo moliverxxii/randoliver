@@ -6,6 +6,7 @@ SOURCES = $(wildcard $(SOURCE_DIR)/*.c)
 HEADERS = $(SOURCES:$(SOURCE_DIR)/%.c=$(HEADER_DIR)/%.h)
 HEADERS = $(wildcard src/*.h)
 OBJECTS = $(SOURCES:$(SOURCE_DIR)/%.c=$(OBJECT_DIR)/%.o)
+CC_FLAGS = -Wall -g
 CC = gcc
 PROJECT = bmp-generator
 
@@ -16,7 +17,7 @@ $(PROJECT): $(OBJECTS)
 
 $(OBJECTS): $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c $(HEADER_DIR)/main.h
 	mkdir -p $(OBJECT_DIR)
-	$(CC) -c -o $@ -I$(HEADER_DIR)  $< 
+	$(CC) $(CC_FLAGS) -c -o $@ -I$(HEADER_DIR)  $< 
 
 $(HEADER_DIR)/main.h: $(HEADERS)
 	touch $@
@@ -24,7 +25,7 @@ $(HEADER_DIR)/main.h: $(HEADERS)
 clean:
 	rm -fr $(OBJECT_DIR) $(PROJECT) 
 	
-ANALYZER = $(shell brew --prefix llvm)/bin/scan-build
+ANALYZER = $(shell /usr/local/bin/brew --prefix llvm)/bin/scan-build
 test:
 	$(ANALYZER) -v -v -v -o $(PROJECT)-analysis make $(PROJECT)
 

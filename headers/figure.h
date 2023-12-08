@@ -30,6 +30,7 @@ typedef struct
 } figure_t;
 
 
+//Initialise une sequence de nombre_point point_t.
 figure_t init_figure(uint32_t nombre_point);
 point_t init_point(void);
 

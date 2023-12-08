@@ -59,31 +59,13 @@ init_header(FILE* file, int width, int height)
 void
 write_image(const image_t* image, FILE* image_file)
 {
-    //Writes an image into a windows BITMAP stream.
     fseek(image_file, HEADER_SIZE, SEEK_SET);
     fwrite(*image->image, image->height * image->width * sizeof(colour_t), 1, image_file);
 }
 
 int
-get_width(FILE* image_file)
-{
-    //Gets the width of the BITMAP array from a WINDOWS BITMAP stream.
-    fseek(image_file, 18, SEEK_SET);
-    return get_int(image_file);
-}
-
-int
-get_height(FILE* image_file)
-{
-    //Gets the height of the BITMAP array from a WINDOWS BITMAP stream.
-    fseek(image_file, 22, SEEK_SET);
-    return get_int(image_file);
-}
-
-int
 get_int(FILE* file)
 {
-    //Returns an int from the current file.
     int output = 0;
     int input;
     char i;
@@ -96,10 +78,23 @@ get_int(FILE* file)
     return output;
 }
 
+int
+get_width(FILE* image_file)
+{
+    fseek(image_file, 18, SEEK_SET);
+    return get_int(image_file);
+}
+
+int
+get_height(FILE* image_file)
+{
+    fseek(image_file, 22, SEEK_SET);
+    return get_int(image_file);
+}
+
 char*
 bmp_extension(const char* input)
 {
-    //Returns the name for BMP file with the ".bmp" extension
     char* output = NULL;
     int length = strlen(input);
     length += 4;
@@ -112,7 +107,6 @@ bmp_extension(const char* input)
 char*
 num_extension(const char* input, int number)
 {
-    // Creates a string with a number appended to the end of the input.
     char* output = NULL;
     int length = strlen(input);
     char empty[0x100] = {0};

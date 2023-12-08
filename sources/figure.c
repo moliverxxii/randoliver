@@ -23,7 +23,6 @@ init_point()
 figure_t
 init_figure(uint32_t nombre_point)
 {
-    //Initialise une sequence de nombre_Point point_t.
     figure_t figure;
 
     figure.amount = nombre_point;
