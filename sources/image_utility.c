@@ -325,12 +325,11 @@ render_figure(image_t* image_p, figure_t figure, camera_t camera)
 
     o = camera.origin;
     f = camera.direction;
+    vector_t of;
+    subtract_vectors(&of, f, o);
 
-    float norme_of = sqrt(
-            pow(f.x - o.x, 2) + pow(f.y - o.y, 2) + pow(f.z - o.z, 2));
-    u.x = (f.x - o.x) / norme_of;
-    u.y = (f.y - o.y) / norme_of;
-    u.z = (f.z - o.z) / norme_of;
+    float norme_of = norm_vector(of);
+    scale_vector(&u, of, 1/norme_of);
 
     v.x = -u.y / sqrt(pow(u.x, 2) + pow(u.y, 2));
     v.y = u.x / sqrt(pow(u.x, 2) + pow(u.y, 2));
@@ -354,9 +353,7 @@ render_figure(image_t* image_p, figure_t figure, camera_t camera)
         p.y = figure.sequence[i].y;
         p.z = figure.sequence[i].z;
 
-        op.x = p.x - o.x;
-        op.y = p.y - o.y;
-        op.z = p.z - o.z;
+        subtract_vectors(&op, p, o);
         //		printf("op %f , %f , %f\n",op.x,op.y, op.z);
 
         op_u_scalaire = scalar_vector(op, u);

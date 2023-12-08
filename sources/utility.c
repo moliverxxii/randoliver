@@ -25,6 +25,50 @@ scalar_vector(vector_t vector_a, vector_t vector_b)
 }
 
 
+vector_t*
+add_vectors(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b)
+{
+    if(!vector_r_p)
+    {
+        return NULL;
+    }
+    memcpy(vector_r_p, &vector_a, sizeof(vector_t));
+    vector_r_p->x += vector_b.x;
+    vector_r_p->y += vector_b.y;
+    vector_r_p->z += vector_b.z;
+    return vector_r_p;
+}
+
+vector_t*
+subtract_vectors(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b)
+{
+    vector_t minus_vector_b;
+    return add_vectors(vector_r_p, vector_a, *negative_vector(&minus_vector_b, vector_b));
+}
+
+vector_t*
+scale_vector(vector_t* vector_r_p, vector_t vector, float scale)
+{
+    if(!vector_r_p)
+    {
+        return vector_r_p;
+    }
+    memcpy(vector_r_p, &vector, sizeof(vector));
+    vector_r_p->x *= scale;
+    vector_r_p->y *= scale;
+    vector_r_p->z *= scale;
+    return vector_r_p;
+
+}
+
+vector_t*
+negative_vector(vector_t* vector_r_p, vector_t vector)
+{
+    return scale_vector(vector_r_p, vector, -1);
+}
+
+
+
 int
 saturator(int input, int min, int max)
 {

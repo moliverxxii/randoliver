@@ -37,6 +37,12 @@ float norm_vector(vector_t vector_p);
  */
 float scalar_vector(vector_t vector_a, vector_t vector_b);
 
+vector_t* add_vectors(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b);
+vector_t* subtract_vectors(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b);
+vector_t* scale_vector(vector_t* vector_r_p, vector_t vector, float scale);
+vector_t* negative_vector(vector_t* vector_r_p, vector_t vector);
+
+
 /* Ecrête le signal entre "min" et "max"
  *
  */

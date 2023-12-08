@@ -125,7 +125,7 @@ planar_scale_point(point_t* point_p, point_t plane_a, point_t normal_b, float sc
 }
 
 void
-rand_coord(point_t* point_p, int height, int width)
+rand_coord_point(point_t* point_p, int height, int width)
 {
     int randX = rand() % width;
     int randY = rand() % height;
