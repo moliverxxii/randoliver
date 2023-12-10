@@ -11,6 +11,9 @@ char marker_g = 0;
 const vector_t VECTOR_X = {1, 0, 0};
 const vector_t VECTOR_Y = {0, 1, 0};
 const vector_t VECTOR_Z = {0, 0, 1};
+const vector_t VECTOR_0 = {0, 0, 0};
+
+
 
 float
 norm_vector(vector_t vector_p)
@@ -91,21 +94,21 @@ void get_rotation(matrix_3x3_t rotation, vector_t vector_a, vector_t vector_b)
 
     float cos_a1 = scalar_vector(vector_z1, VECTOR_Z);
     float sin_a1 = sqrt(1 - pow(cos_a1, 2));
-    printf("rotation a1 %.2f*pi rad\n", acos(cos_a1)/M_PI);
+    printf("rotation a1 %.6f*pi rad\n", acos(cos_a1)/M_PI);
 
     vector_t vector_z2 = vector_z1;
     vector_z2.z = 0;
     scale_vector(&vector_z2, vector_z2, 1/norm_vector(vector_z2));
 
     float cos_a2 = cos_a1 == 1.0f ? 1.0f : scalar_vector(vector_z2, VECTOR_X);
-    float sin_a2 = sqrt(1 - pow(cos_a1, 2));
+    float sin_a2 = sqrt(1 - pow(cos_a2, 2));
 
     float sin_sign = scalar_vector(vector_z2, VECTOR_Y);
     if(sin_sign<0)
     {
         sin_a2 *= -1;
     }
-    printf("rotation a2 %.2f*pi rad\n", (sin_sign ? 1 : -1) * acos(cos_a2)/M_PI);
+    printf("rotation,cos(a2): %f \na2 %.6f*pi rad\n", cos_a2, (sin_sign>=0 ? 1 : -1) * acos(cos_a2)/M_PI);
 
 
     matrix_3x3_t temp_rotation =
@@ -114,6 +117,16 @@ void get_rotation(matrix_3x3_t rotation, vector_t vector_a, vector_t vector_b)
         {sin_a2 * cos_a1,  cos_a2, sin_a2 * sin_a1},
         {        -sin_a1,       0,          cos_a1}
     };
+    for(int n=0; n<3; ++n)
+    {
+        for(int m=0; m<3; ++m)
+        {
+            printf("% 2.3f |", temp_rotation[n][m]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+
     memcpy(rotation, temp_rotation, sizeof(matrix_3x3_t));
 }
 

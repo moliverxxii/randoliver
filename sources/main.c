@@ -38,27 +38,49 @@ main(int argc, char* argv[])
 
 
 #ifdef OLI_3D
-    uint32_t nb = 400000;
+    uint32_t nb = 400;
     int dist_x = 100;
     figure_t test = init_figure(nb);
     colour_t colour;
     *(colour_struct_t*) &colour = RED;
     camera_t camera;
     init_camera(&camera, 350, 0, 100, 350, 10, 100, 100);
+    vector_t vector_z2 = {100, 0, 100};
+    matrix_3x3_t rotation;
+    get_rotation(rotation, VECTOR_0, vector_z2);
     for(int i = 0; i < nb; ++i)
     {
         test.sequence[i].x = (i % 8) * dist_x;
         test.sequence[i].y = dist_x * (i - i % 8) / 8 - 100;
         test.sequence[i].z = 0;
         test.sequence[i].colour = get_random_colour();
-        printf("x,y = %d,%d\n",test.sequence[i].x,test.sequence[i].y);
+//        printf("x,y = %d,%d\n",test.sequence[i].x,test.sequence[i].y);
     }
 
-    render_figure(image, test, camera);
-    for(int i = 0; i < 5; ++i)
+    int j=0;
+    do
     {
-        flou(image);
-    }
+        printf("Image %u\n", j);
+        render_figure(image, test, camera);
+        file_name = num_extension(nom, j);
+
+        file = init_image_file(file_name, image);
+
+        for(int point_n = 0; point_n< test.amount; point_n++)
+        {
+            vector_t vector_temp;
+            vector_t vector_result;
+            space_operation(&vector_result, rotation, point_to_vector(&vector_temp, test.sequence[point_n]), 1);
+            vector_to_point(&test.sequence[point_n], vector_result);
+        }
+
+        free(file_name);
+        fclose(file);
+        set_image(image);
+        ++j;
+    } while (j<2000);
+
+
     strcpy(file_name, "a");
     file = init_image_file(file_name, image);
     fclose(file);

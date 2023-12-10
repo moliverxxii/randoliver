@@ -11,6 +11,7 @@
 #define SAT_MIN 0
 #define SAT_MAX 255
 
+
 typedef float vector_axis_t;
 
 /**
@@ -29,8 +30,11 @@ typedef float matrix_3x1_t [3];
 extern const vector_t VECTOR_X;
 extern const vector_t VECTOR_Y;
 extern const vector_t VECTOR_Z;
+extern const vector_t VECTOR_0;
 
 extern char marker_g;
+
+
 
 /**
  * ||vector_p||

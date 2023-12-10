@@ -20,6 +20,8 @@ typedef struct
     int z;
 } point_t;
 
+
+
 /** Une sequence de points
  *
  */
@@ -28,6 +30,9 @@ typedef struct
     uint32_t amount;
     point_t* sequence;
 } figure_t;
+
+point_t* vector_to_point(point_t* point_p, vector_t vector);
+vector_t* point_to_vector(vector_t* vector_p, point_t point);
 
 
 //Initialise une sequence de nombre_point point_t.

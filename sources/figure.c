@@ -6,6 +6,32 @@
  */
 #include "main.h"
 
+point_t*
+vector_to_point(point_t* point_p, vector_t vector)
+{
+    if(!point_p)
+    {
+        return NULL;
+    }
+    point_p->x = vector.x;
+    point_p->y = vector.y;
+    point_p->z = vector.z;
+    return point_p;
+}
+
+vector_t*
+point_to_vector(vector_t* vector_p, point_t point)
+{
+    if(!vector_p)
+    {
+        return NULL;
+    }
+    vector_p->x = point.x;
+    vector_p->y = point.y;
+    vector_p->z = point.z;
+    return vector_p;
+}
+
 
 point_t
 init_point()
