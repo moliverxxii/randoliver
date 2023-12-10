@@ -26,7 +26,7 @@ main(int argc, char* argv[])
     int width = 1280;
     int height = 720;
 
-    char* file_name = malloc(80*sizeof(char));
+    char* file_name;
     FILE* file;
 
     //Initialisation de l'image.
@@ -45,7 +45,7 @@ main(int argc, char* argv[])
     *(colour_struct_t*) &colour = RED;
     camera_t camera;
     init_camera(&camera, 350, 0, 100, 350, 10, 100, 100);
-    vector_t vector_z2 = {100, 0, 100};
+    vector_t vector_z2 = {1, 0, 100};
     matrix_3x3_t rotation;
     get_rotation(rotation, VECTOR_0, vector_z2);
     for(int i = 0; i < nb; ++i)
@@ -56,6 +56,12 @@ main(int argc, char* argv[])
         test.sequence[i].colour = get_random_colour();
 //        printf("x,y = %d,%d\n",test.sequence[i].x,test.sequence[i].y);
     }
+    vector_t* vector_array = malloc(sizeof(vector_t)*nb);
+    for(int point_n = 0; point_n< test.amount; point_n++)
+    {
+        point_to_vector(&vector_array[point_n], test.sequence[point_n]);
+    }
+
 
     int j=0;
     do
@@ -66,12 +72,10 @@ main(int argc, char* argv[])
 
         file = init_image_file(file_name, image);
 
+        space_operation(vector_array, rotation, vector_array, test.amount);
         for(int point_n = 0; point_n< test.amount; point_n++)
         {
-            vector_t vector_temp;
-            vector_t vector_result;
-            space_operation(&vector_result, rotation, point_to_vector(&vector_temp, test.sequence[point_n]), 1);
-            vector_to_point(&test.sequence[point_n], vector_result);
+            vector_to_point(&test.sequence[point_n], vector_array[point_n]);
         }
 
         free(file_name);
