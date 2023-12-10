@@ -30,6 +30,7 @@ init_image_file(char* name, image_t* image)
     return image_file;
 }
 
+const char bmp_generator_signature[sizeof(uint32_t)] = {'m', 'o', '2', '2'};
 
 void
 init_header(FILE* file, int width, int height)
@@ -38,8 +39,8 @@ init_header(FILE* file, int width, int height)
     bmp_header_t header =
     {
     	    {0x42, 0x4D},
-    	    HEADER_SIZE + 3* width * height,
-    	    0X32326F6D,
+    	    HEADER_SIZE + 3 * width * height,
+    	    *(uint32_t*) bmp_generator_signature,
     	    HEADER_SIZE,
 
     	    40,
@@ -67,14 +68,7 @@ int
 get_int(FILE* file)
 {
     int output = 0;
-    int input;
-    char i;
-    for(i = 0; i < 4; ++i)
-    {
-        input = fgetc(file);
-        output += input << 8 * i;
-
-    }
+    fread(&output, sizeof(int), 1, file);
     return output;
 }
 

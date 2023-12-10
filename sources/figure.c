@@ -11,9 +11,7 @@ point_t
 init_point()
 {
     point_t point;
-    point.colour = (colour_struct_t
-            )
-            {0, 0, 0};
+    point.colour = BLACK;
     point.x = 0;
     point.y = 0;
     point.z = 0;

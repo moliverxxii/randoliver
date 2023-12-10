@@ -44,5 +44,6 @@ extern const colour_struct_t CYAN;
 extern const colour_struct_t MAGENTA;
 extern const colour_struct_t YELLOW;
 
+colour_struct_t get_random_colour();
 
 #endif /* HEADERS_COLOURS_H_ */

@@ -160,7 +160,7 @@ free_image(image_t* image)
 void
 brownien1(image_t* image, int iterations, int spread, int x0, int y0)
 {
-    uint8_t pixels[1][3] =
+    colour_t pixels[1] =
     {
         {0, 0xFF, 0}
     };
@@ -202,29 +202,27 @@ barres1(image_t* image, int spread)
 {
     printf("Début du processus\n");
 
-    colour_t pixel =
-    {0xFF, 0xFF, 0xFF};
     int i = 0;
     int y;
     int x;
-    int xPrime;
-    char bool = 1;
+    int x_prime;
+    int bool = 1;
 
     for(y = 0; y < image->height; ++y)
     {
         x = 2;
-        xPrime = x;
+        x_prime = x;
         bool = 1;
         while(bool)
         {
 
             for(i = 0; i < 3; ++i)
             {
-                image->image[xPrime][y][i] = pixel[i];
+                *(colour_struct_t*) image->image[y][x_prime] = WHITE;
             }
             x += spread;
-            xPrime = x + (rand() % 5 - 2);
-            bool = xPrime < image->width;
+            x_prime = x + (rand() % 5 - 2);
+            bool = x_prime < image->width;
         }
     }
     printf("Processus terminé\n");
@@ -236,32 +234,30 @@ barres2(image_t* image, int spread)
 {
     printf("Début du processus\n");
 
-    colour_t pixel =
-    {0xFF, 0xFF, 0xFF};
     int i = 0;
     int y;
     int x;
-    uint32_t xPrime[3];
-    uint8_t bool;
+    uint32_t x_prime[3];
+    int bool;
 
     for(y = 0; y < image->height; ++y)
     {
         x = 2;
         for(i = 0; i < 3; ++i)
-            xPrime[i] = x;
+            x_prime[i] = x;
         bool = 1;
         while(bool)
         {
 
             for(i = 0; i < 3; ++i)
             {
-                image->image[xPrime[i]][y][i] = pixel[i];
+                *(colour_struct_t*) image->image[y][x_prime[i]] = WHITE;
             }
             x += spread;
             for(i = 0; i < 3; ++i)
-                xPrime[i] = x + (rand() % 5 - 2);
-            bool = (xPrime[0] < image->width) & (xPrime[1] < image->width)
-                    & (xPrime[2] < image->width);
+                x_prime[i] = x + (rand() % 5 - 2);
+            bool = (x_prime[0] < image->width) & (x_prime[1] < image->width)
+                    & (x_prime[2] < image->width);
         }
     }
     printf("Processus terminé\n");

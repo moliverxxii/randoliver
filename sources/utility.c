@@ -15,7 +15,7 @@ const vector_t VECTOR_Z = {0, 0, 1};
 float
 norm_vector(vector_t vector_p)
 {
-	return (float) sqrt(scalar_vector(vector_p, vector_p));
+	return (vector_axis_t) sqrt(scalar_vector(vector_p, vector_p));
 }
 
 float
@@ -67,6 +67,55 @@ negative_vector(vector_t* vector_r_p, vector_t vector)
     return scale_vector(vector_r_p, vector, -1);
 }
 
+
+
+void
+space_operation(vector_t* result_p, const matrix_3x3_t operator, const vector_t* vectors_p, size_t vector_count)
+{
+    int column;
+    int row;
+    for (column = 0; column < vector_count; ++column)
+    {
+        for(row=0; row<3; row++)
+        {
+             ((float*) (result_p + column))[row] = scalar_vector(*(vector_t*) operator[row], vectors_p[column]);
+        }
+    }
+}
+
+void get_rotation(matrix_3x3_t rotation, vector_t vector_a, vector_t vector_b)
+{
+    vector_t vector_z1;
+    subtract_vectors(&vector_z1, vector_b, vector_a);
+    scale_vector(&vector_z1, vector_z1, 1/norm_vector(vector_z1));
+
+    float cos_a1 = scalar_vector(vector_z1, VECTOR_Z);
+    float sin_a1 = sqrt(1 - pow(cos_a1, 2));
+    printf("rotation a1 %.2f*pi rad\n", acos(cos_a1)/M_PI);
+
+    vector_t vector_z2 = vector_z1;
+    vector_z2.z = 0;
+    scale_vector(&vector_z2, vector_z2, 1/norm_vector(vector_z2));
+
+    float cos_a2 = cos_a1 == 1.0f ? 1.0f : scalar_vector(vector_z2, VECTOR_X);
+    float sin_a2 = sqrt(1 - pow(cos_a1, 2));
+
+    float sin_sign = scalar_vector(vector_z2, VECTOR_Y);
+    if(sin_sign<0)
+    {
+        sin_a2 *= -1;
+    }
+    printf("rotation a2 %.2f*pi rad\n", (sin_sign ? 1 : -1) * acos(cos_a2)/M_PI);
+
+
+    matrix_3x3_t temp_rotation =
+    {
+        {cos_a2 * cos_a1, -sin_a2, cos_a2 * sin_a1},
+        {sin_a2 * cos_a1,  cos_a2, sin_a2 * sin_a1},
+        {        -sin_a1,       0,          cos_a1}
+    };
+    memcpy(rotation, temp_rotation, sizeof(matrix_3x3_t));
+}
 
 
 int

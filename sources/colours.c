@@ -15,3 +15,10 @@ const colour_struct_t BLUE    = {0xFF, 0x00, 0x00};
 const colour_struct_t CYAN    = {0xFF, 0xFF, 0x00};
 const colour_struct_t MAGENTA = {0xFF, 0x00, 0xFF};
 const colour_struct_t YELLOW  = {0x00, 0xFF, 0xFF};
+
+colour_struct_t
+get_random_colour()
+{
+    uint32_t colour = rand();
+    return *(colour_struct_t*) &colour;
+}

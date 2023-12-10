@@ -26,8 +26,8 @@ main(int argc, char* argv[])
     int width = 1280;
     int height = 720;
 
-    char* nom_etendu;
-    FILE* fichier;
+    char* file_name = malloc(80*sizeof(char));
+    FILE* file;
 
     //Initialisation de l'image.
     image_t* image = init_image(width, height);
@@ -50,18 +50,17 @@ main(int argc, char* argv[])
         test.sequence[i].x = (i % 8) * dist_x;
         test.sequence[i].y = dist_x * (i - i % 8) / 8 - 100;
         test.sequence[i].z = 0;
-        unsigned int colour = rand();
-        test.sequence[i].colour = *(colour_struct_t*) &colour;
-        //test.sequence[i].colour = *(colour_struct_t*) colour;
+        test.sequence[i].colour = get_random_colour();
         printf("x,y = %d,%d\n",test.sequence[i].x,test.sequence[i].y);
     }
 
     render_figure(image, test, camera);
-//    for(int i = 0; i < 5; ++i)
-//    {
-//        flou(image);
-//    }
-    FILE* file = init_image_file("a.bmp", image);
+    for(int i = 0; i < 5; ++i)
+    {
+        flou(image);
+    }
+    strcpy(file_name, "a");
+    file = init_image_file(file_name, image);
     fclose(file);
 #endif /* OLI_3D */
 
@@ -75,8 +74,7 @@ main(int argc, char* argv[])
     {
          fig.sequence[i].x = image->width/2;
          fig.sequence[i].y = image->height/2;
-         unsigned int colour = rand();
-         fig.sequence[i].colour = *(colour_struct_t*) &colour;
+         fig.sequence[i].colour = get_random_colour();
     }
 
     for(int j=0; j<2000; ++j)
@@ -89,14 +87,14 @@ main(int argc, char* argv[])
 							 image->width,
 							 image->height);
         }
-        nom_etendu = num_extension(nom, j);
+        file_name = num_extension(nom, j);
 
-        fichier = init_image_file(nom_etendu, image);
+        file = init_image_file(file_name, image);
 
         draw_figure(image, &fig);
-        write_image(image, fichier);
-        free(nom_etendu);
-    	fclose(fichier);
+        write_image(image, file);
+        free(file_name);
+    	fclose(file);
         set_image(image);
     }
 #endif
