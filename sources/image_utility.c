@@ -6,6 +6,14 @@
  */
 #include "main.h"
 
+const image_t SYSTEM_SCREEN =
+{
+    1280,
+    720,
+    NULL
+};
+
+
 image_t*
 init_image(int width, int height)
 {
@@ -365,12 +373,11 @@ render_figure(image_t* image_p, figure_t figure, camera_t camera)
         //		printf("op v %f\n",op_v_scalaire);
         //		printf("op w %f\n",op_w_scalaire);
 
-        x_image = 640 + distance * op_v_scalaire / op_u_scalaire;
-        y_image = 400 + distance * op_w_scalaire / op_u_scalaire;
+        x_image = SYSTEM_SCREEN.width/2 + distance * op_v_scalaire / op_u_scalaire;
+        y_image = SYSTEM_SCREEN.height/2 + distance * op_w_scalaire / op_u_scalaire;
 
         //		printf("%d,%d\n\n",x_image,y_image);
-        if((x_image < 1280) && (x_image >= 0) && (y_image < 800)
-                && (y_image >= 0) && op_u_scalaire > 0)
+        if(op_u_scalaire > 0)
         {
             point_t render_point =
             {

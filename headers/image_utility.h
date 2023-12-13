@@ -24,6 +24,11 @@ typedef struct
     row_t*       image;
 } image_t;
 
+/** La definition de l'ecan
+ *
+ */
+extern const image_t SYSTEM_SCREEN;
+
 
 /** Une camera a utiliser pour le rendu 3D
  *
