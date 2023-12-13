@@ -7,7 +7,7 @@
 #include "main.h"
 
 FILE*
-init_image_file(char* name, image_t* image)
+init_image_file(const char* name, image_t* image)
 {
     //FILE CREATION AND NAME
     char* file_name = bmp_extension(name);

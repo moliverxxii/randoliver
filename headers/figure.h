@@ -37,6 +37,6 @@ vector_t* point_to_vector(vector_t* vector_p, point_t point);
 
 //Initialise une sequence de nombre_point point_t.
 figure_t init_figure(uint32_t nombre_point);
-point_t init_point(void);
+point_t init_point();
 
 #endif /* HEADERS_FIGURE_H_ */

@@ -89,8 +89,6 @@ void barres1(image_t* image, int spread);
  */
 void barres2(image_t* image, int spread);
 
-void init_points(point_t** seq, int n);
-void free_points(point_t** seq, int n);
 
 /* Rendu */
 void init_camera(camera_t* camera_p, float origin_x, float origin_y,

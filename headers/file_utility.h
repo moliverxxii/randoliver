@@ -34,7 +34,7 @@ typedef struct __attribute__((packed))
 } bmp_header_t;
 
 
-FILE* init_image_file(char* name, image_t* image);
+FILE* init_image_file(const char* name, image_t* image);
 void init_header(FILE* file, int width, int height);
 
 //Writes an image into a windows BITMAP stream.

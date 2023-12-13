@@ -279,18 +279,6 @@ barres2(image_t* image, int spread)
 
 
 void
-free_points(point_t** seq, int n)
-{
-    int i;
-    for(i = 0; i < n; ++i)
-    {
-        free(seq[i]);
-    }
-    free(seq);
-
-}
-
-void
 init_camera(camera_t* camera_p,
 		    float origin_x, float origin_y, float origin_z,
 			float destin_x, float destin_y, float destin_z,
@@ -319,76 +307,53 @@ render_figure(image_t* image_p, figure_t figure, camera_t camera)
 {
 	printf("Render start.\n");
 
-    vector_t o;
-    vector_t f;
-    vector_t p;
-    vector_t op;
-
-    vector_t u;
-    vector_t v;
-    vector_t w;
-
-    int x_image;
-    int y_image;
-
     float distance = camera.distance;
-
-    o = camera.origin;
-    f = camera.direction;
+    vector_t o = camera.origin;
+    vector_t f = camera.direction;
     vector_t of;
     subtract_vectors(&of, f, o);
 
     float norme_of = norm_vector(of);
+    vector_t u;
     scale_vector(&u, of, 1/norme_of);
 
+    vector_t v;
     v.x = -u.y / sqrt(pow(u.x, 2) + pow(u.y, 2));
-    v.y = u.x / sqrt(pow(u.x, 2) + pow(u.y, 2));
+    v.y =  u.x / sqrt(pow(u.x, 2) + pow(u.y, 2));
     v.z = 0;
 
+    vector_t w;
     w.x = -u.z * u.x / sqrt(pow(u.x, 2) + pow(u.y, 2));
-    w.y = u.z * u.y / sqrt(pow(u.x, 2) + pow(u.y, 2));
+    w.y =  u.z * u.y / sqrt(pow(u.x, 2) + pow(u.y, 2));
     w.z = sqrt(pow(u.x, 2) + pow(u.y, 2));
-
-    //	printf("u %f,%f,%f\n",u.x,u.y,u.z);
-    //	printf("v %f,%f,%f\n",v.x,v.y,v.z);
-    //	printf("w %f,%f,%f\n",w.x,w.y,w.z);
-
-    float op_u_scalaire;
-    float op_v_scalaire;
-    float op_w_scalaire;
 
     for(int i = 0; i < figure.amount; ++i)
     {
-        p.x = figure.sequence[i].x;
-        p.y = figure.sequence[i].y;
-        p.z = figure.sequence[i].z;
+        vector_t p;
+        point_to_vector(&p, figure.sequence[i]);
 
+        vector_t op;
         subtract_vectors(&op, p, o);
-        //		printf("op %f , %f , %f\n",op.x,op.y, op.z);
 
-        op_u_scalaire = scalar_vector(op, u);
-        op_v_scalaire = scalar_vector(op, v);
-        op_w_scalaire = scalar_vector(op, w);
-        //		printf("op u %f\n",op_u_scalaire);
-        //		printf("op v %f\n",op_v_scalaire);
-        //		printf("op w %f\n",op_w_scalaire);
+        float op_u_scalaire = scalar_vector(op, u);
+        float op_v_scalaire = scalar_vector(op, v);
+        float op_w_scalaire = scalar_vector(op, w);
 
-        x_image = SYSTEM_SCREEN.width/2 + distance * op_v_scalaire / op_u_scalaire;
-        y_image = SYSTEM_SCREEN.height/2 + distance * op_w_scalaire / op_u_scalaire;
+        int x_image = SYSTEM_SCREEN.width/2 + distance * op_v_scalaire / op_u_scalaire;
+        int y_image = SYSTEM_SCREEN.height/2 + distance * op_w_scalaire / op_u_scalaire;
 
-        //		printf("%d,%d\n\n",x_image,y_image);
-        if(op_u_scalaire > 0)
+        if(op_u_scalaire <= 0)
         {
-            point_t render_point =
-            {
-                figure.sequence[i].colour,
-            	x_image,
-				y_image,
-				0
-            };
-
-			(*public_point_renderer)(render_point, image_p);
+            continue;
         }
+        point_t render_point =
+        {
+            figure.sequence[i].colour,
+            x_image,
+            y_image,
+            0
+        };
+        (*public_point_renderer)(render_point, image_p);
     }
 	printf("Render end.\n");
 
