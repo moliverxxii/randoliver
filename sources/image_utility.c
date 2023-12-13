@@ -78,7 +78,7 @@ draw_point(const point_t point, image_t* image_p)
     int y;
     x = point.x;
     y = point.y;
-    if((x >= 0) && (x < image_p->width) && (y >= 0) && (y < image_p->height))
+    if(is_in_image(x, y, image_p))
     {
         *(colour_struct_t*) image_p->image[y][x] = *(colour_struct_t*) &point.colour;
     }
@@ -91,9 +91,9 @@ or_point(const point_t point, image_t* image_p)
     int y;
     x = point.x;
     y = point.y;
-    if((x < 0) || (x >= image_p->width) || (y < 0) || (y >= image_p->height))
+    if(!is_in_image(x, y, image_p))
     {
-    	return;
+        return;
     }
     uint32_t buffer = *(uint32_t*) image_p->image[y][x];
     buffer ^= *(uint32_t*) &point.colour;
@@ -109,9 +109,9 @@ xor_point(const point_t point, image_t* image_p)
     int y;
     x = point.x;
     y = point.y;
-    if((x < 0) || (x >= image_p->width) || (y < 0) || (y >= image_p->height))
+    if(!is_in_image(x, y, image_p))
     {
-    	return;
+        return;
     }
     uint32_t buffer = *(uint32_t*) image_p->image[y][x];
     buffer ^= *(uint32_t*) &point.colour;
@@ -126,7 +126,7 @@ average_point(const point_t point, image_t* image_p)
     int y;
     x = point.x;
     y = point.y;
-    if((x < 0) || (x >= image_p->width) || (y < 0) || (y >= image_p->height))
+    if(!is_in_image(x, y, image_p))
     {
     	return;
     }
@@ -136,6 +136,12 @@ average_point(const point_t point, image_t* image_p)
     												(uint32_t) image_p->image[y][x][colour]
 												  + (uint32_t) ((uint8_t*) &point.colour)[colour])/2);
     }
+}
+
+int
+is_in_image(int x, int y, const image_t* image_p)
+{
+    return (x >= 0) && (x < image_p->width) && (y >= 0) && (y < image_p->height);
 }
 
 void

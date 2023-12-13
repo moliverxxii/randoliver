@@ -60,6 +60,8 @@ void or_point(const point_t point, image_t* image_p);
 void xor_point(const point_t point, image_t* image_p);
 void average_point(const point_t point, image_t* image_p);
 
+int is_in_image(int x, int y, const image_t* image_p);
+
 // Draws a sequence of points into an image.
 void draw_figure(image_t* image, figure_t* figure);
 
