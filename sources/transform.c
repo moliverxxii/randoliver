@@ -25,7 +25,9 @@ point_t*
 subtract_points(point_t* point_r_p, point_t point_a, point_t point_b)
 {
 	point_t minus_point_b;
-	return add_points(point_r_p, point_a, *negative_point(&minus_point_b, point_b));
+	return add_points(point_r_p,
+	                  point_a,
+	                  *negative_point(&minus_point_b, point_b));
 }
 
 point_t*

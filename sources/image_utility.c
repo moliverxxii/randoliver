@@ -339,8 +339,10 @@ render_figure(image_t* image_p, figure_t figure, camera_t camera)
         float op_v_scalaire = scalar_vector(op, v);
         float op_w_scalaire = scalar_vector(op, w);
 
-        int x_image = SYSTEM_SCREEN.width/2 + distance * op_v_scalaire / op_u_scalaire;
-        int y_image = SYSTEM_SCREEN.height/2 + distance * op_w_scalaire / op_u_scalaire;
+        int x_image = SYSTEM_SCREEN.width/2
+                    + distance * op_v_scalaire / op_u_scalaire;
+        int y_image = SYSTEM_SCREEN.height/2
+                    + distance * op_w_scalaire / op_u_scalaire;
 
         if(op_u_scalaire <= 0)
         {

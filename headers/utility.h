@@ -52,6 +52,7 @@ vector_t* subtract_vectors(vector_t* vector_r_p, vector_t vector_a, vector_t vec
 vector_t* scale_vector(vector_t* vector_r_p, vector_t vector, float scale);
 vector_t* negative_vector(vector_t* vector_r_p, vector_t vector);
 
+void print_operator(const matrix_3x3_t operator);
 void space_operation(vector_t* result_p, const matrix_3x3_t operator, const vector_t* vectors_p, size_t vector_count);
 
 /**
