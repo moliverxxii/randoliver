@@ -173,7 +173,7 @@ modulo(int input, int modulo)
         multiplier *= -1;
     }
 
-    while(output >= modulo | output < 0)
+    while(output >= modulo || output < 0)
     {
         output += multiplier;
     }
