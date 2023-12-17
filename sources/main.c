@@ -45,9 +45,6 @@ main(int argc, char* argv[])
     *(colour_struct_t*) &colour = RED;
     camera_t camera;
     init_camera(&camera, 350, 0, 100, 350, 10, 100, 100);
-    vector_t vector_z2 = {1, 0, 100};
-    matrix_3x3_t rotation;
-    get_rotation(rotation, VECTOR_0, vector_z2);
     for(int i = 0; i < nb; ++i)
     {
         test.sequence[i].x = (i % 8) * dist_x;
@@ -61,28 +58,42 @@ main(int argc, char* argv[])
     {
         point_to_vector(&vector_array[point_n], test.sequence[point_n]);
     }
+    int frame_count = 2000;
 
-
+    point_t centre_grave = get_average_point(&test);
+    point_t centre_grave_z;
+    add_points(&centre_grave_z, centre_grave, (point_t) {0,0,1, BLACK});
     int j=0;
     do
     {
         printf("Image %u\n", j);
         render_figure(image, test, camera);
+
         file_name = num_extension(nom, j);
 
         file = init_image_file(file_name, image);
 
-        space_operation(vector_array, rotation, vector_array, test.amount);
+        //OPERATION
+
         for(int point_n = 0; point_n< test.amount; point_n++)
         {
             vector_to_point(&test.sequence[point_n], vector_array[point_n]);
         }
+        for(int point_n = 0; point_n< test.amount; point_n++)
+        {
+            rotate_point(&test.sequence[point_n], centre_grave, centre_grave_z, 2*M_PI/360);
+        }
+        for(int point_n = 0; point_n< test.amount; point_n++)
+        {
+            point_to_vector(&vector_array[point_n], test.sequence[point_n]);
+        }
+
 
         free(file_name);
         fclose(file);
         set_image(image);
         ++j;
-    } while (j<2000);
+    } while (j<frame_count);
 
 
     strcpy(file_name, "a");

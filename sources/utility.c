@@ -107,6 +107,23 @@ space_operation(vector_t* result_p,
     }
 }
 
+void
+transpose_operator(matrix_3x3_t matrix_trans, const matrix_3x3_t matrix)
+{
+    if(!matrix_trans || !matrix)
+    {
+        return;
+    }
+    for(int row = 0; row <3; ++row)
+    {
+        for(int column = 0; column<3; ++column)
+        {
+            matrix_trans[row][column] = matrix[column][row];
+        }
+    }
+}
+
+
 void get_rotation(matrix_3x3_t rotation, vector_t vector_a, vector_t vector_b)
 {
     vector_t vector_z1;
@@ -115,7 +132,6 @@ void get_rotation(matrix_3x3_t rotation, vector_t vector_a, vector_t vector_b)
 
     float cos_a1 = scalar_vector(vector_z1, VECTOR_Z);
     float sin_a1 = sqrt(1 - pow(cos_a1, 2));
-    printf("rotation a1 %.6f*pi rad\n", acos(cos_a1)/M_PI);
 
     vector_t vector_z2 = vector_z1;
     vector_z2.z = 0;
@@ -129,10 +145,6 @@ void get_rotation(matrix_3x3_t rotation, vector_t vector_a, vector_t vector_b)
     {
         sin_a2 *= -1;
     }
-    printf("rotation,cos(a2): %f \na2 %.6f*pi rad\n",
-            cos_a2,
-            (sin_sign>=0 ? 1 : -1) * acos(cos_a2)/M_PI);
-
 
     matrix_3x3_t temp_rotation =
     {
@@ -140,7 +152,6 @@ void get_rotation(matrix_3x3_t rotation, vector_t vector_a, vector_t vector_b)
         {sin_a2 * cos_a1,  cos_a2, sin_a2 * sin_a1},
         {        -sin_a1,       0,          cos_a1}
     };
-    print_operator(temp_rotation);
 
     memcpy(rotation, temp_rotation, sizeof(matrix_3x3_t));
 }

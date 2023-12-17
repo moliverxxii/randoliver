@@ -67,6 +67,81 @@ translate_point(point_t* point_p, point_t direction)
 void
 rotate_point(point_t* point_p, point_t axis_a, point_t axis_b, float angle)
 {
+    //Calcul de la base de l'axe de rotation
+    vector_t vector_a;
+    point_to_vector(&vector_a, axis_a);
+
+    vector_t vector_b;
+    point_to_vector(&vector_b, axis_b);
+
+    vector_t z_1;
+    subtract_vectors(&z_1, vector_b, vector_a);
+    scale_vector(&z_1, z_1, 1/norm_vector(z_1));
+
+    matrix_3x3_t base_rotation;
+    get_rotation(base_rotation, vector_a, vector_b);
+
+    struct vector_xy
+    {
+        vector_t x_y;
+        vector_t y_1;
+    };
+
+    const struct vector_xy xy_0 =
+    {
+        VECTOR_X,
+        VECTOR_Y
+    };
+
+    struct vector_xy xy_1;
+    space_operation((vector_t*) &xy_1,
+                    base_rotation,
+                    (vector_t*) &xy_0,
+                    sizeof(struct vector_xy)/sizeof(vector_t));
+
+
+    matrix_3x3_t base_1_to_0;
+    *(struct vector_xy*) &base_1_to_0[0] = xy_1;
+    *(vector_t*)         &base_1_to_0[2] = z_1;
+    matrix_3x3_t base_0_to_1;
+    transpose_operator(base_0_to_1, base_1_to_0);
+
+
+    point_t axis_point;
+    project_point(&axis_point, axis_a, axis_b);
+    vector_t vector_axis_point;
+    point_to_vector(&vector_axis_point, axis_point);
+
+    vector_t vector_pr0;
+
+    vector_t vector;
+    point_to_vector(&vector, *point_p);
+
+    subtract_vectors(&vector_pr0, vector, vector_axis_point);
+
+    //base 0->1
+    vector_t vector_pr1;
+    space_operation(&vector_pr1, base_0_to_1, &vector_pr0, 1);
+
+    matrix_3x3_t rotation =
+    {
+        {cos(angle), -sin(angle), 0},
+        {sin(angle),  cos(angle), 0},
+        {         0,           0, 1}
+    };
+
+    //rotation
+    vector_t vector_pr1_rot;
+    space_operation(&vector_pr1_rot, rotation, &vector_pr1, 1);
+
+    //base 1->0
+    vector_t vector_pr0_rot;
+    space_operation(&vector_pr0_rot, base_1_to_0, &vector_pr1_rot, 1);
+
+    vector_t vector_p_rot;
+    add_vectors(&vector_p_rot, vector_pr0_rot, vector_axis_point);
+
+    vector_to_point(point_p, vector_p_rot);
 }
 
 float

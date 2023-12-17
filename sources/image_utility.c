@@ -350,10 +350,10 @@ render_figure(image_t* image_p, figure_t figure, camera_t camera)
         }
         point_t render_point =
         {
-            figure.sequence[i].colour,
             x_image,
             y_image,
-            0
+            0,
+            figure.sequence[i].colour
         };
         (*public_point_renderer)(render_point, image_p);
     }
