@@ -53,6 +53,17 @@ image_t* init_image(int width, int height);
 //Turns the image black.
 void set_image(image_t* image);
 
+//Colore aléatorement l'image.
+void random_image(image_t* image);
+
+void process_1_image(colour_unary_operator operator, image_t* image_p);
+void process_2_images(colour_binary_operator operator, image_t* image_1_p, const image_t* image_2_p);
+void process_3_images(colour_ternary_operator operator,
+        image_t* image_1_p,
+        const image_t* image_2_p,
+        const image_t* image_3_p);
+void add_images(image_t* image_1_p, const image_t* image_2_p);
+
 //Displays the values of the pixels. Line by line.
 void disp_image(image_t* image);
 

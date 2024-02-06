@@ -6,7 +6,7 @@
  */
 #include "main.h"
 
-#define OLI_3D
+//#define OLI_3D
 //#define OLI_FIG
 
 int
@@ -31,9 +31,20 @@ main(int argc, char* argv[])
 
     //Initialisation de l'image.
     image_t* image = init_image(width, height);
+    image_t* image1 = init_image(width, height);
+    image_t* image2 = init_image(width, height);
 
     //Initialisation des particules
     srand(time(NULL));
+    random_image(image);
+    random_image(image1);
+    random_image(image2);
+
+    add_images(image, image1);
+    add_images(image, image2);
+    file_name = "bloup";
+    file = init_image_file(file_name, image);
+    fclose(file);
 
 
 
@@ -71,7 +82,7 @@ main(int argc, char* argv[])
         //OPERATION
         for(int point_n = 0; point_n< test.amount; point_n++)
         {
-            rotate_point(&test.sequence[point_n].vector, centre_grave, centre_grave_z, 2*M_PI/360);
+            rotate_vector(&test.sequence[point_n].vector, centre_grave, centre_grave_z, 2*M_PI/360);
         }
 
 

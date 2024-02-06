@@ -22,8 +22,8 @@ typedef struct
     vector_axis_t z;
 } vector_t;
 
-typedef float matrix_3x3_t [3][3];
-typedef float matrix_3x1_t [3];
+typedef vector_axis_t matrix_3x3_t [3][3];
+typedef vector_axis_t matrix_3x1_t [3];
 
 extern const vector_t VECTOR_X;
 extern const vector_t VECTOR_Y;
@@ -80,20 +80,20 @@ void get_rotation(matrix_3x3_t rotation, vector_t vector_a, vector_t vector_b);
 
 
 void translate_vector(vector_t* vector_p, vector_t direction);
-void rotate_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle);
+void rotate_vector(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle);
 
-void project_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b);
+void project_vector(vector_t* vector_p, vector_t axis_a, vector_t axis_b);
 
-void radial_scale_point(vector_t* vector_p, vector_t reference, float scale);
-void axial_scale_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float scale);
-void planar_scale_point(vector_t* vector_p, vector_t plane_a, vector_t normal_b, float scale);
+void radial_scale_vector(vector_t* vector_p, vector_t reference, float scale);
+void axial_scale_vector(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float scale);
+void planar_scale_vector(vector_t* vector_p, vector_t plane_a, vector_t normal_b, float scale);
 
-void rand_coord_point(vector_t* point_p, int height, int width);
+void rand_coord_vector(vector_t* vector_p, int height, int width);
 
 /**
- * Randomly moves a point.
+ * Randomly moves a vector.
  */
-void rand_delta_point(vector_t* point_p, int amplitude, int width, int height);
+void rand_delta_vector(vector_t* vector_p, int amplitude, int width, int height);
 
 
 

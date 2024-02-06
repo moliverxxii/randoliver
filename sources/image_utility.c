@@ -42,6 +42,71 @@ set_image(image_t* image)
 }
 
 void
+random_image(image_t* image_p)
+{
+    int x,y;
+    for(x=0; x<image_p->width; ++x)
+    {
+        for(y=0; y<image_p->height; ++y)
+        {
+            *(colour_struct_t*) image_p->image[y][x] = get_random_colour();
+        }
+    }
+}
+
+void
+process_1_image(colour_unary_operator operator, image_t* image_p)
+{
+    int x,y;
+    for(x=0; x<image_p->width; ++x)
+    {
+        for(y=0; y<image_p->height; ++y)
+        {
+            *(colour_struct_t*) image_p->image[y][x] =  (*operator)( *(colour_struct_t*) image_p->image[y][x]);
+        }
+    }
+}
+
+void
+process_2_images(colour_binary_operator operator, image_t* image_1_p, const image_t* image_2_p)
+{
+    int x,y;
+    for(x=0; x<image_1_p->width; ++x)
+    {
+        for(y=0; y<image_1_p->height; ++y)
+        {
+            *(colour_struct_t*) image_1_p->image[y][x] =
+                    (*operator)( *(colour_struct_t*) image_1_p->image[y][x],
+                                 *(colour_struct_t*) image_2_p->image[y][x]);
+        }
+    }
+}
+
+void
+process_3_images(colour_ternary_operator operator,
+        image_t* image_1_p,
+        const image_t* image_2_p,
+        const image_t* image_3_p)
+{
+    int x,y;
+    for(x=0; x<image_1_p->width; ++x)
+    {
+        for(y=0; y<image_1_p->height; ++y)
+        {
+            *(colour_struct_t*) image_1_p->image[y][x] =
+                    (*operator)( *(colour_struct_t*) image_1_p->image[y][x],
+                                 *(colour_struct_t*) image_2_p->image[y][x],
+                                 *(colour_struct_t*) image_3_p->image[y][x]);
+        }
+    }
+}
+
+void add_images(image_t* image_1_p, const image_t* image_2_p)
+{
+    process_2_images(&add_colours, image_1_p, image_2_p);
+}
+
+void
 disp_image(image_t* image)
 {
     int x;

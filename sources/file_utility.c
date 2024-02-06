@@ -43,7 +43,7 @@ init_header(FILE* file, int width, int height)
     bmp_header_t header =
     {
     	    {0x42, 0x4D},
-    	    HEADER_SIZE + 3 * width * height,
+    	    HEADER_SIZE + COLOUR_COUNT * width * height,
     	    *(uint32_t*) bmp_generator_signature,
     	    HEADER_SIZE,
 

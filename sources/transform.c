@@ -169,7 +169,7 @@ translate_vector(vector_t* vector_p, vector_t direction)
 }
 
 void
-rotate_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle)
+rotate_vector(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle)
 {
     //Calcul de la base de l'axe de rotation
     vector_t z_1;
@@ -206,7 +206,7 @@ rotate_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle)
 
 
     vector_t vector_axis_point;
-    project_point(&vector_axis_point, axis_a, axis_b);
+    project_vector(&vector_axis_point, axis_a, axis_b);
 
     vector_t vector_pr0;
 
@@ -239,7 +239,7 @@ rotate_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle)
 
 
 void
-project_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b)
+project_vector(vector_t* vector_p, vector_t axis_a, vector_t axis_b)
 {
     vector_t vect_ab;
 	vector_t vect_ap;
@@ -255,7 +255,7 @@ project_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b)
 
 
 void
-radial_scale_point(vector_t* vector_p, vector_t reference, float scale)
+radial_scale_vector(vector_t* vector_p, vector_t reference, float scale)
 {
     vector_t vector_temp = VECTOR_0;
 
@@ -265,10 +265,10 @@ radial_scale_point(vector_t* vector_p, vector_t reference, float scale)
 }
 
 void
-axial_scale_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float scale)
+axial_scale_vector(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float scale)
 {
     vector_t vector_r = *vector_p;
-	project_point(&vector_r, axis_a, axis_b);
+	project_vector(&vector_r, axis_a, axis_b);
 
 	vector_t vect_rp;
 	subtract_vectors(&vect_rp, *vector_p, vector_r);
@@ -279,12 +279,12 @@ axial_scale_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float sc
 }
 
 void
-planar_scale_point(vector_t* point_p, vector_t plane_a, vector_t normal_b, float scale)
+planar_scale_vector(vector_t* point_p, vector_t plane_a, vector_t normal_b, float scale)
 {
 }
 
 void
-rand_coord_point(vector_t* point_p, int height, int width)
+rand_coord_vector(vector_t* point_p, int height, int width)
 {
     int randX = rand() % width;
     int randY = rand() % height;
@@ -293,7 +293,7 @@ rand_coord_point(vector_t* point_p, int height, int width)
 }
 
 void
-rand_delta_point(vector_t* point_p, int amplitude, int width, int height)
+rand_delta_vector(vector_t* point_p, int amplitude, int width, int height)
 {
     point_p->x += rand() % (2 * amplitude + 1) - amplitude;
     modulo(point_p->x, width);

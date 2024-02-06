@@ -22,3 +22,15 @@ get_random_colour()
     uint32_t colour = rand();
     return *(colour_struct_t*) &colour;
 }
+
+colour_struct_t add_colours(colour_struct_t colour_1, colour_struct_t colour_2)
+{
+    int colour;
+    colour_t return_colour;
+    for(colour = 0; colour<COLOUR_COUNT; ++colour)
+    {
+        uint16_t tmp_colour = (uint16_t) ((uint8_t*) &colour_1)[colour] + ((uint8_t*) &colour_2)[colour];
+        return_colour[colour] = saturator(tmp_colour, SAT_MIN, SAT_MAX);
+    }
+    return *(colour_struct_t*) return_colour;
+}
