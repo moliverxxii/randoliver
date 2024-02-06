@@ -5,6 +5,7 @@
  *      Author: moliver
  */
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "utility.h"
 
