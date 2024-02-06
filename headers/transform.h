@@ -12,52 +12,26 @@
 
 typedef void (*point_transformer_t)(point_t*, ...);
 
-/**
- * *point_r_p = point_a + point_b
- */
-point_t* add_points(point_t* point_r_p, point_t point_a, point_t point_b);
-
-/**
- * *point_r_p = point_a - point_b
- */
-point_t* subtract_points(point_t* point_r_p, point_t point_a, point_t point_b);
-
-/**
- * *point_r_p = scale * point
- */
-point_t* scale_point(point_t* point_r_p, point_t point, float scale);
-
-/**
- * *point_r_p = -point
- */
-point_t* negative_point(point_t* point_r_p, point_t point);
 
 void transform_figure(figure_t* figure_p, point_transformer_t transformer_p);
 void translate_point(point_t* point_p, point_t direction);
-void rotate_point(point_t* point_p, point_t axis_a, point_t axis_b, float angle);
+void rotate_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle);
 
-/**
- * ||point_p||
- */
-float norm_point(point_t point_p);
+void project_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b);
 
-/**
- * <point_a|point_b>
- */
-float scalar(point_t point_a, point_t point_b);
+void radial_scale_point(vector_t* vector_p, vector_t reference, float scale);
+void axial_scale_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float scale);
+void planar_scale_point(vector_t* vector_p, vector_t plane_a, vector_t normal_b, float scale);
 
-void project_point(point_t* point_p, point_t axis_a, point_t axis_b);
-
-void radial_scale_point(point_t* point_p, point_t reference, float scale);
-void axial_scale_point(point_t* point_p, point_t axis_a, point_t axis_b, float scale);
-void planar_scale_point(point_t* point_p, point_t plane_a, point_t normal_b, float scale);
-
-void rand_coord(point_t* point_p, int width, int height);
+void rand_coord_point(vector_t* point_p, int height, int width);
 
 /**
  * Randomly moves a point.
  */
-void rand_delta_point(point_t* point_p, int amplitude, int width, int height);
+void rand_delta_point(vector_t* point_p, int amplitude, int width, int height);
+
+
+
 
 
 #endif /* HEADERS_TRANSFORM_H_ */

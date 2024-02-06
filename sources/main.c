@@ -47,22 +47,17 @@ main(int argc, char* argv[])
     init_camera(&camera, 350, 0, 100, 350, 10, 100, 100);
     for(int i = 0; i < nb; ++i)
     {
-        test.sequence[i].x = (i % 8) * dist_x;
-        test.sequence[i].y = dist_x * (i - i % 8) / 8 - 100;
-        test.sequence[i].z = 0;
+        test.sequence[i].vector.x = (i % 8) * dist_x;
+        test.sequence[i].vector.y = dist_x * (i - i % 8) / 8 - 100;
+        test.sequence[i].vector.z = 0;
         test.sequence[i].colour = get_random_colour();
 //        printf("x,y = %d,%d\n",test.sequence[i].x,test.sequence[i].y);
     }
-    vector_t* vector_array = malloc(sizeof(vector_t)*nb);
-    for(int point_n = 0; point_n< test.amount; point_n++)
-    {
-        point_to_vector(&vector_array[point_n], test.sequence[point_n]);
-    }
     int frame_count = 2000;
 
-    point_t centre_grave = get_average_point(&test);
-    point_t centre_grave_z;
-    add_points(&centre_grave_z, centre_grave, (point_t) {0,0,1, BLACK});
+    vector_t centre_grave = get_average_point(&test);
+    vector_t centre_grave_z;
+    add_vectors(&centre_grave_z, centre_grave, (vector_t) {0,0,1});
     int j=0;
     do
     {
@@ -74,18 +69,9 @@ main(int argc, char* argv[])
         file = init_image_file(file_name, image);
 
         //OPERATION
-
         for(int point_n = 0; point_n< test.amount; point_n++)
         {
-            vector_to_point(&test.sequence[point_n], vector_array[point_n]);
-        }
-        for(int point_n = 0; point_n< test.amount; point_n++)
-        {
-            rotate_point(&test.sequence[point_n], centre_grave, centre_grave_z, 2*M_PI/360);
-        }
-        for(int point_n = 0; point_n< test.amount; point_n++)
-        {
-            point_to_vector(&vector_array[point_n], test.sequence[point_n]);
+            rotate_point(&test.sequence[point_n].vector, centre_grave, centre_grave_z, 2*M_PI/360);
         }
 
 

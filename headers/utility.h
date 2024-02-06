@@ -89,8 +89,9 @@ void get_rotation(matrix_3x3_t rotation, vector_t vector_a, vector_t vector_b);
  */
 int saturator(int input, int satMin, int satMax);
 
-// Renvoie le VRAI reste de la division euclidienne de "input" par "modulo".
-//modulo must be different to 0;
+/** Renvoie le VRAI reste de la division euclidienne de "input" par "modulo".
+ *
+ */
 int modulo(int input, int modulo);
 
 //Affiche un signal ok numéroté.

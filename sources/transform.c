@@ -7,49 +7,6 @@
 
 #include "main.h"
 
-point_t*
-add_points(point_t* point_r_p, point_t point_a, point_t point_b)
-{
-	if(!point_r_p)
-	{
-		return NULL;
-	}
-	memcpy(point_r_p, &point_a, sizeof(point_t));
-	point_r_p->x += point_b.x;
-	point_r_p->y += point_b.y;
-	point_r_p->z += point_b.z;
-	return point_r_p;
-}
-
-point_t*
-subtract_points(point_t* point_r_p, point_t point_a, point_t point_b)
-{
-	point_t minus_point_b;
-	return add_points(point_r_p,
-	                  point_a,
-	                  *negative_point(&minus_point_b, point_b));
-}
-
-point_t*
-scale_point(point_t* point_r_p, point_t point, float scale)
-{
-	if(!point_r_p)
-	{
-		return point_r_p;
-	}
-	memcpy(point_r_p, &point, sizeof(point));
-	point_r_p->x *= scale;
-	point_r_p->y *= scale;
-	point_r_p->z *= scale;
-	return point_r_p;
-
-}
-
-point_t*
-negative_point(point_t* point_r_p, point_t point)
-{
-	return scale_point(point_r_p, point, -1);
-}
 
 
 void
@@ -59,27 +16,21 @@ transform_figure(figure_t* figure_p, point_transformer_t transformer_p)
 }
 
 void
-translate_point(point_t* point_p, point_t direction)
+translate_vector(vector_t* vector_p, vector_t direction)
 {
-	add_points(point_p, *point_p, direction);
+	add_vectors(vector_p, *vector_p, direction);
 }
 
 void
-rotate_point(point_t* point_p, point_t axis_a, point_t axis_b, float angle)
+rotate_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle)
 {
     //Calcul de la base de l'axe de rotation
-    vector_t vector_a;
-    point_to_vector(&vector_a, axis_a);
-
-    vector_t vector_b;
-    point_to_vector(&vector_b, axis_b);
-
     vector_t z_1;
-    subtract_vectors(&z_1, vector_b, vector_a);
+    subtract_vectors(&z_1, axis_b, axis_a);
     scale_vector(&z_1, z_1, 1/norm_vector(z_1));
 
     matrix_3x3_t base_rotation;
-    get_rotation(base_rotation, vector_a, vector_b);
+    get_rotation(base_rotation, axis_a, axis_b);
 
     struct vector_xy
     {
@@ -107,17 +58,12 @@ rotate_point(point_t* point_p, point_t axis_a, point_t axis_b, float angle)
     transpose_operator(base_0_to_1, base_1_to_0);
 
 
-    point_t axis_point;
-    project_point(&axis_point, axis_a, axis_b);
     vector_t vector_axis_point;
-    point_to_vector(&vector_axis_point, axis_point);
+    project_point(&vector_axis_point, axis_a, axis_b);
 
     vector_t vector_pr0;
 
-    vector_t vector;
-    point_to_vector(&vector, *point_p);
-
-    subtract_vectors(&vector_pr0, vector, vector_axis_point);
+    subtract_vectors(&vector_pr0, *vector_p, vector_axis_point);
 
     //base 0->1
     vector_t vector_pr1;
@@ -141,68 +87,57 @@ rotate_point(point_t* point_p, point_t axis_a, point_t axis_b, float angle)
     vector_t vector_p_rot;
     add_vectors(&vector_p_rot, vector_pr0_rot, vector_axis_point);
 
-    vector_to_point(point_p, vector_p_rot);
-}
-
-float
-norm_point(point_t point_p)
-{
-	return (float) sqrt(scalar(point_p, point_p));
-}
-
-float
-scalar(point_t point_a, point_t point_b)
-{
-	return point_a.x*point_b.x + point_a.y*point_b.y + point_a.z*point_b.z;
-}
-
-void
-project_point(point_t* point_p, point_t axis_a, point_t axis_b)
-{
-	point_t vect_ab;
-	point_t vect_ap;
-	subtract_points(&vect_ab, axis_b, axis_a);
-	subtract_points(&vect_ap, *point_p, axis_a);
-
-	float scale = scalar(vect_ab, vect_ap)/scalar(vect_ab, vect_ab);
-
-	point_t vect_temp;
-	scale_point(&vect_temp, vect_ab, scale);
-	add_points(point_p, axis_a, vect_temp);
+    *vector_p = vector_p_rot;
 }
 
 
 void
-radial_scale_point(point_t* point_p, point_t reference, float scale)
+project_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b)
 {
-	point_t point_temp = init_point();
+    vector_t vect_ab;
+	vector_t vect_ap;
+	subtract_vectors(&vect_ab, axis_b, axis_a);
+	subtract_vectors(&vect_ap, *vector_p, axis_a);
 
-	subtract_points(&point_temp, *point_p, reference);
-	scale_point(&point_temp, point_temp, scale);
-	add_points(point_p, point_temp, reference);
+	float scale = scalar_vector(vect_ab, vect_ap)/scalar_vector(vect_ab, vect_ab);
+
+	vector_t vect_temp;
+	scale_vector(&vect_temp, vect_ab, scale);
+	add_vectors(vector_p, axis_a, vect_temp);
+}
+
+
+void
+radial_scale_point(vector_t* vector_p, vector_t reference, float scale)
+{
+    vector_t vector_temp = VECTOR_0;
+
+	subtract_vectors(&vector_temp, *vector_p, reference);
+	scale_vector(&vector_temp, vector_temp, scale);
+	add_vectors(vector_p, vector_temp, reference);
 }
 
 void
-axial_scale_point(point_t* point_p, point_t axis_a, point_t axis_b, float scale)
+axial_scale_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float scale)
 {
-	point_t point_r = *point_p;
-	project_point(&point_r, axis_a, axis_b);
+    vector_t vector_r = *vector_p;
+	project_point(&vector_r, axis_a, axis_b);
 
-	point_t vect_rp;
-	subtract_points(&vect_rp, *point_p, point_r);
-	scale_point(&vect_rp, vect_rp, scale);
+	vector_t vect_rp;
+	subtract_vectors(&vect_rp, *vector_p, vector_r);
+	scale_vector(&vect_rp, vect_rp, scale);
 
-	add_points(point_p, vect_rp, *point_p);
+	add_vectors(vector_p, vect_rp, *vector_p);
 
 }
 
 void
-planar_scale_point(point_t* point_p, point_t plane_a, point_t normal_b, float scale)
+planar_scale_point(vector_t* point_p, vector_t plane_a, vector_t normal_b, float scale)
 {
 }
 
 void
-rand_coord_point(point_t* point_p, int height, int width)
+rand_coord_point(vector_t* point_p, int height, int width)
 {
     int randX = rand() % width;
     int randY = rand() % height;
@@ -211,7 +146,7 @@ rand_coord_point(point_t* point_p, int height, int width)
 }
 
 void
-rand_delta_point(point_t* point_p, int amplitude, int width, int height)
+rand_delta_point(vector_t* point_p, int amplitude, int width, int height)
 {
     point_p->x += rand() % (2 * amplitude + 1) - amplitude;
     modulo(point_p->x, width);

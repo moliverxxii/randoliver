@@ -84,8 +84,8 @@ draw_point(const point_t point, image_t* image_p)
 {
     int x;
     int y;
-    x = point.x;
-    y = point.y;
+    x = point.vector.x;
+    y = point.vector.y;
     if(is_in_image(x, y, image_p))
     {
         *(colour_struct_t*) image_p->image[y][x] = *(colour_struct_t*) &point.colour;
@@ -97,8 +97,8 @@ or_point(const point_t point, image_t* image_p)
 {
     int x;
     int y;
-    x = point.x;
-    y = point.y;
+    x = point.vector.x;
+    y = point.vector.y;
     if(!is_in_image(x, y, image_p))
     {
         return;
@@ -115,8 +115,8 @@ xor_point(const point_t point, image_t* image_p)
 {
     int x;
     int y;
-    x = point.x;
-    y = point.y;
+    x = point.vector.x;
+    y = point.vector.y;
     if(!is_in_image(x, y, image_p))
     {
         return;
@@ -132,8 +132,8 @@ average_point(const point_t point, image_t* image_p)
 {
     int x;
     int y;
-    x = point.x;
-    y = point.y;
+    x = point.vector.x;
+    y = point.vector.y;
     if(!is_in_image(x, y, image_p))
     {
     	return;
@@ -329,8 +329,7 @@ render_figure(image_t* image_p, figure_t figure, camera_t camera)
 
     for(int i = 0; i < figure.amount; ++i)
     {
-        vector_t p;
-        point_to_vector(&p, figure.sequence[i]);
+        vector_t p = figure.sequence[i].vector;
 
         vector_t op;
         subtract_vectors(&op, p, o);
@@ -350,9 +349,11 @@ render_figure(image_t* image_p, figure_t figure, camera_t camera)
         }
         point_t render_point =
         {
-            x_image,
-            y_image,
-            0,
+            {
+                x_image,
+                y_image,
+                0,
+            },
             figure.sequence[i].colour
         };
         (*public_point_renderer)(render_point, image_p);
