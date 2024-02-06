@@ -4,9 +4,10 @@
  *  Created on: Jan 15, 2020
  *      Author: moliver
  */
+#include <string.h>
 
-#include "main.h"
-
+#include "filter.h"
+#include "utility.h"
 void
 flou(image_t* image)
 {

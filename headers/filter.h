@@ -8,7 +8,7 @@
 #ifndef FILTER_H_
 #define FILTER_H_
 
-#include "main.h"
+#include "image_utility.h"
 
 void flou(image_t* image);
 

@@ -8,13 +8,78 @@
 #ifndef HEADERS_TRANSFORM_H_
 #define HEADERS_TRANSFORM_H_
 
-#include "main.h"
+#include "transform.h"
 
-typedef void (*point_transformer_t)(point_t*, ...);
+typedef float vector_axis_t;
+
+/**
+ * Un type pour la representation dans l'espace.
+ */
+typedef struct
+{
+    vector_axis_t x;
+    vector_axis_t y;
+    vector_axis_t z;
+} vector_t;
+
+typedef float matrix_3x3_t [3][3];
+typedef float matrix_3x1_t [3];
+
+extern const vector_t VECTOR_X;
+extern const vector_t VECTOR_Y;
+extern const vector_t VECTOR_Z;
+extern const vector_t VECTOR_0;
+
+/**
+ * ||vector_p||
+ */
+float norm_vector(vector_t vector_p);
+
+/**
+ * <vector_a|vector_b>
+ */
+float scalar_vector(vector_t vector_a, vector_t vector_b);
 
 
-void transform_figure(figure_t* figure_p, point_transformer_t transformer_p);
-void translate_point(point_t* point_p, point_t direction);
+/** *vector_r_p = vector_a + vector_b
+ *
+ */
+vector_t* add_vectors(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b);
+
+/** *vector_r_p = vector_a - vector_b
+ *
+ */
+vector_t* subtract_vectors(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b);
+
+/** *vector_r_p = scale * vector
+ *
+ */
+vector_t* scale_vector(vector_t* vector_r_p, vector_t vector, float scale);
+
+/** *vector_r_p = scale - vector
+ *
+ */
+vector_t* negative_vector(vector_t* vector_r_p, vector_t vector);
+
+void print_operator(const matrix_3x3_t operator);
+
+/** result_p[i] = operator X vectors_p[i], int i, 0<=i <vector_count
+ *
+ */
+void space_operation(vector_t* result_p, const matrix_3x3_t operator, const vector_t* vectors_p, size_t vector_count);
+
+/** matrix_trans = matrix^T
+ *
+ */
+void transpose_operator(matrix_3x3_t matrix_trans, const matrix_3x3_t matrix);
+
+/**
+ * Calculer la matrice de rotation pour obtenir l'opération qui a donné z0 -> z1 = AB/||AB||
+ */
+void get_rotation(matrix_3x3_t rotation, vector_t vector_a, vector_t vector_b);
+
+
+void translate_vector(vector_t* vector_p, vector_t direction);
 void rotate_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle);
 
 void project_point(vector_t* vector_p, vector_t axis_a, vector_t axis_b);

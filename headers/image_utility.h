@@ -8,7 +8,9 @@
 #ifndef IMGUTIL_H_
 #define IMGUTIL_H_
 
-#include "main.h"
+#include "colours.h"
+#include "figure.h"
+#include "transform.h"
 
 #define RES 2835
 

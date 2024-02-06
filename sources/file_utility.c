@@ -4,7 +4,11 @@
  *  Created on: 13 févr. 2019
  *      Author: moliver
  */
-#include "main.h"
+#include <stdlib.h>
+#include <string.h>
+
+#include "file_utility.h"
+
 
 FILE*
 init_image_file(const char* name, image_t* image)

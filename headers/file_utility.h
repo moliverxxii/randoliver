@@ -8,7 +8,10 @@
 #ifndef FILEUTIL_H_
 #define FILEUTIL_H_
 
-#include "main.h"
+#include <stdint.h>
+#include <stdio.h>
+
+#include "image_utility.h"
 
 #define HEADER_SIZE 54
 

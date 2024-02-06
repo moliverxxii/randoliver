@@ -8,7 +8,7 @@
 #ifndef HEADERS_COLOURS_H_
 #define HEADERS_COLOURS_H_
 
-#include "main.h"
+#include <stdint.h>
 
 typedef enum
 {
