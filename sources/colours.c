@@ -26,7 +26,24 @@ get_random_colour()
     return *(colour_struct_t*) &colour;
 }
 
-colour_struct_t add_colours(colour_struct_t colour_1, colour_struct_t colour_2)
+colour_struct_t
+random_delta_colour(colour_struct_t colour)
+{
+    int colour_index;
+    int8_t delta[COLOUR_COUNT];
+    int rand_colour = rand();
+
+    *(colour_struct_t*) delta = *(colour_struct_t*) &rand_colour;
+    for(colour_index = 0; colour_index < COLOUR_COUNT; ++colour_index)
+    {
+        ((int8_t*) &colour)[colour_index] += (int8_t) (2 * (int) delta[colour_index]/INT8_MAX);
+
+    }
+    return colour;
+}
+
+colour_struct_t
+add_colours(colour_struct_t colour_1, colour_struct_t colour_2)
 {
     int colour;
     colour_t return_colour;

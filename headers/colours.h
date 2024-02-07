@@ -50,6 +50,9 @@ typedef colour_struct_t (*colour_ternary_operator)(colour_struct_t, colour_struc
 
 
 colour_struct_t get_random_colour();
+
+colour_struct_t random_delta_colour(colour_struct_t colour);
+
 colour_struct_t add_colours(colour_struct_t colour_1, colour_struct_t colour_2);
 
 #endif /* HEADERS_COLOURS_H_ */

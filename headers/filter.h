@@ -10,7 +10,7 @@
 
 #include "image_utility.h"
 
-void flou(image_t* image);
-void symetry(image_t* image);
-
+void flou(image_t* image_p, int radius);
+void symetry(image_t* image_p);
+void random_colour_shift(image_t* image_p);
 #endif /* FILTER_H_ */

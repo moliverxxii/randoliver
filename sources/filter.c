@@ -9,56 +9,81 @@
 #include "filter.h"
 #include "utility.h"
 
+static colour_struct_t get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius);
+
 void
-flou(image_t* image)
+flou(image_t* image_p, int radius)
 {
-    image_t* image2 = init_image(image->width, image->height);
+    if(radius <= 0)
+    {
+        return;
+    }
+    image_t* image2 = init_image(image_p->width, image_p->height);
     set_image(image2);
 
     int x;
     int y;
-    colour_struct_t tmp;
-    for(x = 1; x < image->width - 1; ++x)
+    for(x = 0; x < image_p->width; ++x)
     {
-        for(y = 1; y < image->height - 1; ++y)
+        for(y = 0; y < image_p->height; ++y)
         {
-            for(int i = -1; i < 2; ++i)
-            {
-                for(int j = -1; j < 2; ++j)
-                {
-                	tmp = *(colour_struct_t*) image2->image[y][x];
-                    for(int colour = 0; colour < 3; colour++)
-                    {
-
-                        image2->image[y][x][colour] =
-                                saturator(  ( (uint8_t*) &tmp)[colour] + (int) image->image[y + j][x + i][colour] / 5,
-										  SAT_MIN,
-                                          SAT_MAX);
-                    }
-                }
-            }
+            *(colour_struct_t*) image2->image[y][x] = get_blurred_pixel(image_p, x, y, radius);
         }
     }
 
-    memcpy(*image->image, *image2->image, image->width*image->height*sizeof(colour_t));
+    memcpy(*image_p->image, *image2->image, image_p->width*image_p->height*sizeof(colour_t));
 
     free_image(image2);
 }
 
 void
-symetry(image_t* image)
+symetry(image_t* image_p)
 {
     int x, y;
-    for(x = 0; x < image->width/2; ++x)
+    for(x = 0; x < image_p->width/2; ++x)
     {
-        for(y = 0; y < image->height/2; ++y)
+        for(y = 0; y < image_p->height/2; ++y)
         {
-            *(colour_struct_t*) image->image[y][image->width - 1 - x]
-                = *(colour_struct_t*) image->image[y][x];
-            *(colour_struct_t*) image->image[image->height - 1 - y][x]
-                = *(colour_struct_t*) image->image[y][x];
-            *(colour_struct_t*) image->image[image->height - 1 - y][image->width - 1 - x]
-                = *(colour_struct_t*) image->image[y][x];
+            *(colour_struct_t*) image_p->image[y][image_p->width - 1 - x]
+                = *(colour_struct_t*) image_p->image[y][x];
+            *(colour_struct_t*) image_p->image[image_p->height - 1 - y][x]
+                = *(colour_struct_t*) image_p->image[y][x];
+            *(colour_struct_t*) image_p->image[image_p->height - 1 - y][image_p->width - 1 - x]
+                = *(colour_struct_t*) image_p->image[y][x];
         }
     }
+}
+
+void random_colour_shift(image_t* image_p)
+{
+    process_1_image(&random_delta_colour, image_p);
+}
+
+
+static colour_struct_t get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius)
+{
+    if(radius <= 0)
+    {
+        return *(colour_struct_t*) image_p->image[pixel_y][pixel_x];
+    }
+    colour_t return_colour = {0, 0, 0};
+    for (int colour = 0; colour < COLOUR_COUNT; colour++)
+    {
+        int sum = 0;
+        int count = 0;
+        for (int i = -radius; i <= radius; ++i)
+        {
+            for (int j = -radius; j <= radius; ++j)
+            {
+                if(!is_in_image(pixel_x + i, pixel_y + j, image_p))
+                {
+                    continue;
+                }
+                sum += image_p->image[pixel_y + j][pixel_x + i][colour];
+                ++ count;
+            }
+        }
+        return_colour[colour] = sum / count;
+    }
+    return *(colour_struct_t*) return_colour;
 }

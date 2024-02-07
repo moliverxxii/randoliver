@@ -39,13 +39,53 @@ main(int argc, char* argv[])
     random_image(image);
     random_image(image1);
     random_image(image2);
+    flou(image,  3);
+    flou(image1, 3);
+
 
     add_images(image, image1);
-    symetry(image);
+
+    for(int j=0; j<2000; ++j)
+    {
+        printf("Image %u\n", j);
+        file_name = num_extension(nom, j);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        random_colour_shift(image);
+        flou(image, 1);
+        symetry(image);
+
+
+        file = init_image_file(file_name, image);
+
+        write_image(image, file);
+        free(file_name);
+        fclose(file);
+    }
+
     file_name = "bloup";
 
-    file = init_image_file(file_name, image);
-    fclose(file);
 
 
 
