@@ -4,7 +4,10 @@
  *  Created on: 19 nov. 2023
  *      Author: moliver
  */
-#include "main.h"
+#include <stdlib.h>
+
+#include "colours.h"
+#include "utility.h"
 
 const colour_struct_t BLACK   = {0x00, 0x00, 0x00};
 const colour_struct_t WHITE   = {0xFF, 0xFF, 0xFF};

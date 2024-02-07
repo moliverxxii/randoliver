@@ -8,6 +8,7 @@
 
 #include "filter.h"
 #include "utility.h"
+
 void
 flou(image_t* image)
 {
@@ -44,3 +45,20 @@ flou(image_t* image)
     free_image(image2);
 }
 
+void
+symetry(image_t* image)
+{
+    int x, y;
+    for(x = 0; x < image->width/2; ++x)
+    {
+        for(y = 0; y < image->height/2; ++y)
+        {
+            *(colour_struct_t*) image->image[y][image->width - 1 - x]
+                = *(colour_struct_t*) image->image[y][x];
+            *(colour_struct_t*) image->image[image->height - 1 - y][x]
+                = *(colour_struct_t*) image->image[y][x];
+            *(colour_struct_t*) image->image[image->height - 1 - y][image->width - 1 - x]
+                = *(colour_struct_t*) image->image[y][x];
+        }
+    }
+}

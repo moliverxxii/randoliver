@@ -11,5 +11,6 @@
 #include "image_utility.h"
 
 void flou(image_t* image);
+void symetry(image_t* image);
 
 #endif /* FILTER_H_ */

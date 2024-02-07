@@ -41,8 +41,9 @@ main(int argc, char* argv[])
     random_image(image2);
 
     add_images(image, image1);
-    add_images(image, image2);
+    symetry(image);
     file_name = "bloup";
+
     file = init_image_file(file_name, image);
     fclose(file);
 
