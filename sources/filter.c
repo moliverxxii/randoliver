@@ -83,7 +83,7 @@ static colour_struct_t get_blurred_pixel(const image_t* image_p, int pixel_x, in
                 ++ count;
             }
         }
-        return_colour[colour] = sum / count;
+        return_colour[colour] = (sum + count/2) / count; //Supprimer "+ count/2" pour supprimer l'arrondi entier.
     }
     return *(colour_struct_t*) return_colour;
 }
