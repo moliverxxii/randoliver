@@ -15,9 +15,12 @@ all: $(PROJECT)
 $(PROJECT): $(OBJECTS)
 	$(CC) -o $@ $^ -lm
 
-$(OBJECTS): $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c $(HEADER_DIR)/main.h
+
+$(OBJECTS): $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c $(HEADER_DIR)/main.h $(OBJECT_DIR)
+	$(CC) $(CC_FLAGS) -I$(HEADER_DIR) -c -o $@ $< 
+
+$(OBJECT_DIR):
 	mkdir -p $(OBJECT_DIR)
-	$(CC) $(CC_FLAGS) -c -o $@ -I$(HEADER_DIR)  $< 
 
 $(HEADER_DIR)/main.h: $(HEADERS)
 	touch $@
@@ -26,7 +29,7 @@ clean:
 	rm -fr $(OBJECT_DIR) $(PROJECT) 
 	
 ANALYZER = $(shell /usr/local/bin/brew --prefix llvm)/bin/scan-build
-test:
+analysis:
 	$(ANALYZER) -v -v -v -o $(PROJECT)-analysis make $(PROJECT)
 
-.PHONY: clean test
+.PHONY: clean analysis
