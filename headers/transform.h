@@ -8,6 +8,8 @@
 #ifndef HEADERS_TRANSFORM_H_
 #define HEADERS_TRANSFORM_H_
 
+#include <stdlib.h>
+
 #include "transform.h"
 
 typedef float vector_axis_t;

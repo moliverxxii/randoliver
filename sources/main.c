@@ -12,6 +12,7 @@
 int
 main(int argc, char* argv[])
 {
+    init_interface();
     //Paramètres de base.
     char* nom = malloc(sizeof(char) * 40);
     printf("argc=%d\n", argc);

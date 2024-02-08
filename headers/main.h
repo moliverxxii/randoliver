@@ -22,5 +22,7 @@
 #include "image_utility.h"
 #include "file_utility.h"
 #include "filter.h"
+#include "animation.h"
+#include "interface.h"
 
 #endif /* MAIN_H_ */

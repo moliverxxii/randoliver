@@ -7,3 +7,9 @@
 
 
 #include "interpreter.h"
+
+typedef struct file_plouf_t
+{
+    int a;
+    int b;
+} file_plouf_t;
