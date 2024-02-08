@@ -76,7 +76,7 @@ typedef enum
 
 typedef enum
 {
-    CURSOR_UP,                       //Moves the cursor n (default 1) cells in the given direction. If the cursor is already at the edge of the screen, this has no effect.
+    CURSOR_UP = 0,                   //Moves the cursor n (default 1) cells in the given direction. If the cursor is already at the edge of the screen, this has no effect.
     CURSOR_DOWN,
     CURSOR_FORWARD,
     CURSOR_BACK,
@@ -89,7 +89,6 @@ typedef enum
     SCROLL_UP,                       //Scroll whole page up by n (default 1) lines. New lines are added at the bottom. (not ANSI.SYS)
     SCROLL_DOWN,                     //Scroll whole page down by n (default 1) lines. New lines are added at the top. (not ANSI.SYS)
     HORIZONTAL_VERTICAL_POSITION,    //Same as CUP, but counts as a format effector function (like CR or LF) rather than an editor function (like CUD or CNL). This can lead to different handling in certain terminal modes.[5]: Annex A
-    SELECT_GRAPHIC_RENDITION,        //Sets colors and style of the characters following this code
     AUX_PORT_ON,                     //Enable aux serial port usually for local serial printer
     AUX_PORT_OFF,                    //Disable aux serial port usually for local serial printer
     DEVICE_STATUS_REPORT,            //Reports the cursor position (CPR) by transmitting ESC[n;mR, where n is the row and m is the column.
@@ -100,6 +99,6 @@ typedef enum
 
 
 void init_interface();
-
+void reset_line();
 
 #endif /* HEADERS_INTERFACE_H_ */

@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stdarg.h>
 #include "interface.h"
 
 static const char* const COLOUR_ESCAPE_COMMAND[COLOUR_ESCAPE_COUNT] =
@@ -59,25 +60,24 @@ static const char* const COLOUR_ESCAPE_COMMAND[COLOUR_ESCAPE_COUNT] =
 
 static const char* const CURSOR_ESCAPE_COMMAND[CURSOR_ESCAPE_COUNT] =
 {
-        "n A"    , //CURSOR_UP,
-        "n B"    , //CURSOR_DOWN,
-        "n C"    , //CURSOR_FORWARD,
-        "n D"    , //CURSOR_BACK,
-        "n E"    , //CURSOR_NEXT_LINE,
-        "n F"    , //CURSOR_PREVIOUS_LINE,
-        "n G"    , //CURSOR_HORIZONTAL_ABSOLUTE,
-        "n ; m H", //CURSOR_POSITION,
-        "n J"    , //ERASE_IN_DISPLAY,
-        "n K"    , //ERASE_IN_LINE,
-        "n S"    , //SCROLL_UP,
-        "n T"    , //SCROLL_DOWN,
-        "n ; m f", //HORIZONTAL_VERTICAL_POSITION,
-        "n m"    , //SELECT_GRAPHIC_RENDITION,
-        "5i"     , //AUX_PORT_ON,
-        "4i"     , //AUX_PORT_OFF,
-        "6n"     , //DEVICE_STATUS_REPORT,
-        "s"      , //SAVE_CURRENT_CURSOR_POSITION,
-        "u"        //RESTORE_SAVED_CURSOR_POSITION,
+        "%dA"   , //CURSOR_UP,
+        "%dB"   , //CURSOR_DOWN,
+        "%dC"   , //CURSOR_FORWARD,
+        "%dD"   , //CURSOR_BACK,
+        "%dE"   , //CURSOR_NEXT_LINE,
+        "%dF"   , //CURSOR_PREVIOUS_LINE,
+        "%dG"   , //CURSOR_HORIZONTAL_ABSOLUTE,
+        "%d;%dH", //CURSOR_POSITION,
+        "%dJ"   , //ERASE_IN_DISPLAY,
+        "%dK"   , //ERASE_IN_LINE,
+        "%dS"   , //SCROLL_UP,
+        "%dT"   , //SCROLL_DOWN,
+        "%d;%df", //HORIZONTAL_VERTICAL_POSITION,
+        "5i"    , //AUX_PORT_ON,
+        "4i"    , //AUX_PORT_OFF,
+        "6n"    , //DEVICE_STATUS_REPORT,
+        "s"     , //SAVE_CURRENT_CURSOR_POSITION,
+        "u"       //RESTORE_SAVED_CURSOR_POSITION,
 };
 
 static const char* const ESCAPE_START = "\033[";
@@ -86,16 +86,25 @@ static const char* const ESCAPE_END   = "m";
 static const char* get_escape_sequence(colour_escape_t colour);
 static const char* get_cursor_escape(cursor_escape_t command);
 
-void set_colour_escape(colour_escape_t colour);
+static void set_colour_escape(colour_escape_t colour);
+static void set_cursor_escape(cursor_escape_t command, ...);
 
 void
 init_interface()
 {
     set_colour_escape(FOREGROUND_GREEN);
     set_colour_escape(BACKGROUND_MAGENTA);
+    set_cursor_escape(SAVE_CURRENT_CURSOR_POSITION);
     printf("COLOUR!!!\n");
     set_colour_escape(RESET);
 }
+
+void reset_line()
+{
+    set_cursor_escape(CURSOR_UP, 1);
+    set_cursor_escape(ERASE_IN_LINE, 0);
+}
+
 
 
 static const char*
@@ -104,8 +113,59 @@ get_escape_sequence(colour_escape_t colour)
     return COLOUR_ESCAPE_COMMAND[colour];
 }
 
-void
+static const char*
+get_cursor_escape(cursor_escape_t command)
+{
+    return CURSOR_ESCAPE_COMMAND[command];
+}
+
+
+static void
 set_colour_escape(colour_escape_t colour)
 {
     printf("%s%s%s", ESCAPE_START, get_escape_sequence(colour), ESCAPE_END);
+}
+
+static void
+set_cursor_escape(cursor_escape_t command, ...)
+{
+    va_list args;
+    va_start(args, command);
+    int n;
+    int m;
+    printf(ESCAPE_START);
+    switch(command)
+    {
+    case CURSOR_UP:
+    case CURSOR_DOWN:
+    case CURSOR_FORWARD:
+    case CURSOR_BACK:
+    case CURSOR_NEXT_LINE:
+    case CURSOR_PREVIOUS_LINE:
+    case CURSOR_HORIZONTAL_ABSOLUTE:
+    case ERASE_IN_DISPLAY:
+    case ERASE_IN_LINE:
+    case SCROLL_UP:
+    case SCROLL_DOWN:
+        n = va_arg(args, int);
+        printf(get_cursor_escape(command), n);
+        break;
+    case CURSOR_POSITION:
+    case HORIZONTAL_VERTICAL_POSITION:
+        n = va_arg(args, int);
+        m = va_arg(args, int);
+        printf(get_cursor_escape(command), n, m);
+        break;
+    case AUX_PORT_ON:
+    case AUX_PORT_OFF:
+    case DEVICE_STATUS_REPORT:
+    case SAVE_CURRENT_CURSOR_POSITION:
+    case RESTORE_SAVED_CURSOR_POSITION:
+    default:
+        printf(get_cursor_escape(command));
+        break;
+    }
+    va_end(args);
+
+
 }

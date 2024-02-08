@@ -48,6 +48,7 @@ main(int argc, char* argv[])
 
     for(int j=0; j<2000; ++j)
     {
+        reset_line();
         printf("Image %u\n", j);
         file_name = num_extension(nom, j);
         random_colour_shift(image);
