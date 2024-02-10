@@ -80,23 +80,31 @@ static const char* const CURSOR_ESCAPE_COMMAND[CURSOR_ESCAPE_COUNT] =
         "u"       //RESTORE_SAVED_CURSOR_POSITION,
 };
 
+static const char* const COLOUR_PARAMETER_LIST[COLOUR_PARMETER_COUNT] =
+{
+    "",            //COLOUR_PARAMETER_NONE
+    ";5;%d",       //COLOUR_PARAMETER_1B
+    ";2;%d;%d;%d"  //COLOUR_PARAMETER_3B
+};
+
 static const char* const ESCAPE_START = "\033[";
 static const char* const ESCAPE_END   = "m";
 
 static const char* get_escape_sequence(colour_escape_t colour);
 static const char* get_cursor_escape(cursor_escape_t command);
-
-static void set_colour_escape(colour_escape_t colour);
+static void set_colour_escape(colour_escape_t colour,
+                              colour_parameter_count_t parameter_count,
+                              ...);
 static void set_cursor_escape(cursor_escape_t command, ...);
 
 void
 init_interface()
 {
-    set_colour_escape(FOREGROUND_GREEN);
-    set_colour_escape(BACKGROUND_MAGENTA);
+    set_colour_escape(FOREGROUND_COLOUR, COLOUR_PARAMETER_1B, 0x4);
+    set_colour_escape(BACKGROUND_MAGENTA, COLOUR_PARAMETER_NONE);
     set_cursor_escape(SAVE_CURRENT_CURSOR_POSITION);
     printf("COLOUR!!!\n");
-    set_colour_escape(RESET);
+    set_colour_escape(RESET, COLOUR_PARAMETER_NONE);
 }
 
 void reset_line()
@@ -114,6 +122,12 @@ get_escape_sequence(colour_escape_t colour)
 }
 
 static const char*
+get_colour_parameter(colour_parameter_count_t count)
+{
+    return COLOUR_PARAMETER_LIST[count];
+}
+
+static const char*
 get_cursor_escape(cursor_escape_t command)
 {
     return CURSOR_ESCAPE_COMMAND[command];
@@ -121,9 +135,37 @@ get_cursor_escape(cursor_escape_t command)
 
 
 static void
-set_colour_escape(colour_escape_t colour)
+set_colour_escape(colour_escape_t colour,
+                  colour_parameter_count_t parameter_count,
+                  ...)
 {
-    printf("%s%s%s", ESCAPE_START, get_escape_sequence(colour), ESCAPE_END);
+    va_list args;
+    va_start(args, parameter_count);
+
+    printf("%s%s", ESCAPE_START, get_escape_sequence(colour));
+    int colour_1b;
+    int red;
+    int green;
+    int blue;
+    switch(parameter_count)
+    {
+    case COLOUR_PARAMETER_NONE:
+    default:
+        printf(get_colour_parameter(parameter_count));
+        break;
+    case COLOUR_PARAMETER_1B:
+        colour_1b = va_arg(args, int);
+        printf(get_colour_parameter(parameter_count), colour_1b);
+        break;
+    case COLOUR_PARAMETER_3B:
+        red   = va_arg(args, int);
+        green = va_arg(args, int);
+        blue  = va_arg(args, int);
+        printf(get_colour_parameter(parameter_count), red, green, blue);
+        break;
+    }
+    va_end(args);
+    printf(ESCAPE_END);
 }
 
 static void

@@ -41,6 +41,10 @@ typedef enum
     FOREGROUND_CYAN           ,
     FOREGROUND_WHITE          ,
     FOREGROUND_COLOUR         , //Set foreground color    Next arguments are 5;n or 2;r;g;b
+                                //  0 -   7: standard colors (as in ESC [ 30–37 m)
+                                //  8 -  15: high intensity colors (as in ESC [ 90–97 m)
+                                // 16 - 231: 6 × 6 × 6 cube (216 colors): 16 + 36 × r + 6 × g + b (0 ≤ r, g, b ≤ 5)
+                                //232 - 255: grayscale from dark to light in 24 steps
     DEFAULT_FOREGROUND_COLOUR , //Default foreground color    Implementation defined (according to standard)
     BACKGROUND_BLACK          , //Set foreground color
     BACKGROUND_RED            ,
@@ -73,6 +77,14 @@ typedef enum
                                 //100–107 Set bright background color
     COLOUR_ESCAPE_COUNT
 } colour_escape_t;
+
+typedef enum
+{
+    COLOUR_PARAMETER_NONE = 0,
+    COLOUR_PARAMETER_1B,
+    COLOUR_PARAMETER_3B,
+    COLOUR_PARMETER_COUNT
+} colour_parameter_count_t;
 
 typedef enum
 {
