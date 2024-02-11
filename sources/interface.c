@@ -92,19 +92,17 @@ static const char* const ESCAPE_END   = "m";
 
 static const char* get_escape_sequence(colour_escape_t colour);
 static const char* get_cursor_escape(cursor_escape_t command);
-static void set_colour_escape(colour_escape_t colour,
-                              colour_parameter_count_t parameter_count,
-                              ...);
+static void set_colour_escape(colour_escape_t colour, ...);
 static void set_cursor_escape(cursor_escape_t command, ...);
 
 void
 init_interface()
 {
     set_colour_escape(FOREGROUND_COLOUR, COLOUR_PARAMETER_1B, 0x4);
-    set_colour_escape(BACKGROUND_MAGENTA, COLOUR_PARAMETER_NONE);
+    set_colour_escape(BACKGROUND_MAGENTA);
     set_cursor_escape(SAVE_CURRENT_CURSOR_POSITION);
     printf("COLOUR!!!\n");
-    set_colour_escape(RESET, COLOUR_PARAMETER_NONE);
+    set_colour_escape(RESET);
 }
 
 void reset_line()
@@ -136,11 +134,22 @@ get_cursor_escape(cursor_escape_t command)
 
 static void
 set_colour_escape(colour_escape_t colour,
-                  colour_parameter_count_t parameter_count,
                   ...)
 {
     va_list args;
-    va_start(args, parameter_count);
+    va_start(args, colour);
+
+    colour_parameter_count_t parameter_count;
+    switch(colour)
+    {
+    case FOREGROUND_COLOUR: //Set foreground color    Next arguments are 5;n or 2;r;g;b
+    case BACKGROUND_COLOUR:
+        parameter_count = va_arg(args, colour_parameter_count_t);
+        break;
+    default:
+        parameter_count = COLOUR_PARAMETER_NONE;
+    }
+
 
     printf("%s%s", ESCAPE_START, get_escape_sequence(colour));
     int colour_1b;
