@@ -36,7 +36,7 @@ random_delta_colour(colour_struct_t colour)
     *(colour_struct_t*) delta = *(colour_struct_t*) &rand_colour;
     for(colour_index = 0; colour_index < COLOUR_COUNT; ++colour_index)
     {
-        ((int8_t*) &colour)[colour_index] += (int8_t) (2 * (int) delta[colour_index]/INT8_MAX);
+        ((int8_t*) &colour)[colour_index] += (int8_t) (2 * ((float) delta[colour_index] + 0.5f)/INT8_MAX);
 
     }
     return colour;
