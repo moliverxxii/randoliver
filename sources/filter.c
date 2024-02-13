@@ -59,7 +59,6 @@ void random_colour_shift(image_t* image_p)
     process_1_image(&random_delta_colour, image_p);
 }
 
-
 static colour_struct_t get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius)
 {
     if(radius <= 0)
@@ -69,7 +68,7 @@ static colour_struct_t get_blurred_pixel(const image_t* image_p, int pixel_x, in
     colour_t return_colour = {0, 0, 0};
     for (int colour = 0; colour < COLOUR_COUNT; colour++)
     {
-        int sum = 0;
+        float sum = 0;
         int count = 0;
         for (int i = -radius; i <= radius; ++i)
         {
@@ -83,7 +82,9 @@ static colour_struct_t get_blurred_pixel(const image_t* image_p, int pixel_x, in
                 ++count;
             }
         }
-        return_colour[colour] = sum / count; //Supprimer "+ count/2" pour supprimer l'arrondi entier.
+        sum /= count;
+        sum += (float) rand()/RAND_MAX;
+        return_colour[colour] = sum;  //Supprimer "+ count/2" pour supprimer l'arrondi entier.
     }
     return *(colour_struct_t*) return_colour;
 }

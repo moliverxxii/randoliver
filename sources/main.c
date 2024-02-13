@@ -48,9 +48,10 @@ main(int argc, char* argv[])
 
     for(int j=0; j<2000; ++j)
     {
-        reset_line();
+//        reset_line();
         printf("Image %u\n", j);
         file_name = num_extension(nom, j);
+        printf("    start: %11d\n", get_sum_colour(image));
         random_colour_shift(image);
         random_colour_shift(image);
         random_colour_shift(image);
@@ -75,8 +76,10 @@ main(int argc, char* argv[])
         random_colour_shift(image);
         random_colour_shift(image);
         random_colour_shift(image);
+        printf("  post op: %11d\n", get_sum_colour(image));
         flou(image, 1);
         symetry(image);
+        printf("post flou: %11d\n", get_sum_colour(image));
 
 
         file = init_image_file(file_name, image);
