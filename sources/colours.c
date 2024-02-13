@@ -27,7 +27,7 @@ get_random_colour()
 }
 
 colour_struct_t
-random_delta_colour(colour_struct_t colour, void* parameters_p)
+random_delta_colour(colour_struct_t colour)
 {
     float range = *(int*) parameters_p;
     int colour_index;
