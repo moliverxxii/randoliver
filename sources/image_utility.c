@@ -54,6 +54,25 @@ random_image(image_t* image_p)
     }
 }
 
+int
+get_sum_colour(const image_t* image_p)
+{
+    int sum = 0;
+    for(int colour = 0; colour<COLOUR_COUNT; colour++)
+    {
+        int x,y;
+        for(x=0; x<image_p->width; ++x)
+        {
+            for(y=0; y<image_p->height; ++y)
+            {
+                sum += image_p->image[y][x][colour];
+            }
+        }
+
+    }
+    return sum;
+}
+
 void
 process_1_image(colour_unary_operator operator, image_t* image_p, void* parameters_p)
 {
