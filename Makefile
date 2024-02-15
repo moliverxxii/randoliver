@@ -8,7 +8,7 @@ HEADERS = $(wildcard src/*.h)
 OBJECTS = $(SOURCES:$(SOURCE_DIR)/%.c=$(OBJECT_DIR)/%.o)
 CC_FLAGS = -Wall -g
 CC = gcc
-PROJECT = bmp-generator
+PROJECT = randoliver
 
 all: $(PROJECT)
 
