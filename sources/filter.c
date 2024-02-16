@@ -54,9 +54,9 @@ symetry(image_t* image_p)
     }
 }
 
-void random_colour_shift(image_t* image_p)
+void random_colour_shift(image_t* image_p, int delta)
 {
-    process_1_image(&random_delta_colour, image_p);
+    process_1_image(&random_delta_colour, image_p, &delta);
 }
 
 static colour_struct_t get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius)

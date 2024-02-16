@@ -44,15 +44,15 @@ extern const colour_struct_t CYAN;
 extern const colour_struct_t MAGENTA;
 extern const colour_struct_t YELLOW;
 
-typedef colour_struct_t (*colour_unary_operator)(colour_struct_t);
-typedef colour_struct_t (*colour_binary_operator)(colour_struct_t, colour_struct_t);
-typedef colour_struct_t (*colour_ternary_operator)(colour_struct_t, colour_struct_t, colour_struct_t);
+typedef colour_struct_t (*colour_unary_operator)(colour_struct_t, void*);
+typedef colour_struct_t (*colour_binary_operator)(colour_struct_t, colour_struct_t, void*);
+typedef colour_struct_t (*colour_ternary_operator)(colour_struct_t, colour_struct_t, colour_struct_t, void*);
 
 
 colour_struct_t get_random_colour();
 
-colour_struct_t random_delta_colour(colour_struct_t colour);
+colour_struct_t random_delta_colour(colour_struct_t colour, void* parameters_p);
 
-colour_struct_t add_colours(colour_struct_t colour_1, colour_struct_t colour_2);
+colour_struct_t add_colours(colour_struct_t colour_1, colour_struct_t colour_2, void* parameters_p);
 
 #endif /* HEADERS_COLOURS_H_ */

@@ -12,5 +12,5 @@
 
 void flou(image_t* image_p, int radius);
 void symetry(image_t* image_p);
-void random_colour_shift(image_t* image_p);
+void random_colour_shift(image_t* image_p, int delta);
 #endif /* FILTER_H_ */
