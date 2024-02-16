@@ -113,9 +113,7 @@ void
 init_interface()
 {
     set_colour_escape(FOREGROUND_BRIGHT_WHITE);
-    printf("COLOUR!!!\n");
-    set_colour_escape(BOLD);
-    printf("COLOUR!!!\n");
+    printf("OAM IMAGE SYNTHESIZER (2019-2024)\n");
     set_colour_escape(RESET);
     set_colour_escape(DEFAULT_BACKGROUND_COLOUR);
 }
