@@ -54,9 +54,9 @@ main(int argc, char* argv[])
         file_name = num_extension(nom, j);
 
         printf("%11d, ", get_sum_colour(image));
-        random_colour_shift(image, 20);
+        random_colour_shift(image, 40);
         printf("%11d, ", get_sum_colour(image));
-        flou(image, 1);
+        flou(image, 5);
         //symetry(image);
         printf("%11d\n", get_sum_colour(image));
 
