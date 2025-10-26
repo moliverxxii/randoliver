@@ -5,7 +5,7 @@
  *      Author: moliver
  */
 #include <stdlib.h>
-
+#include <string.h>
 #include "colours.h"
 #include "utility.h"
 
@@ -22,8 +22,10 @@ const colour_struct_t YELLOW  = {0x00, 0xFF, 0xFF};
 colour_struct_t
 get_random_colour()
 {
-    uint32_t colour = rand();
-    return *(colour_struct_t*) &colour;
+    uint32_t colour_raw = rand();
+    colour_struct_t colour;
+    memcpy(&colour, &colour_raw, sizeof(colour));
+    return colour;
 }
 
 colour_struct_t
@@ -32,9 +34,9 @@ random_delta_colour(colour_struct_t colour, void* parameters_p)
     float range = *(int*) parameters_p;
     int colour_index;
     int8_t delta[COLOUR_COUNT];
-    int rand_colour = rand();
+    uint32_t rand_colour = rand();
 
-    *(colour_struct_t*) delta = *(colour_struct_t*) &rand_colour;
+    memcpy(delta, &rand_colour, sizeof(delta));
     for(colour_index = 0; colour_index < COLOUR_COUNT; ++colour_index)
     {
         uint8_t* colour_p = (uint8_t*) &colour + colour_index;

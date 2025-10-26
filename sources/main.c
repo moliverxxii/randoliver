@@ -6,8 +6,9 @@
  */
 #include "main.h"
 
+//#define OLI_FLOU
 //#define OLI_3D
-//#define OLI_FIG
+#define OLI_FIG
 
 int
 main(int argc, char* argv[])
@@ -43,14 +44,14 @@ main(int argc, char* argv[])
     flou(image,  3);
     flou(image1, 3);
 
-
+#ifdef OLI_FLOU
     add_images(image, image1);
 
     printf("\"image\", \"start\", \"post op\", \"post flou\"\n");
     for(int j=0; j<2000; ++j)
     {
-        reset_line();
-	printf("%7u, ", j);
+//        reset_line();
+        printf("%7u, ", j);
         file_name = num_extension(nom, j);
 
         printf("%11d, ", get_sum_colour(image));
@@ -67,11 +68,7 @@ main(int argc, char* argv[])
         free(file_name);
         fclose(file);
     }
-
-    file_name = "bloup";
-
-
-
+#endif // OLI_FLOU
 
 #ifdef OLI_3D
     uint32_t nb = 400;
@@ -107,7 +104,10 @@ main(int argc, char* argv[])
         //OPERATION
         for(int point_n = 0; point_n< test.amount; point_n++)
         {
-            rotate_vector(&test.sequence[point_n].vector, centre_grave, centre_grave_z, 2*M_PI/360);
+            rotate_vector(&test.sequence[point_n].vector,
+                          centre_grave,
+                          centre_grave_z,
+                          2*M_PI/360);
         }
 
 
@@ -117,7 +117,6 @@ main(int argc, char* argv[])
         ++j;
     } while (j<frame_count);
 
-
     strcpy(file_name, "a");
     file = init_image_file(file_name, image);
     fclose(file);
@@ -126,25 +125,26 @@ main(int argc, char* argv[])
 #ifdef OLI_BROWN
     brownien1(image, 30000, 1, width/2, height/2);
 #endif /* OLI_BROWN */
+
 #ifdef OLI_FIG
     unsigned int num_points = 20000;
     figure_t fig = init_figure(num_points);
     for(int i=0; i<fig.amount; ++i)
     {
-         fig.sequence[i].x = image->width/2;
-         fig.sequence[i].y = image->height/2;
+         fig.sequence[i].vector.x = image->width/2;
+         fig.sequence[i].vector.y = image->height/2;
          fig.sequence[i].colour = get_random_colour();
     }
 
     for(int j=0; j<2000; ++j)
     {
-    	printf("Image %u\n", j);
+        printf("Image %u\n", j);
         for(int i=0; i<fig.amount;++i)
         {
-			rand_delta_point(&fig.sequence[i],
-							 1,
-							 image->width,
-							 image->height);
+           rand_delta_vector(&fig.sequence[i].vector,
+                             1,
+                             image->width,
+                             image->height);
         }
         file_name = num_extension(nom, j);
 
@@ -157,6 +157,5 @@ main(int argc, char* argv[])
         set_image(image);
     }
 #endif
-
     return EXIT_SUCCESS;
 }

@@ -195,7 +195,7 @@ or_point(const point_t point, image_t* image_p)
     }
     uint32_t buffer = *(uint32_t*) image_p->image[y][x];
     buffer ^= *(uint32_t*) &point.colour;
-    *(colour_struct_t*) image_p->image[y][x] = *(colour_struct_t*) &buffer;
+    memcpy(&image_p->image[y][x], &buffer, sizeof(image_p->image[y][x]));
 
 }
 
@@ -213,7 +213,7 @@ xor_point(const point_t point, image_t* image_p)
     }
     uint32_t buffer = *(uint32_t*) image_p->image[y][x];
     buffer ^= *(uint32_t*) &point.colour;
-    *(colour_struct_t*) image_p->image[y][x] = *(colour_struct_t*) &buffer;
+    memcpy(&image_p->image[y][x], &buffer, sizeof(image_p->image[y][x]));
 
 }
 
