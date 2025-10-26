@@ -1,7 +1,11 @@
 *.o
 *.DS_Store
+dependencies
+objects
 .cproject
 .project
 .settings
 *.bmp
-bmp-generator
+*.swp
+randoliver
+*.exe
