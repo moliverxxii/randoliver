@@ -5,9 +5,15 @@
  *      Author: moliver
  */
 
+#define _POSIX_SOURCE 1
+
+#include <termios.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <stdarg.h>
+#include <string.h>
+#include <unistd.h>
+
 #include "interface.h"
 
 static const char* const COLOUR_ESCAPE_COMMAND[COLOUR_ESCAPE_COUNT] =
@@ -76,24 +82,24 @@ static const char* const COLOUR_ESCAPE_COMMAND[COLOUR_ESCAPE_COUNT] =
 
 static const char* const CURSOR_ESCAPE_COMMAND[CURSOR_ESCAPE_COUNT] =
 {
-        "%dA"   , //CURSOR_UP,
-        "%dB"   , //CURSOR_DOWN,
-        "%dC"   , //CURSOR_FORWARD,
-        "%dD"   , //CURSOR_BACK,
-        "%dE"   , //CURSOR_NEXT_LINE,
-        "%dF"   , //CURSOR_PREVIOUS_LINE,
-        "%dG"   , //CURSOR_HORIZONTAL_ABSOLUTE,
-        "%d;%dH", //CURSOR_POSITION,
-        "%dJ"   , //ERASE_IN_DISPLAY,
-        "%dK"   , //ERASE_IN_LINE,
-        "%dS"   , //SCROLL_UP,
-        "%dT"   , //SCROLL_DOWN,
-        "%d;%df", //HORIZONTAL_VERTICAL_POSITION,
-        "5i"    , //AUX_PORT_ON,
-        "4i"    , //AUX_PORT_OFF,
-        "6n"    , //DEVICE_STATUS_REPORT,
-        "s"     , //SAVE_CURRENT_CURSOR_POSITION,
-        "u"       //RESTORE_SAVED_CURSOR_POSITION,
+    "%dA"   , //CURSOR_UP,
+    "%dB"   , //CURSOR_DOWN,
+    "%dC"   , //CURSOR_FORWARD,
+    "%dD"   , //CURSOR_BACK,
+    "%dE"   , //CURSOR_NEXT_LINE,
+    "%dF"   , //CURSOR_PREVIOUS_LINE,
+    "%dG"   , //CURSOR_HORIZONTAL_ABSOLUTE,
+    "%d;%dH", //CURSOR_POSITION,
+    "%dJ"   , //ERASE_IN_DISPLAY,
+    "%dK"   , //ERASE_IN_LINE,
+    "%dS"   , //SCROLL_UP,
+    "%dT"   , //SCROLL_DOWN,
+    "%d;%df", //HORIZONTAL_VERTICAL_POSITION,
+    "5i"    , //AUX_PORT_ON,
+    "4i"    , //AUX_PORT_OFF,
+    "6n"    , //DEVICE_STATUS_REPORT,
+    "s"     , //SAVE_CURRENT_CURSOR_POSITION,
+    "u"       //RESTORE_SAVED_CURSOR_POSITION,
 };
 
 static const char* const COLOUR_PARAMETER_LIST[COLOUR_PARMETER_COUNT] =
@@ -106,25 +112,51 @@ static const char* const COLOUR_PARAMETER_LIST[COLOUR_PARMETER_COUNT] =
 static const char* const ESCAPE_START = "\033[";
 static const char* const ESCAPE_END   = "m";
 
+static char terminal_response[16];
+static const uint32_t TERMINAL_RESPONSE_LENGTH = sizeof(terminal_response) - 1;
+
 static const char* get_escape_sequence(colour_escape_t colour);
 static const char* get_cursor_escape(cursor_escape_t command);
+static const char* get_terminal_response();
+
 
 void
 init_interface()
 {
-    set_colour_escape(FOREGROUND_BRIGHT_WHITE);
-    printf("OAM IMAGE SYNTHESIZER (2019-2024)\n");
+
+    struct termios interface_terminal;
+    set_cursor_escape(ERASE_IN_DISPLAY,2);    
+    set_cursor_escape(HORIZONTAL_VERTICAL_POSITION,1,1);    
+    fflush(stdout); //On s'assure que les donnees sortent.
+    tcgetattr(STDIN_FILENO, &interface_terminal);
+    printf("canon: %u\n",(interface_terminal.c_lflag & ICANON) != 0);
+    const struct termios original_terminal = interface_terminal;
+
+    interface_terminal.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &interface_terminal);
+    
+    tcgetattr(STDIN_FILENO, &interface_terminal);
+    printf("canon: %u\n",(interface_terminal.c_lflag & ICANON) != 0);
+
+    set_cursor_escape(DEVICE_STATUS_REPORT);
+    fflush(stdout); //On s'assure que les donnees sortent.
+    const char* p_text = get_terminal_response();
+    int row = 0;
+    int column = 0;
+    sscanf(p_text, "\033[%d;%dR", &row, &column);
+    printf("xy %d,%d\n", row,column);
+    set_colour_escape(FOREGROUND_GREEN);
+    printf("OAM IMAGE SYNTHESIZER (2019-2025)\n");
     set_colour_escape(RESET);
     set_colour_escape(DEFAULT_BACKGROUND_COLOUR);
 }
+
 
 void reset_line()
 {
     set_cursor_escape(CURSOR_UP, 1);
     set_cursor_escape(ERASE_IN_LINE, 0);
 }
-
-
 
 static const char*
 get_escape_sequence(colour_escape_t colour)
@@ -142,6 +174,16 @@ static const char*
 get_cursor_escape(cursor_escape_t command)
 {
     return CURSOR_ESCAPE_COMMAND[command];
+}
+
+static const char*
+get_terminal_response()
+{
+    memset(terminal_response, 0, sizeof(terminal_response));
+    ssize_t response = read(STDIN_FILENO, terminal_response, 
+         TERMINAL_RESPONSE_LENGTH);
+    printf("response length %ld\n", response);
+    return terminal_response;
 }
 
 
@@ -230,6 +272,5 @@ set_cursor_escape(cursor_escape_t command, ...)
         break;
     }
     va_end(args);
-
-
 }
+

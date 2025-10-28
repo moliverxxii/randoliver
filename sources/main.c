@@ -50,7 +50,7 @@ main(int argc, char* argv[])
     printf("\"image\", \"start\", \"post op\", \"post flou\"\n");
     for(int j=0; j<2000; ++j)
     {
-//        reset_line();
+        reset_line();
         printf("%7u, ", j);
         file_name = num_extension(nom, j);
 
@@ -138,6 +138,7 @@ main(int argc, char* argv[])
 
     for(int j=0; j<2000; ++j)
     {
+        reset_line();
         printf("Image %u\n", j);
         for(int i=0; i<fig.amount;++i)
         {

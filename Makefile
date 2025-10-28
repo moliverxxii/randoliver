@@ -20,7 +20,7 @@ $(PROJECT): $(OBJECTS)
 
 
 $(OBJECTS): $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c | $(OBJECT_DIR) $(DEPENDENCY_DIR)
-	$(CC) $(CC_FLAGS) $(DEPENDENCY_FLAGS) -MF $(patsubst $(@D)%.o, $(DEPENDENCY_DIR)%.d, $@) -c -o $@ $< 
+	$(CC) $(CC_FLAGS) $(DEPENDENCY_FLAGS) -MF $(patsubst $(@D)%.o,$(DEPENDENCY_DIR)%.d, $@) -c -o $@ $< 
 
 -include $(DEPENDENCIES)
 
