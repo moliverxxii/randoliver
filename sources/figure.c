@@ -47,17 +47,12 @@ vector_t
 get_average_point(const figure_t* figure_p)
 {
     vector_t average = {0, 0, 0};
-    uint32_t integral_colours[COLOUR_COUNT] = {0, 0, 0};
 
     for(uint32_t point_count = 0; point_count<figure_p->amount; ++point_count)
     {
         for(int axis=0; axis<3; ++axis)
         {
             (&average.x)[axis] += (&figure_p->sequence[point_count].vector.x)[axis];
-        }
-        for(int colour=0; colour<COLOUR_COUNT; ++colour)
-        {
-            integral_colours[colour] += ((uint8_t*) &figure_p->sequence[point_count].colour)[colour];
         }
     }
     for(int axis=0; axis<3; ++axis)

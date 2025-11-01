@@ -59,7 +59,8 @@ void random_colour_shift(image_t* image_p, int delta)
     image_process_1(&colour_random_delta, image_p, &delta);
 }
 
-static colour_struct_t get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius)
+static colour_struct_t
+get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius)
 {
     if(radius <= 0)
     {

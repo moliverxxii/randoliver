@@ -4,8 +4,15 @@
  *  Created on: 13 févr. 2019
  *      Author: moliver
  */
-#include "main.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+#include <math.h>
 
+#include "interface.h"
+#include "image.h"
+#include "file_utility.h"
 //#define OLI_FLOU
 #define OLI_3D
 //#define OLI_FIG
@@ -13,7 +20,7 @@
 int
 main(int argc, char* argv[])
 {
-    init_interface();
+    interface_init();
     //Paramètres de base.
     char* nom = malloc(sizeof(char) * 40);
     printf("argc=%d\n", argc);
@@ -32,39 +39,32 @@ main(int argc, char* argv[])
     FILE* file;
 
     //Initialisation de l'image.
-    image_t* image = image_init(width, height);
-    image_t* image1 = image_init(width, height);
-    image_t* image2 = image_init(width, height);
+    image_t* image_p  = image_init(width, height);
 
     //Initialisation des particules
     srand(time(NULL));
-    image_random(image);
-    image_random(image1);
-    image_random(image2);
-    flou(image,  3);
-    flou(image1, 3);
 
 #ifdef OLI_FLOU
-    add_images(image, image1);
+    add_images(image_p, image1_p);
 
     printf("\"image\", \"start\", \"post op\", \"post flou\"\n");
-    for(int j=0; j<2000; ++j)
+    for(int frame=0; frame<2000; ++frame)
     {
-        reset_line();
-        printf("%7u, ", j);
-        file_name = num_extension(nom, j);
+        interface_state_restore();
+        printf("%7u, ", frame);
+        file_name = num_extension(nom, frame);
 
-        printf("%11d, ", get_sum_colour(image));
-        random_colour_shift(image, 40);
-        printf("%11d, ", get_sum_colour(image));
-        flou(image, 5);
+        printf("%11d, ", get_sum_colour(image_p));
+        random_colour_shift(image_p, 40);
+        printf("%11d, ", get_sum_colour(image_p));
+        flou(image_p, 5);
         //symetry(image);
-        printf("%11d\n", get_sum_colour(image));
+        printf("%11d\n", get_sum_colour(image_p));
 
 
-        file = init_image_file(file_name, image);
+        file = init_image_file(file_name, image_p);
 
-        write_image(image, file);
+        write_image(image_p, file);
         free(file_name);
         fclose(file);
     }
@@ -77,12 +77,12 @@ main(int argc, char* argv[])
     colour_t colour;
     *(colour_struct_t*) &colour = RED;
     camera_t camera = camera_init(350, 0, 100, 350, 10, 100, 100);
-    for(int i = 0; i < nb; ++i)
+    for(uint32_t point_n = 0; point_n < nb; ++point_n)
     {
-        test.sequence[i].vector.x = (i % 8) * dist_x;
-        test.sequence[i].vector.y = dist_x * (i - i % 8) / 8 - 100;
-        test.sequence[i].vector.z = 0;
-        test.sequence[i].colour = colour_get_random();
+        test.sequence[point_n].vector.x = (point_n % 8) * dist_x;
+        test.sequence[point_n].vector.y = dist_x * (float) (point_n - (point_n % 8)) / 8 - 100;
+        test.sequence[point_n].vector.z = 0;
+        test.sequence[point_n].colour = colour_get_random();
 //        printf("x,y = %d,%d\n",test.sequence[i].x,test.sequence[i].y);
     }
     int frame_count = 2000;
@@ -90,39 +90,42 @@ main(int argc, char* argv[])
     vector_t centre_grave = get_average_point(&test);
     vector_t centre_grave_z;
     add_vectors(&centre_grave_z, centre_grave, (vector_t) {0,0,1});
-    int j=0;
+    int frame=0;
+    interface_state_save();
     do
     {
-        printf("Image %u\n", j);
-        render_figure(image, test, camera);
+        interface_state_restore();
+        printf("Image %u\n", frame);
+        render_figure(image_p, test, camera);
 
-        file_name = num_extension(nom, j);
+        file_name = num_extension(nom, frame);
 
-        file = init_image_file(file_name, image);
+        file = init_image_file(file_name, image_p);
 
         //OPERATION
-        for(int point_n = 0; point_n< test.amount; point_n++)
+        for(uint32_t point_n = 0; point_n< test.amount; point_n++)
         {
             rotate_vector(&test.sequence[point_n].vector,
                           centre_grave,
                           centre_grave_z,
-                          2*M_PI/360);
+                          2.*M_PI/360.);
         }
-
 
         free(file_name);
         fclose(file);
-        image_set(image);
-        ++j;
-    } while (j<frame_count);
+        image_set(image_p);
+        ++frame;
+    } while (frame<frame_count);
 
     strcpy(file_name, "a");
-    file = init_image_file(file_name, image);
+    file = init_image_file(file_name, image_p);
     fclose(file);
+    interface_deinit();
+
 #endif /* OLI_3D */
 
 #ifdef OLI_BROWN
-    brownien1(image, 30000, 1, width/2, height/2);
+    brownien1(image_p, 30000, 1, width/2, height/2);
 #endif /* OLI_BROWN */
 
 #ifdef OLI_FIG
@@ -130,32 +133,33 @@ main(int argc, char* argv[])
     figure_t fig = init_figure(num_points);
     for(int i=0; i<fig.amount; ++i)
     {
-         fig.sequence[i].vector.x = image->width/2;
-         fig.sequence[i].vector.y = image->height/2;
+         fig.sequence[i].vector.x = image_p->width/2;
+         fig.sequence[i].vector.y = image_p->height/2;
          fig.sequence[i].colour = colour_get_random();
     }
 
-    for(int j=0; j<2000; ++j)
+    for(int frame=0; frame<2000; ++frame)
     {
-        reset_line();
-        printf("Image %u\n", j);
+        interface_state_restore();
+        printf("Image %u\n", frame);
         for(int i=0; i<fig.amount;++i)
         {
            rand_delta_vector(&fig.sequence[i].vector,
                              1,
-                             image->width,
-                             image->height);
+                             image_p->width,
+                             image_p->height);
         }
-        file_name = num_extension(nom, j);
+        file_name = num_extension(nom, frame);
 
-        file = init_image_file(file_name, image);
+        file = init_image_file(file_name, image_p);
 
-        draw_figure(image, &fig);
-        write_image(image, file);
+        draw_figure(image_p, &fig);
+        write_image(image_p, file);
         free(file_name);
     	fclose(file);
-        image_set(image);
+        image_set(image_p);
     }
 #endif
     return EXIT_SUCCESS;
 }
+

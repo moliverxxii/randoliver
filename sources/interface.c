@@ -5,8 +5,6 @@
  *      Author: moliver
  */
 
-#define _POSIX_SOURCE 1
-
 #include <termios.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -119,9 +117,16 @@ static const char* get_escape_sequence(colour_escape_t colour);
 static const char* get_cursor_escape(cursor_escape_t command);
 static const char* get_terminal_response();
 
+struct interface_state
+{
+    int row;
+    int column;
+} interface;
+
+struct termios original_terminal;
 
 void
-init_interface()
+interface_init()
 {
 
     struct termios interface_terminal;
@@ -129,33 +134,38 @@ init_interface()
     set_cursor_escape(HORIZONTAL_VERTICAL_POSITION,1,1);    
     fflush(stdout); //On s'assure que les donnees sortent.
     tcgetattr(STDIN_FILENO, &interface_terminal);
-    printf("canon: %u\n",(interface_terminal.c_lflag & ICANON) != 0);
-    const struct termios original_terminal = interface_terminal;
+    original_terminal = interface_terminal;
 
     interface_terminal.c_lflag &= ~(ICANON | ECHO);
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &interface_terminal);
-    
-    tcgetattr(STDIN_FILENO, &interface_terminal);
-    printf("canon: %u\n",(interface_terminal.c_lflag & ICANON) != 0);
 
-    set_cursor_escape(DEVICE_STATUS_REPORT);
-    fflush(stdout); //On s'assure que les donnees sortent.
-    const char* p_text = get_terminal_response();
-    int row = 0;
-    int column = 0;
-    sscanf(p_text, "\033[%d;%dR", &row, &column);
-    printf("xy %d,%d\n", row,column);
     set_colour_escape(FOREGROUND_GREEN);
     printf("OAM IMAGE SYNTHESIZER (2019-2025)\n");
     set_colour_escape(RESET);
     set_colour_escape(DEFAULT_BACKGROUND_COLOUR);
+
+    interface_state_save();
+}
+
+void
+interface_deinit()
+{
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &original_terminal);
+}
+
+void interface_state_save()
+{
+    set_cursor_escape(DEVICE_STATUS_REPORT);
+    fflush(stdout); //On s'assure que les donnees sortent.
+    const char* p_text = get_terminal_response();
+    sscanf(p_text, "\033[%d;%dR", &interface.row, &interface.column);
 }
 
 
-void reset_line()
+void interface_state_restore()
 {
-    set_cursor_escape(CURSOR_UP, 1);
-    set_cursor_escape(ERASE_IN_LINE, 0);
+    set_cursor_escape(HORIZONTAL_VERTICAL_POSITION, interface.row, interface.column);
+    set_cursor_escape(ERASE_IN_DISPLAY, 0);
 }
 
 static const char*

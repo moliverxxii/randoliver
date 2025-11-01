@@ -8,7 +8,7 @@ HEADERS = $(SOURCES:$(SOURCE_DIR)/%.c=$(HEADER_DIR)/%.h)
 OBJECTS = $(SOURCES:$(SOURCE_DIR)/%.c=$(OBJECT_DIR)/%.o)
 DEPENDENCIES = $(SOURCES:$(SOURCE_DIR)/%.c=$(DEPENDENCY_DIR)/%.d)
 DIRS = $(OBJECT_DIR) $(DEPENDENCY_DIR)
-CC_FLAGS = -std=c99 -Wall -Ofast -g -I$(HEADER_DIR)
+CC_FLAGS = -std=c99 -Wall -Wextra -pedantic -D_POSIX_C_SOURCE=200112L -g -I$(HEADER_DIR)
 DEPENDENCY_FLAGS = -MMD
 CC = gcc
 PROJECT = randoliver
@@ -34,7 +34,7 @@ rebuild: clean all
 
 ANALYZER = $(shell /usr/local/bin/brew --prefix llvm)/bin/scan-build
 
-analysis:
+analysis: clean
 	$(ANALYZER) -v -v -v -o $(PROJECT)-analysis make $(PROJECT)
 
 .PHONY: clean analysis

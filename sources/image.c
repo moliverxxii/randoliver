@@ -425,8 +425,9 @@ render_figure(image_t* image_p, figure_t figure, camera_t camera)
                                           0,
                                           figure.sequence[i].colour);
         if(point_is_in_image(&render_point, image_p))
-
-        (*public_point_renderer)(render_point, image_p);
+        {
+            (*public_point_renderer)(render_point, image_p);
+        }
     }
 	printf("Render end.\n");
 

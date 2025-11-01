@@ -124,8 +124,10 @@ typedef enum
     CURSOR_ESCAPE_COUNT
 } cursor_escape_t;
 
-void init_interface();
-void reset_line();
+void interface_init();
+void interface_deinit();
+void interface_state_save();
+void interface_state_restore();
 void set_colour_escape(colour_escape_t colour, ...);
 void set_cursor_escape(cursor_escape_t command, ...);
 
