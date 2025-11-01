@@ -4,7 +4,13 @@
  *  Created on: 13 févr. 2019
  *      Author: moliver
  */
-#include "main.h"
+
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+
+#include "utility.h"
+#include "image.h"
 
 const image_t SYSTEM_SCREEN =
 {
@@ -15,15 +21,15 @@ const image_t SYSTEM_SCREEN =
 
 
 image_t*
-init_image(int width, int height)
+image_init(int width, int height)
 {
 
     colour_t* image_data_p = malloc(height * width * sizeof(colour_t));
 
-    image_t* image = (image_t*) malloc(sizeof(image_t));
+    image_t* image = malloc(sizeof(image_t));
     image->width   = width;
     image->height  = height;
-    image->image   = (row_t*) malloc(height * sizeof(row_t));
+    image->image   = malloc(height * sizeof(row_t));
 
     uint32_t y;
 	row_t row_p = image_data_p;
@@ -36,13 +42,23 @@ init_image(int width, int height)
 }
 
 void
-set_image(image_t* image)
+image_free(image_t* image)
+{
+    free(*(image->image));
+    free(image->image);
+    free(image);
+}
+
+
+
+void
+image_set(image_t* image)
 {
     memset(*image->image, 0, image->width * image->height * sizeof(colour_t) );
 }
 
 void
-random_image(image_t* image_p)
+image_random(image_t* image_p)
 {
     int x,y;
     for(x=0; x<image_p->width; ++x)
@@ -55,7 +71,7 @@ random_image(image_t* image_p)
 }
 
 int
-get_sum_colour(const image_t* image_p)
+image_get_sum_colour(const image_t* image_p)
 {
     int sum = 0;
     for(int colour = 0; colour<COLOUR_COUNT; colour++)
@@ -74,7 +90,7 @@ get_sum_colour(const image_t* image_p)
 }
 
 void
-process_1_image(colour_unary_operator operator, image_t* image_p, void* parameters_p)
+image_process_1(colour_unary_operator operator, image_t* image_p, void* parameters_p)
 {
     int x,y;
     for(x=0; x<image_p->width; ++x)
@@ -87,7 +103,7 @@ process_1_image(colour_unary_operator operator, image_t* image_p, void* paramete
 }
 
 void
-process_2_images(colour_binary_operator operator,
+image_process_2(colour_binary_operator operator,
         image_t* image_1_p,
         const image_t* image_2_p,
         void* parameters_p)
@@ -106,7 +122,7 @@ process_2_images(colour_binary_operator operator,
 }
 
 void
-process_3_images(colour_ternary_operator operator,
+image_process_3(colour_ternary_operator operator,
         image_t* image_1_p,
         const image_t* image_2_p,
         const image_t* image_3_p,
@@ -126,13 +142,14 @@ process_3_images(colour_ternary_operator operator,
     }
 }
 
-void add_images(image_t* image_1_p, const image_t* image_2_p)
+void
+image_add(image_t* image_1_p, const image_t* image_2_p)
 {
-    process_2_images(&add_colours, image_1_p, image_2_p, NULL);
+    image_process_2(&add_colours, image_1_p, image_2_p, NULL);
 }
 
 void
-disp_image(image_t* image)
+image_display(image_t* image)
 {
     int x;
     int y;
@@ -148,8 +165,8 @@ disp_image(image_t* image)
 }
 
 void
-draw_rect(colour_t color, int botLeftX, int botLeftY, int topRightX,
-          int topRightY, image_t* image)
+image_draw_rect(colour_t color, int botLeftX, int botLeftY, int topRightX,
+                int topRightY, image_t* image)
 {
     int x;
     int y;
@@ -176,10 +193,7 @@ draw_point(const point_t point, image_t* image_p)
     int y;
     x = point.vector.x;
     y = point.vector.y;
-    if(is_in_image(x, y, image_p))
-    {
-        *(colour_struct_t*) image_p->image[y][x] = *(colour_struct_t*) &point.colour;
-    }
+    *(colour_struct_t*) image_p->image[y][x] = *(colour_struct_t*) &point.colour;
 }
 
 void
@@ -189,10 +203,6 @@ or_point(const point_t point, image_t* image_p)
     int y;
     x = point.vector.x;
     y = point.vector.y;
-    if(!is_in_image(x, y, image_p))
-    {
-        return;
-    }
     uint32_t buffer = *(uint32_t*) image_p->image[y][x];
     buffer ^= *(uint32_t*) &point.colour;
     memcpy(&image_p->image[y][x], &buffer, sizeof(image_p->image[y][x]));
@@ -207,10 +217,6 @@ xor_point(const point_t point, image_t* image_p)
     int y;
     x = point.vector.x;
     y = point.vector.y;
-    if(!is_in_image(x, y, image_p))
-    {
-        return;
-    }
     uint32_t buffer = *(uint32_t*) image_p->image[y][x];
     buffer ^= *(uint32_t*) &point.colour;
     memcpy(&image_p->image[y][x], &buffer, sizeof(image_p->image[y][x]));
@@ -224,10 +230,6 @@ average_point(const point_t point, image_t* image_p)
     int y;
     x = point.vector.x;
     y = point.vector.y;
-    if(!is_in_image(x, y, image_p))
-    {
-    	return;
-    }
     for(int colour=0; colour<COLOUR_COUNT; ++colour)
     {
     	image_p->image[y][x][colour] = (uint8_t) ((
@@ -236,10 +238,24 @@ average_point(const point_t point, image_t* image_p)
     }
 }
 
-int
-is_in_image(int x, int y, const image_t* image_p)
+point_t point_init(vector_axis_t x, vector_axis_t y, vector_axis_t z, colour_struct_t colour)
 {
-    return (x >= 0) && (x < image_p->width) && (y >= 0) && (y < image_p->height);
+    point_t point =
+    {
+        {x, y , z},
+        colour
+    };
+    return point;
+}
+
+
+int
+point_is_in_image(const point_t* point_p, const image_t* image_p)
+{
+    return (point_p->vector.x >= 0)
+            && (point_p->vector.x < image_p->width)
+            && (point_p->vector.y >= 0)
+            && (point_p->vector.y < image_p->height);
 }
 
 void
@@ -250,15 +266,6 @@ draw_figure(image_t* image, figure_t* figure)
     {
     	(*public_point_renderer)(figure->sequence[i],image);
     }
-}
-
-
-void
-free_image(image_t* image)
-{
-    free(*(image->image));
-    free(image->image);
-    free(image);
 }
 
 void
@@ -437,15 +444,12 @@ render_figure(image_t* image_p, figure_t figure, camera_t camera)
         {
             continue;
         }
-        point_t render_point =
-        {
-            {
-                x_image,
-                y_image,
-                0,
-            },
-            figure.sequence[i].colour
-        };
+        point_t render_point = point_init(x_image,
+                                          y_image,
+                                          0,
+                                          figure.sequence[i].colour);
+        if(point_is_in_image(&render_point, image_p))
+
         (*public_point_renderer)(render_point, image_p);
     }
 	printf("Render end.\n");

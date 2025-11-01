@@ -32,15 +32,15 @@ main(int argc, char* argv[])
     FILE* file;
 
     //Initialisation de l'image.
-    image_t* image = init_image(width, height);
-    image_t* image1 = init_image(width, height);
-    image_t* image2 = init_image(width, height);
+    image_t* image = image_init(width, height);
+    image_t* image1 = image_init(width, height);
+    image_t* image2 = image_init(width, height);
 
     //Initialisation des particules
     srand(time(NULL));
-    random_image(image);
-    random_image(image1);
-    random_image(image2);
+    image_random(image);
+    image_random(image1);
+    image_random(image2);
     flou(image,  3);
     flou(image1, 3);
 
@@ -113,7 +113,7 @@ main(int argc, char* argv[])
 
         free(file_name);
         fclose(file);
-        set_image(image);
+        image_set(image);
         ++j;
     } while (j<frame_count);
 
@@ -155,7 +155,7 @@ main(int argc, char* argv[])
         write_image(image, file);
         free(file_name);
     	fclose(file);
-        set_image(image);
+        image_set(image);
     }
 #endif
     return EXIT_SUCCESS;

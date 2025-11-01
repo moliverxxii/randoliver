@@ -19,10 +19,10 @@
 #include "colours.h"
 #include "transform.h"
 #include "figure.h"
-#include "image_utility.h"
 #include "file_utility.h"
 #include "filter.h"
 #include "animation.h"
+#include "image.h"
 #include "interface.h"
 
 #endif /* MAIN_H_ */

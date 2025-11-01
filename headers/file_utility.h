@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "image_utility.h"
+#include "image.h"
 
 #define HEADER_SIZE 54
 

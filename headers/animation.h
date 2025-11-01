@@ -9,7 +9,8 @@
 #define HEADERS_ANIMATION_H_
 
 #include <stdint.h>
-#include "image_utility.h"
+
+#include "image.h"
 
 typedef struct animation_t
 {

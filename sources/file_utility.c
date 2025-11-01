@@ -26,9 +26,6 @@ init_image_file(const char* name, image_t* image)
     }
 
 
-    //HEADER
-    init_header(image_file, image->width, image->height);
-
     //DATA
     write_image(image, image_file);
     return image_file;
@@ -65,9 +62,10 @@ void
 write_image(const image_t* image, FILE* image_file)
 {
     fseek(image_file, HEADER_SIZE, SEEK_SET);
+    init_header(image_file, image->width, image->height);
     fwrite(*image->image,
-           image->height * image->width * sizeof(colour_t),
-           1,
+           sizeof(colour_t),
+           image->height * image->width,
            image_file);
 }
 

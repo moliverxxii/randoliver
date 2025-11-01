@@ -18,8 +18,8 @@ flou(image_t* image_p, int radius)
     {
         return;
     }
-    image_t* image2 = init_image(image_p->width, image_p->height);
-    set_image(image2);
+    image_t* image2 = image_init(image_p->width, image_p->height);
+    image_set(image2);
 
     int x;
     int y;
@@ -33,7 +33,7 @@ flou(image_t* image_p, int radius)
 
     memcpy(*image_p->image, *image2->image, image_p->width*image_p->height*sizeof(colour_t));
 
-    free_image(image2);
+    image_free(image2);
 }
 
 void
@@ -56,7 +56,7 @@ symetry(image_t* image_p)
 
 void random_colour_shift(image_t* image_p, int delta)
 {
-    process_1_image(&random_delta_colour, image_p, &delta);
+    image_process_1(&random_delta_colour, image_p, &delta);
 }
 
 static colour_struct_t get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius)
@@ -74,7 +74,8 @@ static colour_struct_t get_blurred_pixel(const image_t* image_p, int pixel_x, in
         {
             for (int j = -radius; j <= radius; ++j)
             {
-                if(!is_in_image(pixel_x + i, pixel_y + j, image_p))
+                point_t point = point_init(pixel_x + i, pixel_y + j, 0, BLACK);
+                if(!point_is_in_image(&point, image_p))
                 {
                     continue;
                 }
