@@ -9,6 +9,7 @@
 #define IMGUTIL_H_
 
 #include "colours.h"
+#include "camera.h"
 #include "figure.h"
 #include "transform.h"
 
@@ -30,17 +31,6 @@ typedef struct
  *
  */
 extern const image_t SYSTEM_SCREEN;
-
-
-/** Une camera a utiliser pour le rendu 3D
- *
- */
-typedef struct
-{
-    vector_t origin;
-    vector_t direction;
-    float distance;
-} camera_t;
 
 typedef void (*point_renderer)(const point_t, image_t*);
 
@@ -106,11 +96,6 @@ void barres1(image_t* image, int spread);
  */
 void barres2(image_t* image, int spread);
 
-
-/* Rendu */
-void init_camera(camera_t* camera_p, float origin_x, float origin_y,
-        float origin_z, float destin_x, float destin_y, float destin_z,
-        float distance);
 void render_figure(image_t* image_p, figure_t figure, camera_t camera);
 
 #endif /* IMGUTIL_H_ */

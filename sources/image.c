@@ -65,7 +65,7 @@ image_random(image_t* image_p)
     {
         for(y=0; y<image_p->height; ++y)
         {
-            *(colour_struct_t*) image_p->image[y][x] = get_random_colour();
+            *(colour_struct_t*) image_p->image[y][x] = colour_get_random();
         }
     }
 }
@@ -145,7 +145,7 @@ image_process_3(colour_ternary_operator operator,
 void
 image_add(image_t* image_1_p, const image_t* image_2_p)
 {
-    image_process_2(&add_colours, image_1_p, image_2_p, NULL);
+    image_process_2(&colour_add_2, image_1_p, image_2_p, NULL);
 }
 
 void
@@ -372,30 +372,6 @@ barres2(image_t* image, int spread)
         }
     }
     printf("Processus terminé\n");
-}
-
-
-void
-init_camera(camera_t* camera_p,
-		    float origin_x, float origin_y, float origin_z,
-			float destin_x, float destin_y, float destin_z,
-			float distance)
-{
-	camera_t camera_loc =
-	{
-		{
-			origin_x,
-			origin_y,
-			origin_z
-		},
-		{
-			destin_x,
-			destin_y,
-			destin_z
-		},
-		distance
-	};
-    (*camera_p) = camera_loc;
 }
 
 

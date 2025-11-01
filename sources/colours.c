@@ -20,7 +20,7 @@ const colour_struct_t MAGENTA = {0xFF, 0x00, 0xFF};
 const colour_struct_t YELLOW  = {0x00, 0xFF, 0xFF};
 
 colour_struct_t
-get_random_colour()
+colour_get_random()
 {
     uint32_t colour_raw = rand();
     colour_struct_t colour;
@@ -29,7 +29,7 @@ get_random_colour()
 }
 
 colour_struct_t
-random_delta_colour(colour_struct_t colour, void* parameters_p)
+colour_random_delta(colour_struct_t colour, void* parameters_p)
 {
     float range = *(int*) parameters_p;
     int colour_index;
@@ -47,7 +47,7 @@ random_delta_colour(colour_struct_t colour, void* parameters_p)
 }
 
 colour_struct_t
-add_colours(colour_struct_t colour_1, colour_struct_t colour_2, void* parameters_p)
+colour_add_2(colour_struct_t colour_1, colour_struct_t colour_2, void* parameters_p)
 {
     int colour;
     colour_t return_colour;

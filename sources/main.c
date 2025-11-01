@@ -7,8 +7,8 @@
 #include "main.h"
 
 //#define OLI_FLOU
-//#define OLI_3D
-#define OLI_FIG
+#define OLI_3D
+//#define OLI_FIG
 
 int
 main(int argc, char* argv[])
@@ -76,14 +76,13 @@ main(int argc, char* argv[])
     figure_t test = init_figure(nb);
     colour_t colour;
     *(colour_struct_t*) &colour = RED;
-    camera_t camera;
-    init_camera(&camera, 350, 0, 100, 350, 10, 100, 100);
+    camera_t camera = camera_init(350, 0, 100, 350, 10, 100, 100);
     for(int i = 0; i < nb; ++i)
     {
         test.sequence[i].vector.x = (i % 8) * dist_x;
         test.sequence[i].vector.y = dist_x * (i - i % 8) / 8 - 100;
         test.sequence[i].vector.z = 0;
-        test.sequence[i].colour = get_random_colour();
+        test.sequence[i].colour = colour_get_random();
 //        printf("x,y = %d,%d\n",test.sequence[i].x,test.sequence[i].y);
     }
     int frame_count = 2000;
@@ -133,7 +132,7 @@ main(int argc, char* argv[])
     {
          fig.sequence[i].vector.x = image->width/2;
          fig.sequence[i].vector.y = image->height/2;
-         fig.sequence[i].colour = get_random_colour();
+         fig.sequence[i].colour = colour_get_random();
     }
 
     for(int j=0; j<2000; ++j)
