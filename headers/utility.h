@@ -10,6 +10,8 @@
 
 #include <stdlib.h>
 
+#define OLI_UNUSED(PARAMETER) (void) PARAMETER
+
 #define SAT_MIN 0
 #define SAT_MAX 255
 

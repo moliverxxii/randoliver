@@ -36,10 +36,10 @@ void print_point(point_t point);
 
 
 //Initialise une sequence de nombre_point point_t.
-figure_t init_figure(uint32_t nombre_point);
+figure_t figure_init(uint32_t nombre_point);
 point_t init_point();
 
-vector_t get_average_point(const figure_t* figure_p);
+vector_t figure_get_average_point(const figure_t* figure_p);
 
 
 #endif /* HEADERS_FIGURE_H_ */

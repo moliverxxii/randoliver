@@ -73,21 +73,21 @@ main(int argc, char* argv[])
 #ifdef OLI_3D
     uint32_t nb = 400;
     int dist_x = 100;
-    figure_t test = init_figure(nb);
+    figure_t test = figure_init(nb);
     colour_t colour;
     *(colour_struct_t*) &colour = RED;
     camera_t camera = camera_init(350, 0, 100, 350, 10, 100, 100);
     for(uint32_t point_n = 0; point_n < nb; ++point_n)
     {
         test.sequence[point_n].vector.x = (point_n % 8) * dist_x;
-        test.sequence[point_n].vector.y = dist_x * (float) (point_n - (point_n % 8)) / 8 - 100;
+        test.sequence[point_n].vector.y = (dist_x * (float) (point_n - point_n % 8)) / 8 - 100;
         test.sequence[point_n].vector.z = 0;
         test.sequence[point_n].colour = colour_get_random();
 //        printf("x,y = %d,%d\n",test.sequence[i].x,test.sequence[i].y);
     }
-    int frame_count = 2000;
+    int frame_count = 360;
 
-    vector_t centre_grave = get_average_point(&test);
+    vector_t centre_grave = figure_get_average_point(&test);
     vector_t centre_grave_z;
     add_vectors(&centre_grave_z, centre_grave, (vector_t) {0,0,1});
     int frame=0;
@@ -117,9 +117,6 @@ main(int argc, char* argv[])
         ++frame;
     } while (frame<frame_count);
 
-    strcpy(file_name, "a");
-    file = init_image_file(file_name, image_p);
-    fclose(file);
     interface_deinit();
 
 #endif /* OLI_3D */
@@ -130,7 +127,7 @@ main(int argc, char* argv[])
 
 #ifdef OLI_FIG
     unsigned int num_points = 20000;
-    figure_t fig = init_figure(num_points);
+    figure_t fig = figure_init(num_points);
     for(int i=0; i<fig.amount; ++i)
     {
          fig.sequence[i].vector.x = image_p->width/2;
@@ -160,6 +157,6 @@ main(int argc, char* argv[])
         image_set(image_p);
     }
 #endif
+
     return EXIT_SUCCESS;
 }
-

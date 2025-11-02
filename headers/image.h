@@ -38,7 +38,7 @@ extern point_renderer public_point_renderer;
 
 /* Elementaires */
 //Returns a pointer to an image.
-image_t* image_init(int width, int height);
+image_t* image_init(uint32_t width, uint32_t height);
 
 //Frees the memory the image occupies in memory.
 void image_free(image_t* image);

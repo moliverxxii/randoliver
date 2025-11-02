@@ -28,23 +28,23 @@ init_point()
 }
 
 figure_t
-init_figure(uint32_t nombre_point)
+figure_init(uint32_t point_count)
 {
     figure_t figure;
 
-    figure.amount = nombre_point;
-    figure.sequence = (point_t*) malloc(nombre_point * sizeof(point_t));
+    figure.amount = point_count;
+    figure.sequence = (point_t*) malloc(point_count * sizeof(point_t));
 
-    int i;
-    for(i = 0; i < nombre_point; ++i)
+    uint32_t point;
+    for(point = 0; point < point_count; ++point)
     {
-        figure.sequence[i] = init_point();
+        figure.sequence[point] = init_point();
     }
     return figure;
 }
 
 vector_t
-get_average_point(const figure_t* figure_p)
+figure_get_average_point(const figure_t* figure_p)
 {
     vector_t average = {0, 0, 0};
 

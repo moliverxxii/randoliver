@@ -21,7 +21,7 @@ const image_t SYSTEM_SCREEN =
 
 
 image_t*
-image_init(int width, int height)
+image_init(uint32_t width, uint32_t height)
 {
 
     colour_t* image_data_p = malloc(height * width * sizeof(colour_t));
@@ -60,7 +60,7 @@ image_set(image_t* image)
 void
 image_random(image_t* image_p)
 {
-    int x,y;
+    uint32_t x,y;
     for(x=0; x<image_p->width; ++x)
     {
         for(y=0; y<image_p->height; ++y)
@@ -76,7 +76,7 @@ image_get_sum_colour(const image_t* image_p)
     int sum = 0;
     for(int colour = 0; colour<COLOUR_COUNT; colour++)
     {
-        int x,y;
+        uint32_t x,y;
         for(x=0; x<image_p->width; ++x)
         {
             for(y=0; y<image_p->height; ++y)
@@ -92,7 +92,7 @@ image_get_sum_colour(const image_t* image_p)
 void
 image_process_1(colour_unary_operator operator, image_t* image_p, void* parameters_p)
 {
-    int x,y;
+    uint32_t x,y;
     for(x=0; x<image_p->width; ++x)
     {
         for(y=0; y<image_p->height; ++y)
@@ -108,7 +108,7 @@ image_process_2(colour_binary_operator operator,
         const image_t* image_2_p,
         void* parameters_p)
 {
-    int x,y;
+    uint32_t x,y;
     for(x=0; x<image_1_p->width; ++x)
     {
         for(y=0; y<image_1_p->height; ++y)
@@ -128,7 +128,7 @@ image_process_3(colour_ternary_operator operator,
         const image_t* image_3_p,
         void* parameters_p)
 {
-    int x,y;
+    uint32_t x,y;
     for(x=0; x<image_1_p->width; ++x)
     {
         for(y=0; y<image_1_p->height; ++y)
@@ -151,8 +151,8 @@ image_add(image_t* image_1_p, const image_t* image_2_p)
 void
 image_display(image_t* image)
 {
-    int x;
-    int y;
+    uint32_t x;
+    uint32_t y;
     for(x = 0; x < image->width; ++x)
     {
         for(y = 0; y < image->height; ++y)
@@ -314,9 +314,9 @@ barres1(image_t* image, int spread)
     printf("Début du processus\n");
 
     int i = 0;
-    int y;
-    int x;
-    int x_prime;
+    uint32_t y;
+    uint32_t x;
+    uint32_t x_prime;
     int bool = 1;
 
     for(y = 0; y < image->height; ++y)
@@ -346,8 +346,8 @@ barres2(image_t* image, int spread)
     printf("Début du processus\n");
 
     int i = 0;
-    int y;
-    int x;
+    uint32_t y;
+    uint32_t x;
     uint32_t x_prime[3];
     int bool;
 
@@ -400,9 +400,9 @@ render_figure(image_t* image_p, figure_t figure, camera_t camera)
     w.y =  u.z * u.y / sqrt(pow(u.x, 2) + pow(u.y, 2));
     w.z = sqrt(pow(u.x, 2) + pow(u.y, 2));
 
-    for(int i = 0; i < figure.amount; ++i)
+    for(uint32_t point = 0; point < figure.amount; ++point)
     {
-        vector_t p = figure.sequence[i].vector;
+        vector_t p = figure.sequence[point].vector;
 
         vector_t op;
         subtract_vectors(&op, p, o);
@@ -423,7 +423,7 @@ render_figure(image_t* image_p, figure_t figure, camera_t camera)
         point_t render_point = point_init(x_image,
                                           y_image,
                                           0,
-                                          figure.sequence[i].colour);
+                                          figure.sequence[point].colour);
         if(point_is_in_image(&render_point, image_p))
         {
             (*public_point_renderer)(render_point, image_p);

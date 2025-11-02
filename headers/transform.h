@@ -9,6 +9,7 @@
 #define HEADERS_TRANSFORM_H_
 
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "transform.h"
 
@@ -68,7 +69,7 @@ void print_operator(const matrix_3x3_t operator);
 /** result_p[i] = operator X vectors_p[i], int i, 0<=i <vector_count
  *
  */
-void space_operation(vector_t* result_p, const matrix_3x3_t operator, const vector_t* vectors_p, size_t vector_count);
+void space_operation(vector_t* result_p, const matrix_3x3_t operator, const vector_t* vectors_p, uint32_t vector_count);
 
 /** matrix_trans = matrix^T
  *

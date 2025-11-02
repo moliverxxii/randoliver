@@ -21,8 +21,8 @@ flou(image_t* image_p, int radius)
     image_t* image2 = image_init(image_p->width, image_p->height);
     image_set(image2);
 
-    int x;
-    int y;
+    uint32_t x;
+    uint32_t y;
     for(x = 0; x < image_p->width; ++x)
     {
         for(y = 0; y < image_p->height; ++y)
@@ -39,16 +39,16 @@ flou(image_t* image_p, int radius)
 void
 symetry(image_t* image_p)
 {
-    int x, y;
+    uint32_t x, y;
     for(x = 0; x < image_p->width/2; ++x)
     {
         for(y = 0; y < image_p->height/2; ++y)
         {
-            *(colour_struct_t*) image_p->image[y][image_p->width - 1 - x]
+            *(colour_struct_t*) image_p->image[y][image_p->width - (1 + x)]
                 = *(colour_struct_t*) image_p->image[y][x];
-            *(colour_struct_t*) image_p->image[image_p->height - 1 - y][x]
+            *(colour_struct_t*) image_p->image[image_p->height - (1 + y)][x]
                 = *(colour_struct_t*) image_p->image[y][x];
-            *(colour_struct_t*) image_p->image[image_p->height - 1 - y][image_p->width - 1 - x]
+            *(colour_struct_t*) image_p->image[image_p->height - (1 + y)][image_p->width - (1 + x)]
                 = *(colour_struct_t*) image_p->image[y][x];
         }
     }

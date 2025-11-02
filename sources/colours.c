@@ -49,6 +49,8 @@ colour_random_delta(colour_struct_t colour, void* parameters_p)
 colour_struct_t
 colour_add_2(colour_struct_t colour_1, colour_struct_t colour_2, void* parameters_p)
 {
+    OLI_UNUSED(parameters_p);
+
     int colour;
     colour_t return_colour;
     for(colour = 0; colour<COLOUR_COUNT; ++colour)

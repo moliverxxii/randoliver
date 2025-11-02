@@ -98,10 +98,10 @@ void
 space_operation(vector_t* result_p,
                 const matrix_3x3_t operator,
                 const vector_t* vectors_p,
-                size_t vector_count)
+                uint32_t vector_count)
 {
-    int column;
-    int row;
+    uint32_t column;
+    uint32_t row;
     for (column = 0; column < vector_count; ++column)
     {
         for(row=0; row<3; row++)
@@ -281,6 +281,10 @@ axial_scale_vector(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float s
 void
 planar_scale_vector(vector_t* point_p, vector_t plane_a, vector_t normal_b, float scale)
 {
+    OLI_UNUSED(point_p);
+    OLI_UNUSED(plane_a);
+    OLI_UNUSED(normal_b);
+    OLI_UNUSED(scale);
 }
 
 void
