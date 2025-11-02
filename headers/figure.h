@@ -23,12 +23,8 @@ typedef struct
     point_t* sequence;
 } figure_t;
 
-void print_point(point_t point);
-
-
 //Initialise une sequence de nombre_point point_t.
 figure_t figure_init(uint32_t nombre_point);
-point_t init_point();
 
 vector_t figure_get_average_point(const figure_t* figure_p);
 

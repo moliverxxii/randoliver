@@ -55,7 +55,8 @@ symetry(image_t* image_p)
     }
 }
 
-void random_colour_shift(image_t* image_p, int delta)
+void
+random_colour_shift(image_t* image_p, int delta)
 {
     image_process_1(&colour_random_delta, image_p, &delta);
 }

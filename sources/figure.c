@@ -9,24 +9,6 @@
 #include <stdlib.h>
 #include "figure.h"
 
-void
-print_point(point_t point)
-{
-    printf("(x y z) = (%4f %4f %4f | (R G B) = (%02X %02X %02X))\n",
-            point.vector.x, point.vector.y, point.vector.z,
-            point.colour.red, point.colour.green, point.colour.blue);
-}
-
-
-point_t
-init_point()
-{
-    point_t point;
-    point.colour = BLACK;
-    point.vector = VECTOR_0;
-    return point;
-}
-
 figure_t
 figure_init(uint32_t point_count)
 {
@@ -38,7 +20,7 @@ figure_init(uint32_t point_count)
     uint32_t point;
     for(point = 0; point < point_count; ++point)
     {
-        figure.sequence[point] = init_point();
+        figure.sequence[point] = point_init(0, 0, 0, BLACK);
     }
     return figure;
 }
