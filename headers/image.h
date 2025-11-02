@@ -9,7 +9,6 @@
 #define IMGUTIL_H_
 
 #include "colours.h"
-#include "camera.h"
 #include "figure.h"
 #include "transform.h"
 
@@ -75,7 +74,5 @@ void average_point(const point_t point, image_t* image_p);
 int point_is_in_image(const point_t* point_p, const image_t* image_p);
 // Draws a sequence of points into an image.
 void image_draw_figure(image_t* image, const figure_t* figure);
-
-void render_figure(image_t* image_p, figure_t figure, camera_t camera);
 
 #endif /* IMGUTIL_H_ */

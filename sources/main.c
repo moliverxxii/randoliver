@@ -14,9 +14,10 @@
 #include "image.h"
 #include "file_utility.h"
 #include "image_drawing.h"
+#include "camera.h"
 
-//#define OLI_3D
-#define OLI_BROWN
+#define OLI_3D
+//#define OLI_BROWN
 //#define OLI_FIG
 
 int
@@ -72,7 +73,7 @@ main(int argc, char* argv[])
     {
         interface_state_restore();
         printf("Image %u\n", frame);
-        render_figure(image_p, test, camera);
+        camera_render_figure(&camera, image_p, test);
 
         file_name = num_extension(nom, frame);
 

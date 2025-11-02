@@ -28,7 +28,7 @@ $(DIRS):
 	mkdir -p $@
 
 clean:
-	rm -fr $(OBJECT_DIR) $(DEPENDENCIES) $(PROJECT)
+	rm -fr $(OBJECT_DIR) $(DEPENDENCY_DIR) $(PROJECT)
 	
 rebuild: clean all
 
