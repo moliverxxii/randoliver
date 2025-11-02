@@ -11,8 +11,6 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "transform.h"
-
 typedef float vector_axis_t;
 
 /**
@@ -24,6 +22,24 @@ typedef struct
     vector_axis_t y;
     vector_axis_t z;
 } vector_t;
+
+typedef enum
+{
+    VECTOR_AXIS_X = 0,
+    VECTOR_AXIS_Y,
+    VECTOR_AXIS_Z,
+    VECTOR_AXIS_COUNT
+} vector_axis_e;
+
+#define VECTOR_AXIS_MASK(AXIS) VECTOR_AXIS_MASK_##AXIS = 1 << VECTOR_AXIS_##AXIS
+
+typedef enum
+{
+    VECTOR_AXIS_MASK(X),
+    VECTOR_AXIS_MASK(Y),
+    VECTOR_AXIS_MASK(Z),
+    VECTOR_AXIS_MASK_ALL = VECTOR_AXIS_MASK_X | VECTOR_AXIS_MASK_Y | VECTOR_AXIS_MASK_Z
+} vector_axis_mask_e;
 
 typedef vector_axis_t matrix_3x3_t [3][3];
 typedef vector_axis_t matrix_3x1_t [3];

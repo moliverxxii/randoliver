@@ -61,7 +61,7 @@ void image_process_3(colour_ternary_operator operator,
 void image_add(image_t* image_1_p, const image_t* image_2_p);
 
 //Displays the values of the pixels. Line by line.
-void image_display(image_t* image);
+void image_print(const image_t* image);
 
 //Draws a colored rectangle in an image.
 void image_draw_rect(colour_t color, int botLeftX, int botLeftY, int topRightX,
@@ -72,29 +72,9 @@ void or_point(const point_t point, image_t* image_p);
 void xor_point(const point_t point, image_t* image_p);
 void average_point(const point_t point, image_t* image_p);
 
-point_t point_init(vector_axis_t x, vector_axis_t y, vector_axis_t z, colour_struct_t colour);
 int point_is_in_image(const point_t* point_p, const image_t* image_p);
 // Draws a sequence of points into an image.
-void draw_figure(image_t* image, figure_t* figure);
-
-/* Processus */
-/**Ajoute un mouvement brownien à l'image de longueur "iterations" et de
- *point
- *de départ (x0,y0).
- */
-void brownien1(image_t* image, int iterations, int spread, int x0, int y0);
-
-/**Ajoutes des barres blanches brouillées verticales à l'image.
- *Elles sont espacées centre-à-centre
- *de la distance "spread".
- */
-void barres1(image_t* image, int spread);
-
-/**Ajoutes des barres verticales brouillées à l'image.
- *Elles sont espacées centre-à-centre
- *de la distance "spread".
- */
-void barres2(image_t* image, int spread);
+void image_draw_figure(image_t* image, const figure_t* figure);
 
 void render_figure(image_t* image_p, figure_t figure, camera_t camera);
 

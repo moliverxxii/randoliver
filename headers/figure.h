@@ -10,18 +10,9 @@
 
 #include <stdint.h>
 
+#include "point.h"
 #include "colours.h"
 #include "transform.h"
-
-/** Un point dans l'espace
- *
- */
-typedef struct
-{
-    vector_t vector;
-    colour_struct_t colour;
-} point_t;
-
 
 /** Une sequence de points
  *

@@ -6,6 +6,7 @@
  */
 #include <string.h>
 
+#include "point.h"
 #include "filter.h"
 #include "utility.h"
 

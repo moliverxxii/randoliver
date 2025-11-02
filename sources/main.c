@@ -13,8 +13,10 @@
 #include "interface.h"
 #include "image.h"
 #include "file_utility.h"
-//#define OLI_FLOU
-#define OLI_3D
+#include "image_drawing.h"
+
+//#define OLI_3D
+#define OLI_BROWN
 //#define OLI_FIG
 
 int
@@ -43,32 +45,6 @@ main(int argc, char* argv[])
 
     //Initialisation des particules
     srand(time(NULL));
-
-#ifdef OLI_FLOU
-    add_images(image_p, image1_p);
-
-    printf("\"image\", \"start\", \"post op\", \"post flou\"\n");
-    for(int frame=0; frame<2000; ++frame)
-    {
-        interface_state_restore();
-        printf("%7u, ", frame);
-        file_name = num_extension(nom, frame);
-
-        printf("%11d, ", get_sum_colour(image_p));
-        random_colour_shift(image_p, 40);
-        printf("%11d, ", get_sum_colour(image_p));
-        flou(image_p, 5);
-        //symetry(image);
-        printf("%11d\n", get_sum_colour(image_p));
-
-
-        file = init_image_file(file_name, image_p);
-
-        write_image(image_p, file);
-        free(file_name);
-        fclose(file);
-    }
-#endif // OLI_FLOU
 
 #ifdef OLI_3D
     uint32_t nb = 400;
@@ -117,18 +93,23 @@ main(int argc, char* argv[])
         ++frame;
     } while (frame<frame_count);
 
-    interface_deinit();
-
 #endif /* OLI_3D */
 
 #ifdef OLI_BROWN
+    file_name = nom;
     brownien1(image_p, 30000, 1, width/2, height/2);
+    file = init_image_file(file_name, image_p);
+
+    write_image(image_p, file);
+    free(file_name);
+    fclose(file);
+    image_set(image_p);
 #endif /* OLI_BROWN */
 
 #ifdef OLI_FIG
     unsigned int num_points = 20000;
     figure_t fig = figure_init(num_points);
-    for(int i=0; i<fig.amount; ++i)
+    for(uint32_t i=0; i<fig.amount; ++i)
     {
          fig.sequence[i].vector.x = image_p->width/2;
          fig.sequence[i].vector.y = image_p->height/2;
@@ -139,7 +120,7 @@ main(int argc, char* argv[])
     {
         interface_state_restore();
         printf("Image %u\n", frame);
-        for(int i=0; i<fig.amount;++i)
+        for(uint32_t i=0; i<fig.amount;++i)
         {
            rand_delta_vector(&fig.sequence[i].vector,
                              1,
@@ -150,13 +131,15 @@ main(int argc, char* argv[])
 
         file = init_image_file(file_name, image_p);
 
-        draw_figure(image_p, &fig);
+        image_draw_figure(image_p, &fig);
         write_image(image_p, file);
         free(file_name);
     	fclose(file);
         image_set(image_p);
     }
 #endif
+
+    interface_deinit();
 
     return EXIT_SUCCESS;
 }
