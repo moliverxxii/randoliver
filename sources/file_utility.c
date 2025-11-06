@@ -9,6 +9,7 @@
 
 #include "file_utility.h"
 
+const size_t ROW_PADDING = sizeof(uint32_t);
 
 FILE*
 init_image_file(const char* name, image_t* image)
@@ -63,10 +64,16 @@ write_image(const image_t* image, FILE* image_file)
 {
     fseek(image_file, HEADER_SIZE, SEEK_SET);
     init_header(image_file, image->width, image->height);
-    fwrite(*image->image,
-           sizeof(colour_t),
-           image->height * image->width,
-           image_file);
+    for(uint32_t y = 0; y<image->height; ++y)
+    {
+        fwrite(image->image[y],
+               sizeof(colour_t),
+               image->width,
+               image_file);
+        uint8_t pad[3] = {0, 0, 0};
+        uint8_t pad_length = (ROW_PADDING - (sizeof(colour_t) * image->width) % ROW_PADDING) % ROW_PADDING;
+        fwrite(pad, sizeof(uint8_t), pad_length, image_file);
+    }
 }
 
 int
