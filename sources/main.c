@@ -16,9 +16,10 @@
 #include "image_drawing.h"
 #include "camera.h"
 
-#define OLI_3D
+//#define OLI_3D
 //#define OLI_BROWN
 //#define OLI_FIG
+#define OLI_TEST_PATTERN
 
 int
 main(int argc, char* argv[])
@@ -46,6 +47,11 @@ main(int argc, char* argv[])
 
     //Initialisation des particules
     srand(time(NULL));
+
+    test_pattern_squares(image_p, 9);
+    image_scale(&image_p, 1./8, SCALE_ALGORITHM_LINEAR);
+    image_scale(&image_p, 8   , SCALE_ALGORITHM_LINEAR);
+    init_image_file(nom, image_p);
 
 #ifdef OLI_3D
     uint32_t nb = 400;

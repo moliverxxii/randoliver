@@ -26,6 +26,12 @@ typedef struct
     row_t*       image;
 } image_t;
 
+typedef enum
+{
+    SCALE_ALGORITHM_DUMB = 0,
+    SCALE_ALGORITHM_LINEAR
+} image_scale_algorithm_t;
+
 /** La definition de l'ecan
  *
  */
@@ -44,6 +50,8 @@ void image_free(image_t* image);
 
 //Turns the image black.
 void image_set(image_t* image);
+
+void image_scale(image_t** image_pp, float scale, image_scale_algorithm_t algorithm);
 
 //Colore aléatorement l'image.
 void image_random(image_t* image);

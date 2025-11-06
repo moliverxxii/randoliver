@@ -58,6 +58,27 @@ image_set(image_t* image)
 }
 
 void
+image_scale(image_t** image_pp, float scale, image_scale_algorithm_t algorithm)
+{
+    uint32_t new_width  = (*image_pp)->width * scale;
+    uint32_t new_height = (*image_pp)->height * scale;
+    image_t* new_image_p = image_init(new_width, new_height);
+    for(uint32_t y=0; y<new_height; ++y)
+    {
+        for(uint32_t x=0; x<new_width; ++x)
+        {
+            float x_source = x/scale;
+            float y_source = y/scale;
+            memcpy(new_image_p->image[y][x],
+                   (*image_pp)->image[(uint32_t) y_source][(uint32_t) x_source],
+                   sizeof(colour_t));
+        }
+    }
+    image_free(*image_pp);
+    *image_pp = new_image_p;
+}
+
+void
 image_random(image_t* image_p)
 {
     uint32_t x,y;

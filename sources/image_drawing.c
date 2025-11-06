@@ -115,4 +115,29 @@ barres2(image_t* image, int spread)
     printf("Processus terminé\n");
 }
 
+void
+test_pattern_squares(image_t* image_p, uint32_t period)
+{
+    uint32_t x_squares = (image_p->width + period - 1) / period;
+    uint32_t y_squares = (image_p->height + period - 1) / period;
+    colour_struct_t* square_colours_p = malloc(x_squares*y_squares*sizeof(colour_struct_t));
+    for(uint32_t square = 0; square < x_squares * y_squares; ++ square)
+    {
+        square_colours_p[square] = colour_get_random();
+    }
+    for(uint32_t y=0; y < image_p->height; ++y)
+    {
+        for(uint32_t x=0; x < image_p->width; ++x)
+        {
+            draw_point((point_t) {
+                                    {x, y, 0},
+                                    square_colours_p[x/period + (y/period)*x_squares]
+                                 },
+                       image_p);
+        }
+
+    }
+    free(square_colours_p);
+}
+
 
