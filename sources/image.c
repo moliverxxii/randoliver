@@ -8,9 +8,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-
 #include "utility.h"
 #include "image.h"
+#include "interface.h"
 
 const image_t SYSTEM_SCREEN =
 {
@@ -57,6 +57,118 @@ image_set(image_t* image)
     memset(*image->image, 0, image->width * image->height * sizeof(colour_t) );
 }
 
+static void
+scale_pixel(image_t* new_image_p, const image_t* image_p, uint32_t new_x, uint32_t new_y, float scale)
+{
+    float x_source = new_x/scale;
+    float y_source = new_y/scale;
+    memcpy(new_image_p->image[new_y][new_x],
+           image_p->image[(uint32_t) y_source][(uint32_t) x_source],
+           sizeof(colour_t));
+}
+
+static void
+scale_pixel_linear(image_t* new_image_p, const image_t* image_p, uint32_t new_x, uint32_t new_y, float scale)
+{
+    float x_n = new_x/scale;
+    float y_n = new_y/scale;
+    float colour_temp[COLOUR_COUNT] = {0, 0, 0};
+
+    uint32_t x_n_f = (uint32_t) x_n;
+    uint32_t y_n_f = (uint32_t) y_n;
+    float y_n1 = (new_y + 1)/scale;
+    uint32_t y_n1_f = (uint32_t) y_n1;
+    float x_n1 = (new_x + 1)/scale;
+    uint32_t x_n1_f = (uint32_t) x_n1;
+    float y_coef = 0;
+
+    if(scale>1.0f)
+    {
+#warning NON.
+        float x_coef = x_n - (float) x_n_f;
+        for(uint8_t colour_index = 0; colour_index < COLOUR_COUNT;
+                ++colour_index)
+        {
+            colour_temp[colour_index] +=
+                     x_coef * (float) image_p->image[y_n_f][x_n_f + 1][colour_index];
+        }
+        float x_coef1 = (float) x_n_f + 1 - x_n;
+        printf("%f + %f = %f\n", x_coef, x_coef1, x_coef + x_coef1);
+        for(uint8_t colour_index = 0; colour_index < COLOUR_COUNT;
+                ++colour_index)
+        {
+            colour_temp[colour_index] +=
+                     x_coef1 * (float) image_p->image[y_n_f][x_n_f][colour_index];
+        }
+        for(uint8_t colour_index = 0; colour_index < COLOUR_COUNT;
+                ++colour_index)
+        {
+            colour_temp[colour_index] /= (x_coef + x_coef1);
+        }
+    }
+    else
+    {
+        for(uint32_t y_i = y_n_f; y_i <= y_n1_f; ++y_i)
+        {
+            if(y_i == y_n_f)
+            {
+                y_coef = (float) y_n_f + 1 - y_n;
+            }
+            else if(y_i == y_n1_f)
+            {
+                y_coef = y_n1 - (float) y_n1_f;
+            }
+            else
+            {
+                y_coef = 1;
+            }
+
+            if(y_coef <= 0)
+            {
+                continue;
+            }
+
+            for(uint32_t x_i = x_n_f; x_i <= x_n1_f; ++x_i)
+            {
+                float x_coef = 0;
+
+                if(x_i == x_n_f)
+                {
+                    x_coef = (float) x_n_f + 1 - x_n;
+                }
+                else if(x_i == x_n1_f)
+                {
+                    x_coef = x_n1 - (float) x_n1_f;
+                }
+                else
+                {
+                    x_coef = 1;
+                }
+
+                if(x_coef <= 0)
+                {
+                    continue;
+                }
+
+
+                for(uint8_t colour_index = 0; colour_index < COLOUR_COUNT;
+                        ++colour_index)
+                {
+                    colour_temp[colour_index] +=
+                            y_coef * x_coef * (float) image_p->image[y_i][x_i][colour_index];
+                }
+            }
+        }
+        for(uint8_t colour_index = 0; colour_index<COLOUR_COUNT; ++colour_index)
+        {
+            colour_temp[colour_index] *= scale*scale;
+        }
+
+    }
+    colour_t colour = {colour_temp[0], colour_temp[1], colour_temp[2]};
+    memcpy(new_image_p->image[new_y][new_x], colour, sizeof(colour_t));
+}
+
 void
 image_scale(image_t** image_pp, float scale, image_scale_algorithm_t algorithm)
 {
@@ -67,11 +179,16 @@ image_scale(image_t** image_pp, float scale, image_scale_algorithm_t algorithm)
     {
         for(uint32_t x=0; x<new_width; ++x)
         {
-            float x_source = x/scale;
-            float y_source = y/scale;
-            memcpy(new_image_p->image[y][x],
-                   (*image_pp)->image[(uint32_t) y_source][(uint32_t) x_source],
-                   sizeof(colour_t));
+            switch(algorithm)
+            {
+            case SCALE_ALGORITHM_DUMB:
+                scale_pixel(new_image_p, *image_pp, x, y, scale);
+                break;
+            case SCALE_ALGORITHM_LINEAR:
+                scale_pixel_linear(new_image_p, *image_pp, x, y, scale);
+                break;
+
+            }
         }
     }
     image_free(*image_pp);
