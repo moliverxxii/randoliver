@@ -29,7 +29,8 @@ typedef struct
 typedef enum
 {
     SCALE_ALGORITHM_DUMB = 0,
-    SCALE_ALGORITHM_LINEAR
+    SCALE_ALGORITHM_LINEAR,
+    SCALE_ALGORITHM_COUNT
 } image_scale_algorithm_t;
 
 /** La definition de l'ecan
