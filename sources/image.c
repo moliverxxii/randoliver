@@ -72,42 +72,74 @@ scale_pixel_linear(image_t* new_image_p, const image_t* image_p, uint32_t new_x,
 {
     float x_n = new_x/scale;
     float y_n = new_y/scale;
-    float colour_temp[COLOUR_COUNT] = {0, 0, 0};
+    float colour_new[COLOUR_COUNT] = {0, 0, 0};
 
-    uint32_t x_n_f = (uint32_t) x_n;
-    uint32_t y_n_f = (uint32_t) y_n;
-    float y_n1 = (new_y + 1)/scale;
-    uint32_t y_n1_f = (uint32_t) y_n1;
-    float x_n1 = (new_x + 1)/scale;
-    uint32_t x_n1_f = (uint32_t) x_n1;
-    float y_coef = 0;
 
     if(scale>1.0f)
     {
-#warning NON.
-        float x_coef = x_n - (float) x_n_f;
-        for(uint8_t colour_index = 0; colour_index < COLOUR_COUNT;
-                ++colour_index)
+        float f_new_x = (float) new_x + 1.0f/2;
+        float e_new_x = f_new_x / scale;
+        int32_t n_x = (int32_t) floorf(e_new_x - 1.0f/2);
+        float e_n_x = n_x + 1.0f/2;
+        float colour_factor_x[2] = {0, e_new_x - e_n_x};
+        colour_factor_x[0] = 1 - colour_factor_x[1];
+
+        float f_new_y = (float) new_y + 1.0f/2;
+        float e_new_y = f_new_y / scale;
+        int32_t n_y = (int32_t) floorf(e_new_y - 1.0f/2);
+        float e_n_y = n_y + 1.0f/2;
+        float colour_factor_y[2] = {0, e_new_y - e_n_y};
+        colour_factor_y[0] = 1 - colour_factor_y[1];
+
+        float colour_factor_sum = 0;
+
+        for(int32_t n_y_offset=0; n_y_offset<=1; ++n_y_offset)
         {
-            colour_temp[colour_index] +=
-                     x_coef * (float) image_p->image[y_n_f][x_n_f + 1][colour_index];
+
+            if(n_y + n_y_offset >= (int32_t) image_p->height
+                || n_y + n_y_offset < 0)
+            {
+                continue;
+            }
+
+            for(int32_t n_x_offset=0; n_x_offset<=1; ++n_x_offset)
+            {
+                if(n_x + n_x_offset >= (int32_t) image_p->width
+                    || n_x + n_x_offset < 0)
+                {
+                    continue;
+                }
+
+                float colour_factor = colour_factor_y[n_y_offset] * colour_factor_x[n_x_offset];
+                for(uint8_t colour_index = 0;
+                    colour_index < COLOUR_COUNT;
+                    ++colour_index)
+                {
+                    colour_new[colour_index] +=
+                             colour_factor * (float) image_p->image[n_y + n_y_offset][n_x + n_x_offset][colour_index];
+                }
+                colour_factor_sum += colour_factor;
+
+            }
         }
-        float x_coef1 = (float) x_n_f + 1 - x_n;
-        printf("%f + %f = %f\n", x_coef, x_coef1, x_coef + x_coef1);
+
+
         for(uint8_t colour_index = 0; colour_index < COLOUR_COUNT;
                 ++colour_index)
         {
-            colour_temp[colour_index] +=
-                     x_coef1 * (float) image_p->image[y_n_f][x_n_f][colour_index];
-        }
-        for(uint8_t colour_index = 0; colour_index < COLOUR_COUNT;
-                ++colour_index)
-        {
-            colour_temp[colour_index] /= (x_coef + x_coef1);
+            colour_new[colour_index] /= colour_factor_sum;
         }
     }
     else
     {
+        uint32_t x_n_f = (uint32_t) x_n;
+        uint32_t y_n_f = (uint32_t) y_n;
+        float y_n1 = (new_y + 1)/scale;
+        uint32_t y_n1_f = (uint32_t) y_n1;
+        float x_n1 = (new_x + 1)/scale;
+        uint32_t x_n1_f = (uint32_t) x_n1;
+        float y_coef = 0;
+
         for(uint32_t y_i = y_n_f; y_i <= y_n1_f; ++y_i)
         {
             if(y_i == y_n_f)
@@ -154,18 +186,18 @@ scale_pixel_linear(image_t* new_image_p, const image_t* image_p, uint32_t new_x,
                 for(uint8_t colour_index = 0; colour_index < COLOUR_COUNT;
                         ++colour_index)
                 {
-                    colour_temp[colour_index] +=
+                    colour_new[colour_index] +=
                             y_coef * x_coef * (float) image_p->image[y_i][x_i][colour_index];
                 }
             }
         }
         for(uint8_t colour_index = 0; colour_index<COLOUR_COUNT; ++colour_index)
         {
-            colour_temp[colour_index] *= scale*scale;
+            colour_new[colour_index] *= scale*scale;
         }
 
     }
-    colour_t colour = {colour_temp[0], colour_temp[1], colour_temp[2]};
+    colour_t colour = {colour_new[0], colour_new[1], colour_new[2]};
     memcpy(new_image_p->image[new_y][new_x], colour, sizeof(colour_t));
 }
 

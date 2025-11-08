@@ -36,8 +36,8 @@ main(int argc, char* argv[])
     {
         strcpy(nom, "sans titre");
     }
-    int width = 7;
-    int height = 7;
+    int width = 2;
+    int height = 2;
 
     char* file_name;
     FILE* file;
@@ -49,10 +49,10 @@ main(int argc, char* argv[])
     srand(time(NULL));
 
     interface_state_save();
-    test_pattern_squares(image_p, 3);
+    test_pattern_squares(image_p, 1);
 //    image_scale(&image_p, 1./20, SCALE_ALGORITHM_DUMB);
     interface_state_save();
-    image_scale(&image_p, 100.4340  , SCALE_ALGORITHM_LINEAR);
+    image_scale(&image_p, 540, SCALE_ALGORITHM_LINEAR);
     init_image_file(nom, image_p);
 
 #ifdef OLI_3D
