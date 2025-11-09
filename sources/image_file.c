@@ -36,67 +36,67 @@ const size_t ROW_PADDING = sizeof(uint32_t);
 const size_t HEADER_SIZE = sizeof(bmp_header_t);
 const char BMP_GENERATOR_SIGNATURE[sizeof(uint32_t)] = {'m', 'o', '2', '2'};
 
-static void image_file_init_header(FILE* file, int width, int height);
+static void image_file_init_header(FILE* file, uint32_t width, uint32_t height);
 
-FILE*
-image_file_init(const char* name, image_t* image)
+image_file_t*
+image_file_init(const char* name_p, image_t* image_p)
 {
-    //FILE CREATION AND NAME
-    char* file_name = bmp_extension(name);
-    if(!file_name)
+    char* image_name_p = malloc((strlen(name_p) + 1)* sizeof(char));
+    strcpy(image_name_p, name_p);
+
+
+    char* file_name_p = bmp_extension(name_p);
+
+    if(!file_name_p)
     {
     	printf("file name error\n");
+        return NULL;
     }
-    FILE* image_file = fopen(file_name, "wb+");
-    if(!image_file)
+
+    FILE* file_p = fopen(file_name_p, "wb+");
+    free(file_name_p);
+    file_name_p = NULL;
+
+    if(!file_p)
     {
-    	printf("image file error\n");
+        printf("image file error\n");
+        free(image_name_p);
+        return NULL;
     }
 
+    image_file_t image_file = {image_name_p, file_p};
 
-    //DATA
-    image_file_write(image, image_file);
-    return image_file;
+    image_file_t* image_file_p = malloc(sizeof(image_file_t));
+    *image_file_p = image_file;
+
+    image_file_write(image_file_p, image_p);
+    return image_file_p;
+}
+
+void
+image_file_free(image_file_t* image_file_p)
+{
+    free(image_file_p->file_name_p);
+    fclose(image_file_p->file_p);
+    free(image_file_p);
 }
 
 
 void
-image_file_write(const image_t* image, FILE* image_file)
+image_file_write(image_file_t* image_file_p , const image_t* image_p)
 {
-    fseek(image_file, HEADER_SIZE, SEEK_SET);
-    image_file_init_header(image_file, image->width, image->height);
-    for(uint32_t y = 0; y<image->height; ++y)
+    fseek(image_file_p->file_p, HEADER_SIZE, SEEK_SET);
+    image_file_init_header(image_file_p->file_p, image_p->width, image_p->height);
+    for(uint32_t y = 0; y<image_p->height; ++y)
     {
-        fwrite(image->image[y],
+        fwrite(image_p->image[y],
                sizeof(colour_t),
-               image->width,
-               image_file);
+               image_p->width,
+               image_file_p->file_p);
         uint8_t pad[3] = {0, 0, 0};
-        uint8_t pad_length = (ROW_PADDING - (sizeof(colour_t) * image->width) % ROW_PADDING) % ROW_PADDING;
-        fwrite(pad, sizeof(uint8_t), pad_length, image_file);
+        uint8_t pad_length = (ROW_PADDING - (sizeof(colour_t) * image_p->width) % ROW_PADDING) % ROW_PADDING;
+        fwrite(pad, sizeof(uint8_t), pad_length, image_file_p->file_p);
     }
-}
-
-int
-get_int(FILE* file)
-{
-    int output = 0;
-    fread(&output, sizeof(int), 1, file);
-    return output;
-}
-
-int
-get_width(FILE* image_file)
-{
-    fseek(image_file, 18, SEEK_SET);
-    return get_int(image_file);
-}
-
-int
-get_height(FILE* image_file)
-{
-    fseek(image_file, 22, SEEK_SET);
-    return get_int(image_file);
 }
 
 char*
@@ -124,7 +124,7 @@ num_extension(const char* input, int number)
 }
 
 static void
-image_file_init_header(FILE* file, int width, int height)
+image_file_init_header(FILE* file, uint32_t width, uint32_t height)
 {
     fseek(file, 0, SEEK_SET);
     bmp_header_t header =

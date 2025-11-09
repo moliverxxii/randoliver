@@ -21,9 +21,9 @@ typedef colour_t* row_t;
  */
 typedef struct
 {
-    unsigned int width;
-    unsigned int height;
-    row_t*       image;
+    uint32_t width;
+    uint32_t height;
+    row_t*   image;
 } image_t;
 
 typedef enum

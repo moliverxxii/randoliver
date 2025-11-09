@@ -8,7 +8,8 @@
 #ifndef HEADERS_INTERPRETER_H_
 #define HEADERS_INTERPRETER_H_
 
-typedef struct file_plouf_t* plouf_pointer_t;
+#include <stdio.h>
 
+void interpreter_parse_arguments(int argc, char* argv[]);
 
 #endif /* HEADERS_INTERPRETER_H_ */

@@ -26,21 +26,19 @@ main(int argc, char* argv[])
 {
     interface_init();
     //Paramètres de base.
-    char* nom = malloc(sizeof(char) * 40);
-    printf("argc=%d\n", argc);
+    char* file_name_prefix_p = malloc(sizeof(char) * 40);
     if(1 < argc)
     {
-        strcpy(nom, argv[1]);
+        strcpy(file_name_prefix_p, argv[1]);
     }
     else
     {
-        strcpy(nom, "sans titre");
+        strcpy(file_name_prefix_p, "sans titre");
     }
     int width = 4;
     int height = 4;
 
-    char* file_name;
-    FILE* file;
+    image_file_t* image_file_p;
 
     //Initialisation de l'image.
     image_t* image_p  = image_init(width, height);
@@ -48,14 +46,15 @@ main(int argc, char* argv[])
     //Initialisation des particules
     srand(time(NULL));
 
+#ifdef OLI_TEST_PATTERN
     interface_state_save();
-    test_pattern_squares(image_p, 1);
-//    image_scale(&image_p, 1./20, SCALE_ALGORITHM_DUMB);
     interface_state_save();
     image_scale(&image_p, 250, SCALE_ALGORITHM_LINEAR);
     image_scale(&image_p, 10.0f/250, SCALE_ALGORITHM_LINEAR);
     image_scale(&image_p, 25, SCALE_ALGORITHM_LINEAR);
-    image_file_init(nom, image_p);
+    image_file_p = image_file_init(file_name_prefix_p, image_p);
+#endif //OLI_TEST_PATTERN
+
 
 #ifdef OLI_3D
     uint32_t nb = 400;
@@ -85,9 +84,9 @@ main(int argc, char* argv[])
         printf("Image %u\n", frame);
         camera_render_figure(&camera, image_p, test);
 
-        file_name = num_extension(nom, frame);
+        char* file_name_p = num_extension(file_name_prefix_p, frame);
 
-        file = image_file_init(file_name, image_p);
+        image_file_p = image_file_init(file_name_p, image_p);
 
         //OPERATION
         for(uint32_t point_n = 0; point_n< test.amount; point_n++)
@@ -98,8 +97,9 @@ main(int argc, char* argv[])
                           2.*M_PI/360.);
         }
 
-        free(file_name);
-        fclose(file);
+        free(file_name_p);
+        image_file_free(image_file_p);
+        image_file_p = NULL;
         image_set(image_p);
         ++frame;
     } while (frame<frame_count);
@@ -107,13 +107,11 @@ main(int argc, char* argv[])
 #endif /* OLI_3D */
 
 #ifdef OLI_BROWN
-    file_name = nom;
     brownien1(image_p, 30000, 1, width/2, height/2);
-    file = image_file_init(file_name, image_p);
+    image_file_p = image_file_init(file_name_prefix_p, image_p);
 
-    image_file_write(image_p, file);
-    free(file_name);
-    fclose(file);
+    image_file_write(image_file_p, image_p);
+    image_file_free(image_file_p);
     image_set(image_p);
 #endif /* OLI_BROWN */
 
@@ -127,7 +125,7 @@ main(int argc, char* argv[])
          fig.sequence[i].colour = colour_get_random();
     }
 
-    for(int frame=0; frame<2000; ++frame)
+    for(int frame=0; frame<200; ++frame)
     {
         interface_state_restore();
         printf("Image %u\n", frame);
@@ -138,18 +136,19 @@ main(int argc, char* argv[])
                              image_p->width,
                              image_p->height);
         }
-        file_name = num_extension(nom, frame);
+        char* file_name_p = num_extension(file_name_prefix_p, frame);
 
-        file = image_file_init(file_name, image_p);
+        image_file_p = image_file_init(file_name_p, image_p);
 
         image_draw_figure(image_p, &fig);
-        image_file_write(image_p, file);
-        free(file_name);
-    	fclose(file);
+        image_file_write(image_file_p, image_p);
+        free(file_name_p);
+        image_file_free(image_file_p);
         image_set(image_p);
     }
 #endif
 
+    free(file_name_prefix_p);
     interface_deinit();
 
     return EXIT_SUCCESS;

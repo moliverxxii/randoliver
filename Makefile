@@ -35,6 +35,6 @@ rebuild: clean all
 ANALYZER = $(shell /usr/local/bin/brew --prefix llvm)/bin/scan-build
 
 analysis: clean
-	$(ANALYZER) -v -v -v -o $(PROJECT)-analysis make $(PROJECT)
+	$(ANALYZER) -o $(PROJECT)-analysis make $(PROJECT)
 
 .PHONY: clean analysis

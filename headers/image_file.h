@@ -15,23 +15,14 @@
 
 typedef struct
 {
+    char* file_name_p;
     FILE* file_p;
-    const char* file_name_p;
 } image_file_t;
 
-FILE* image_file_init(const char* name, image_t* image);
-
+image_file_t* image_file_init(const char* name, image_t* image);
+void image_file_free(image_file_t* image_file_p);
 //Writes an image into a windows BITMAP stream.
-void image_file_write(const image_t* image, FILE* imageFile);
-
-//Returns an int from the current file.
-int get_int(FILE* file);
-
-//Gets the width of the BITMAP array from a WINDOWS BITMAP stream.
-int get_width(FILE* imageFile);
-
-//Gets the height of the BITMAP array from a WINDOWS BITMAP stream.
-int get_height(FILE* imageFile);
+void image_file_write(image_file_t* image_file_p , const image_t* image_p);
 
 //Returns the name for BMP file with the ".bmp" extension
 char* bmp_extension(const char* input);
