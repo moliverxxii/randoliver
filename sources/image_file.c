@@ -10,10 +10,36 @@
 
 #include "image_file.h"
 
+
+typedef struct __attribute__((packed))
+{
+    //FormatHeader
+    char     magic_number[2];
+    uint32_t file_size;
+    uint32_t app_signature;
+    uint32_t data_offset;
+
+    //DIBHeader
+    uint32_t dib_header_size;
+    uint32_t width;
+    uint32_t height;
+    uint32_t depth;
+    uint32_t compression;
+    uint32_t image_size;
+    uint32_t res_x;
+    uint32_t res_y;
+    uint32_t color_number;
+    uint32_t important_colours;
+} bmp_header_t;
+
 const size_t ROW_PADDING = sizeof(uint32_t);
+const size_t HEADER_SIZE = sizeof(bmp_header_t);
+const char BMP_GENERATOR_SIGNATURE[sizeof(uint32_t)] = {'m', 'o', '2', '2'};
+
+static void image_file_init_header(FILE* file, int width, int height);
 
 FILE*
-init_image_file(const char* name, image_t* image)
+image_file_init(const char* name, image_t* image)
 {
     //FILE CREATION AND NAME
     char* file_name = bmp_extension(name);
@@ -29,42 +55,16 @@ init_image_file(const char* name, image_t* image)
 
 
     //DATA
-    write_image(image, image_file);
+    image_file_write(image, image_file);
     return image_file;
 }
 
-const char bmp_generator_signature[sizeof(uint32_t)] = {'m', 'o', '2', '2'};
 
 void
-init_header(FILE* file, int width, int height)
-{
-    fseek(file, 0, SEEK_SET);
-    bmp_header_t header =
-    {
-    	    {0x42, 0x4D},
-    	    HEADER_SIZE + COLOUR_COUNT * width * height,
-    	    *(uint32_t*) bmp_generator_signature,
-    	    HEADER_SIZE,
-
-    	    40,
-			width,
-			height,
-    	    0x00180001,
-    	    0,
-    	    3 * width * height,
-    	    RES,
-    	    RES,
-    	    0,
-    	    0
-    };
-    fwrite(&header, sizeof(header), 1, file);
-}
-
-void
-write_image(const image_t* image, FILE* image_file)
+image_file_write(const image_t* image, FILE* image_file)
 {
     fseek(image_file, HEADER_SIZE, SEEK_SET);
-    init_header(image_file, image->width, image->height);
+    image_file_init_header(image_file, image->width, image->height);
     for(uint32_t y = 0; y<image->height; ++y)
     {
         fwrite(image->image[y],
@@ -121,4 +121,29 @@ num_extension(const char* input, int number)
     output = malloc(length);
     sprintf(output, "%s %d", input, number);
     return output;
+}
+
+static void
+image_file_init_header(FILE* file, int width, int height)
+{
+    fseek(file, 0, SEEK_SET);
+    bmp_header_t header =
+    {
+            {0x42, 0x4D},
+            HEADER_SIZE + COLOUR_COUNT * width * height,
+            *(uint32_t*) BMP_GENERATOR_SIGNATURE,
+            HEADER_SIZE,
+
+            40,
+            width,
+            height,
+            0x00180001,
+            0,
+            3 * width * height,
+            RES,
+            RES,
+            0,
+            0
+    };
+    fwrite(&header, sizeof(header), 1, file);
 }

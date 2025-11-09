@@ -13,35 +13,16 @@
 
 #include "image.h"
 
-#define HEADER_SIZE 54
-
-typedef struct __attribute__((packed))
+typedef struct
 {
-    //FormatHeader
-    char     magic_number[2];
-    uint32_t file_size;
-    uint32_t app_signature;
-    uint32_t data_offset;
+    FILE* file_p;
+    const char* file_name_p;
+} image_file_t;
 
-    //DIBHeader
-    uint32_t dib_header_size;
-    uint32_t width;
-    uint32_t height;
-    uint32_t depth;
-    uint32_t compression;
-    uint32_t image_size;
-    uint32_t res_x;
-    uint32_t res_y;
-    uint32_t color_number;
-    uint32_t important_colours;
-} bmp_header_t;
-
-
-FILE* init_image_file(const char* name, image_t* image);
-void init_header(FILE* file, int width, int height);
+FILE* image_file_init(const char* name, image_t* image);
 
 //Writes an image into a windows BITMAP stream.
-void write_image(const image_t* image, FILE* imageFile);
+void image_file_write(const image_t* image, FILE* imageFile);
 
 //Returns an int from the current file.
 int get_int(FILE* file);

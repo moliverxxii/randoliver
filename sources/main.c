@@ -19,7 +19,7 @@
 //#define OLI_3D
 //#define OLI_BROWN
 //#define OLI_FIG
-#define OLI_TEST_PATTERN
+//#define OLI_TEST_PATTERN
 
 int
 main(int argc, char* argv[])
@@ -55,7 +55,7 @@ main(int argc, char* argv[])
     image_scale(&image_p, 250, SCALE_ALGORITHM_LINEAR);
     image_scale(&image_p, 10.0f/250, SCALE_ALGORITHM_LINEAR);
     image_scale(&image_p, 25, SCALE_ALGORITHM_LINEAR);
-    init_image_file(nom, image_p);
+    image_file_init(nom, image_p);
 
 #ifdef OLI_3D
     uint32_t nb = 400;
@@ -87,7 +87,7 @@ main(int argc, char* argv[])
 
         file_name = num_extension(nom, frame);
 
-        file = init_image_file(file_name, image_p);
+        file = image_file_init(file_name, image_p);
 
         //OPERATION
         for(uint32_t point_n = 0; point_n< test.amount; point_n++)
@@ -109,9 +109,9 @@ main(int argc, char* argv[])
 #ifdef OLI_BROWN
     file_name = nom;
     brownien1(image_p, 30000, 1, width/2, height/2);
-    file = init_image_file(file_name, image_p);
+    file = image_file_init(file_name, image_p);
 
-    write_image(image_p, file);
+    image_file_write(image_p, file);
     free(file_name);
     fclose(file);
     image_set(image_p);
@@ -140,10 +140,10 @@ main(int argc, char* argv[])
         }
         file_name = num_extension(nom, frame);
 
-        file = init_image_file(file_name, image_p);
+        file = image_file_init(file_name, image_p);
 
         image_draw_figure(image_p, &fig);
-        write_image(image_p, file);
+        image_file_write(image_p, file);
         free(file_name);
     	fclose(file);
         image_set(image_p);
