@@ -4,10 +4,11 @@
  *  Created on: 13 févr. 2019
  *      Author: moliver
  */
+
 #include <stdlib.h>
 #include <string.h>
 
-#include "file_utility.h"
+#include "image_file.h"
 
 const size_t ROW_PADDING = sizeof(uint32_t);
 

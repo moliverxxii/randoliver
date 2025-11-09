@@ -190,8 +190,7 @@ static const char*
 get_terminal_response()
 {
     memset(terminal_response, 0, sizeof(terminal_response));
-    ssize_t response = read(STDIN_FILENO, terminal_response, 
-         TERMINAL_RESPONSE_LENGTH);
+    read(STDIN_FILENO, terminal_response, TERMINAL_RESPONSE_LENGTH);
     return terminal_response;
 }
 

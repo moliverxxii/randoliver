@@ -12,7 +12,7 @@
 
 #include "interface.h"
 #include "image.h"
-#include "file_utility.h"
+#include "image_file.h"
 #include "image_drawing.h"
 #include "camera.h"
 
