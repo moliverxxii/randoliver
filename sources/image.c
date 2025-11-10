@@ -218,7 +218,7 @@ image_draw_rect(colour_t color, int botLeftX, int botLeftY, int topRightX,
 }
 
 
-point_renderer public_point_renderer = &or_point;
+point_renderer public_point_renderer = &draw_point;
 
 void
 draw_point(const point_t point, image_t* image_p)
@@ -267,8 +267,8 @@ average_point(const point_t point, image_t* image_p)
     for(int colour=0; colour<COLOUR_COUNT; ++colour)
     {
     	image_p->image[y][x][colour] = (uint8_t) ((
-    												(uint32_t) image_p->image[y][x][colour]
-												  + (uint32_t) ((uint8_t*) &point.colour)[colour])/2);
+    					(uint32_t) image_p->image[y][x][colour]
+		                      + (uint32_t) ((uint8_t*) &point.colour)[colour])/2);
     }
 }
 
@@ -287,7 +287,10 @@ image_draw_figure(image_t* image, const figure_t* figure)
     unsigned int i;
     for(i = 0; i < figure->amount; ++i)
     {
-    	(*public_point_renderer)(figure->sequence[i],image);
+        if(point_is_in_image(figure->sequence + i, image))
+        {
+            (*public_point_renderer)(figure->sequence[i],image);
+        }
     }
 }
 

@@ -15,11 +15,13 @@
 #include "image_file.h"
 #include "image_drawing.h"
 #include "camera.h"
+#include "utility.h"
 
+//#define OLI_TEST_PATTERN
 //#define OLI_3D
 //#define OLI_BROWN
 //#define OLI_FIG
-#define OLI_TEST_PATTERN
+#define OLI_FIG_2
 
 int
 main(int argc, char* argv[])
@@ -35,8 +37,8 @@ main(int argc, char* argv[])
     {
         strcpy(file_name_prefix_p, "sans titre");
     }
-    int width = 1080;
-    int height = 1080;
+    int width = 1280;
+    int height = 720;
 
     image_file_t* image_file_p;
 
@@ -46,8 +48,9 @@ main(int argc, char* argv[])
     //Initialisation des particules
     srand(time(NULL));
 
-#ifdef OLI_TEST_PATTERN
     interface_state_save();
+
+#ifdef OLI_TEST_PATTERN
     image_scale(&image_p, 4.0f/width, SCALE_ALGORITHM_LINEAR);
     test_pattern_squares(image_p, 1);
     image_scale(&image_p, 250, SCALE_ALGORITHM_LINEAR);
@@ -126,6 +129,7 @@ main(int argc, char* argv[])
          fig.sequence[i].vector.y = image_p->height/2;
          fig.sequence[i].colour = colour_get_random();
     }
+    
 
     for(int frame=0; frame<200; ++frame)
     {
@@ -147,6 +151,34 @@ main(int argc, char* argv[])
         free(file_name_p);
         image_file_free(image_file_p);
         image_set(image_p);
+    }
+#endif
+#ifdef OLI_FIG_2
+    test_pattern_squares(image_p, 1);
+
+    for(uint32_t frame = 0; frame < 2000; ++frame)
+    {
+        interface_state_restore();
+        printf("Image %u\n", frame);
+        
+        figure_t figure = figure_from_image(image_p);
+        for(uint32_t point=0; point<figure.amount;++point)
+        {
+           rand_delta_vector(&figure.sequence[point].vector,
+                             8,
+                             image_p->width,
+                             image_p->height);
+        }
+
+        image_draw_figure(image_p, &figure);
+        figure_free(&figure);
+        image_scale(&image_p, 1.0f/8, SCALE_ALGORITHM_DUMB);
+        image_scale(&image_p, 8, SCALE_ALGORITHM_DUMB);
+
+        char* file_name_p = num_extension(file_name_prefix_p, frame);
+        image_file_p = image_file_init(file_name_p, image_p);
+        free(file_name_p);
+        image_file_free(image_file_p);
     }
 #endif
 

@@ -7,7 +7,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "figure.h"
+#include "image.h"
 
 figure_t
 figure_init(uint32_t point_count)
@@ -21,6 +23,35 @@ figure_init(uint32_t point_count)
     for(point = 0; point < point_count; ++point)
     {
         figure.sequence[point] = point_init(0, 0, 0, BLACK);
+    }
+    return figure;
+}
+
+void
+figure_free(figure_t* figure_p)
+{
+    figure_p->amount = 0;
+    free(figure_p->sequence);
+    figure_p-> sequence = NULL;
+}
+
+figure_t
+figure_from_image(const image_t* image_p)
+{
+    figure_t figure = figure_init(image_p->width*image_p->height);
+    for(uint32_t point = 0; point<figure.amount; point++)
+    {
+        colour_t* image_data_p = *image_p->image;
+        figure.sequence[point] 
+            = (point_t) 
+            {
+                {point%image_p->width, point/image_p->height, 0},
+                {
+                    image_data_p[point][0],
+                    image_data_p[point][1],
+                    image_data_p[point][2]
+                } 
+            };
     }
     return figure;
 }
@@ -44,6 +75,4 @@ figure_get_average_point(const figure_t* figure_p)
 
     return average;
 }
-
-
 
