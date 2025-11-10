@@ -19,7 +19,7 @@
 //#define OLI_3D
 //#define OLI_BROWN
 //#define OLI_FIG
-//#define OLI_TEST_PATTERN
+#define OLI_TEST_PATTERN
 
 int
 main(int argc, char* argv[])
@@ -35,8 +35,8 @@ main(int argc, char* argv[])
     {
         strcpy(file_name_prefix_p, "sans titre");
     }
-    int width = 4;
-    int height = 4;
+    int width = 1080;
+    int height = 1080;
 
     image_file_t* image_file_p;
 
@@ -48,11 +48,13 @@ main(int argc, char* argv[])
 
 #ifdef OLI_TEST_PATTERN
     interface_state_save();
-    interface_state_save();
+    image_scale(&image_p, 4.0f/width, SCALE_ALGORITHM_LINEAR);
+    test_pattern_squares(image_p, 1);
     image_scale(&image_p, 250, SCALE_ALGORITHM_LINEAR);
     image_scale(&image_p, 10.0f/250, SCALE_ALGORITHM_LINEAR);
     image_scale(&image_p, 25, SCALE_ALGORITHM_LINEAR);
     image_file_p = image_file_init(file_name_prefix_p, image_p);
+    image_file_free(image_file_p);
 #endif //OLI_TEST_PATTERN
 
 
