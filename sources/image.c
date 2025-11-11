@@ -433,6 +433,6 @@ scale_pixel_linear(image_t* new_image_p, const image_t* image_p, uint32_t new_x,
         }
 
     }
-    colour_t colour = {colour_new[0], colour_new[1], colour_new[2]};
+    colour_t colour = {dither(colour_new[0]), dither(colour_new[1]), dither(colour_new[2])};
     memcpy(new_image_p->image[new_y][new_x], colour, sizeof(colour_t));
 }

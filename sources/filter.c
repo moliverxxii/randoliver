@@ -87,8 +87,7 @@ get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius)
             }
         }
         sum /= count;
-        sum += (float) rand()/RAND_MAX;
-        return_colour[colour] = sum;  //Supprimer "+ count/2" pour supprimer l'arrondi entier.
+        return_colour[colour] = dither(sum);
     }
     return *(colour_struct_t*) return_colour;
 }

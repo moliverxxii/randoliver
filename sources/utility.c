@@ -49,6 +49,13 @@ modulo(int input, int modulo)
 
 }
 
+int
+dither(float value)
+{
+    float noise = ((float) rand() * (RAND_MAX - 1)) / ((float) (RAND_MAX) * (RAND_MAX));
+    return (int) (value + noise);
+}
+
 void
 ok(int num)
 {

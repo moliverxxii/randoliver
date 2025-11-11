@@ -27,6 +27,7 @@ int saturator(int input, int satMin, int satMax);
  *
  */
 int modulo(int input, int modulo);
+int dither(float value);
 
 //Affiche un signal ok numéroté.
 void ok(int num);
@@ -35,6 +36,5 @@ void ok(int num);
  * du pointeur.
  */
 void ok_p(int num, void* pointer);
-
 void print_memory(void* pointer, size_t size);
 #endif /* UTIL_H_ */
