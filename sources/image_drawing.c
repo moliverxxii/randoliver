@@ -14,11 +14,11 @@ brownien1(image_t* image, int iterations, int spread, int x0, int y0)
 {
     colour_t pixels[1] =
     {
-        {0, 0xFF, 0}
+        {{0, 0xFF, 0}}
     };
     int y = y0;
     int x = x0;
-    int color = 0;
+    int colour = 0;
     int delta = 0;
     int i;
     iterations = 1000000;
@@ -26,16 +26,16 @@ brownien1(image_t* image, int iterations, int spread, int x0, int y0)
     printf("Début du processus\n");
     for(i = 0; i < iterations; ++i)
     {
-        for(color = 0; color < 3; ++color)
+        for(colour = 0; colour < 3; ++colour)
         {
 
-            image->image[y][x][color] = pixels[0][color];
-            if(color == 1)
+            image->image[y][x].bytes[colour] = pixels[0].bytes[colour];
+            if(colour == 1)
             {
                 delta = rand() % 3 - 1;
-                pixels[0][color] = saturator(pixels[0][color] + delta,
-                SAT_MIN,
-                SAT_MAX);
+                pixels[0].bytes[colour] = saturator(pixels[0].bytes[colour] + delta,
+                COLOUR_MIN,
+                COLOUR_MAX);
             }
         }
         delta = rand() % (2 * spread + 1) - spread;
@@ -70,7 +70,7 @@ barres1(image_t* image, int spread)
 
             for(i = 0; i < 3; ++i)
             {
-                *(colour_struct_t*) image->image[y][x_prime] = WHITE;
+                image->image[y][x_prime] = WHITE;
             }
             x += spread;
             x_prime = x + (rand() % 5 - 2);
@@ -103,7 +103,7 @@ barres2(image_t* image, int spread)
 
             for(i = 0; i < 3; ++i)
             {
-                *(colour_struct_t*) image->image[y][x_prime[i]] = WHITE;
+                image->image[y][x_prime[i]] = WHITE;
             }
             x += spread;
             for(i = 0; i < 3; ++i)
@@ -120,7 +120,7 @@ test_pattern_squares(image_t* image_p, uint32_t period)
 {
     uint32_t x_squares = (image_p->width + period - 1) / period;
     uint32_t y_squares = (image_p->height + period - 1) / period;
-    colour_struct_t* square_colours_p = malloc(x_squares*y_squares*sizeof(colour_struct_t));
+    colour_t* square_colours_p = malloc(x_squares*y_squares*sizeof(colour_t));
     for(uint32_t square = 0; square < x_squares * y_squares; ++ square)
     {
         square_colours_p[square] = colour_get_random();

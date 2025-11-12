@@ -9,7 +9,7 @@
 #include "point.h"
 
 point_t
-point_init(vector_axis_t x, vector_axis_t y, vector_axis_t z, colour_struct_t colour)
+point_init(vector_axis_t x, vector_axis_t y, vector_axis_t z, colour_t colour)
 {
     point_t point =
     {

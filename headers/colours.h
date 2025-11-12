@@ -18,41 +18,44 @@ typedef enum
 	COLOUR_COUNT
 } pixel_colour_t;
 
-/** Couleur en données brutes BVR.
- *
- */
-typedef uint8_t colour_t[COLOUR_COUNT];
+typedef uint8_t colour_value_t;
 
-/** Couleur sous formes de champs lisibles par un humain.
- *  Compatible pour la conversion avec color_t
- *
- */
-typedef struct
+typedef enum
 {
-    uint8_t blue;
-    uint8_t green;
-    uint8_t red;
-} colour_struct_t;
+    COLOUR_MIN = 0,
+    COLOUR_MAX = UINT8_MAX,
+} colour_boundaries_t;
 
-extern const colour_struct_t BLACK;
-extern const colour_struct_t WHITE;
-extern const colour_struct_t GREY;
-extern const colour_struct_t RED;
-extern const colour_struct_t GREEN;
-extern const colour_struct_t BLUE;
-extern const colour_struct_t CYAN;
-extern const colour_struct_t MAGENTA;
-extern const colour_struct_t YELLOW;
+typedef union
+{
+    struct
+    {
+        colour_value_t blue;
+        colour_value_t green;
+        colour_value_t red;
+    };
+    colour_value_t bytes[COLOUR_COUNT];
+} colour_t;
 
-typedef colour_struct_t (*colour_unary_operator)(colour_struct_t, void*);
-typedef colour_struct_t (*colour_binary_operator)(colour_struct_t, colour_struct_t, void*);
-typedef colour_struct_t (*colour_ternary_operator)(colour_struct_t, colour_struct_t, colour_struct_t, void*);
+extern const colour_t BLACK;
+extern const colour_t WHITE;
+extern const colour_t GREY;
+extern const colour_t RED;
+extern const colour_t GREEN;
+extern const colour_t BLUE;
+extern const colour_t CYAN;
+extern const colour_t MAGENTA;
+extern const colour_t YELLOW;
+
+typedef colour_t (*colour_unary_operator)(colour_t, void*);
+typedef colour_t (*colour_binary_operator)(colour_t, colour_t, void*);
+typedef colour_t (*colour_ternary_operator)(colour_t, colour_t, colour_t, void*);
 
 
-colour_struct_t colour_get_random();
+colour_t colour_get_random();
 
-colour_struct_t colour_random_delta(colour_struct_t colour, void* parameters_p);
+colour_t colour_random_delta(colour_t colour, void* parameters_p);
 
-colour_struct_t colour_add_2(colour_struct_t colour_1, colour_struct_t colour_2, void* parameters_p);
+colour_t colour_add_2(colour_t colour_1, colour_t colour_2, void* parameters_p);
 
 #endif /* HEADERS_COLOURS_H_ */

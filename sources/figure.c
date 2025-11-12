@@ -46,11 +46,7 @@ figure_from_image(const image_t* image_p)
             = (point_t) 
             {
                 {point%image_p->width, point/image_p->height, 0},
-                {
-                    image_data_p[point][0],
-                    image_data_p[point][1],
-                    image_data_p[point][2]
-                } 
+                image_data_p[point]
             };
     }
     return figure;

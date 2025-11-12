@@ -17,11 +17,11 @@
 #include "camera.h"
 #include "utility.h"
 
-#define OLI_TEST_PATTERN
+//#define OLI_TEST_PATTERN
 //#define OLI_3D
 //#define OLI_BROWN
 //#define OLI_FIG
-//#define OLI_FIG_2
+#define OLI_FIG_2
 
 int
 main(int argc, char* argv[])
@@ -37,8 +37,8 @@ main(int argc, char* argv[])
     {
         strcpy(file_name_prefix_p, "sans titre");
     }
-    int width = 1440;
-    int height = 1080;
+    int width = 1920;
+    int height = 960;
 
     image_file_t* image_file_p;
 
@@ -51,11 +51,11 @@ main(int argc, char* argv[])
     interface_state_save();
 
 #ifdef OLI_TEST_PATTERN
-    image_scale(&image_p, 3.0f/height, SCALE_ALGORITHM_LINEAR);
+    image_scale(&image_p, 1.0f/height, SCALE_ALGORITHM_LINEAR);
     test_pattern_squares(image_p, 1);
-    image_scale(&image_p, 360, SCALE_ALGORITHM_LINEAR);
-    image_scale(&image_p, 10.0f/360, SCALE_ALGORITHM_LINEAR);
-    image_scale(&image_p, 36, SCALE_ALGORITHM_LINEAR);
+    image_scale(&image_p, 960, SCALE_ALGORITHM_LINEAR);
+    image_scale(&image_p, 10.0f/960, SCALE_ALGORITHM_LINEAR);
+    image_scale(&image_p, 96, SCALE_ALGORITHM_LINEAR);
     image_file_p = image_file_init(file_name_prefix_p, image_p);
     image_file_free(image_file_p);
 #endif //OLI_TEST_PATTERN

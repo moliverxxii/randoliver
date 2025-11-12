@@ -9,27 +9,27 @@
 #include "colours.h"
 #include "utility.h"
 
-const colour_struct_t BLACK   = {0x00, 0x00, 0x00};
-const colour_struct_t WHITE   = {0xFF, 0xFF, 0xFF};
-const colour_struct_t GREY    = {0x80, 0x80, 0x80};
-const colour_struct_t RED     = {0x00, 0x00, 0xFF};
-const colour_struct_t GREEN   = {0x00, 0xFF, 0x00};
-const colour_struct_t BLUE    = {0xFF, 0x00, 0x00};
-const colour_struct_t CYAN    = {0xFF, 0xFF, 0x00};
-const colour_struct_t MAGENTA = {0xFF, 0x00, 0xFF};
-const colour_struct_t YELLOW  = {0x00, 0xFF, 0xFF};
+const colour_t BLACK   = {{0x00, 0x00, 0x00}};
+const colour_t WHITE   = {{0xFF, 0xFF, 0xFF}};
+const colour_t GREY    = {{0x80, 0x80, 0x80}};
+const colour_t RED     = {{0x00, 0x00, 0xFF}};
+const colour_t GREEN   = {{0x00, 0xFF, 0x00}};
+const colour_t BLUE    = {{0xFF, 0x00, 0x00}};
+const colour_t CYAN    = {{0xFF, 0xFF, 0x00}};
+const colour_t MAGENTA = {{0xFF, 0x00, 0xFF}};
+const colour_t YELLOW  = {{0x00, 0xFF, 0xFF}};
 
-colour_struct_t
+colour_t
 colour_get_random()
 {
     uint32_t colour_raw = rand();
-    colour_struct_t colour;
+    colour_t colour;
     memcpy(&colour, &colour_raw, sizeof(colour));
     return colour;
 }
 
-colour_struct_t
-colour_random_delta(colour_struct_t colour, void* parameters_p)
+colour_t
+colour_random_delta(colour_t colour, void* parameters_p)
 {
     float range = *(int*) parameters_p;
     int colour_index;
@@ -46,8 +46,8 @@ colour_random_delta(colour_struct_t colour, void* parameters_p)
     return colour;
 }
 
-colour_struct_t
-colour_add_2(colour_struct_t colour_1, colour_struct_t colour_2, void* parameters_p)
+colour_t
+colour_add_2(colour_t colour_1, colour_t colour_2, void* parameters_p)
 {
     OLI_UNUSED(parameters_p);
 
@@ -55,8 +55,8 @@ colour_add_2(colour_struct_t colour_1, colour_struct_t colour_2, void* parameter
     colour_t return_colour;
     for(colour = 0; colour<COLOUR_COUNT; ++colour)
     {
-        uint16_t tmp_colour = (uint16_t) ((uint8_t*) &colour_1)[colour] + ((uint8_t*) &colour_2)[colour];
-        return_colour[colour] = saturator(tmp_colour, SAT_MIN, SAT_MAX);
+        uint16_t tmp_colour = (uint16_t) colour_1.bytes[colour] + (uint16_t) colour_2.bytes[colour];
+        return_colour.bytes[colour] = saturator(tmp_colour, COLOUR_MIN, COLOUR_MAX);
     }
-    return *(colour_struct_t*) return_colour;
+    return return_colour;
 }

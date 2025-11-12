@@ -99,7 +99,7 @@ image_random(image_t* image_p)
     {
         for(y=0; y<image_p->height; ++y)
         {
-            *(colour_struct_t*) image_p->image[y][x] = colour_get_random();
+            image_p->image[y][x] = colour_get_random();
         }
     }
 }
@@ -115,7 +115,7 @@ image_get_sum_colour(const image_t* image_p)
         {
             for(y=0; y<image_p->height; ++y)
             {
-                sum += image_p->image[y][x][colour];
+                sum += image_p->image[y][x].bytes[colour];
             }
         }
 
@@ -131,7 +131,7 @@ image_process_1(colour_unary_operator operator, image_t* image_p, void* paramete
     {
         for(y=0; y<image_p->height; ++y)
         {
-            *(colour_struct_t*) image_p->image[y][x] =  (*operator)( *(colour_struct_t*) image_p->image[y][x], parameters_p);
+            image_p->image[y][x] =  (*operator)(image_p->image[y][x], parameters_p);
         }
     }
 }
@@ -147,10 +147,10 @@ image_process_2(colour_binary_operator operator,
     {
         for(y=0; y<image_1_p->height; ++y)
         {
-            *(colour_struct_t*) image_1_p->image[y][x] =
-                    (*operator)( *(colour_struct_t*) image_1_p->image[y][x],
-                                 *(colour_struct_t*) image_2_p->image[y][x],
-                                 parameters_p);
+            image_1_p->image[y][x] =
+                    (*operator)(image_1_p->image[y][x],
+                                image_2_p->image[y][x],
+                                parameters_p);
         }
     }
 }
@@ -167,11 +167,11 @@ image_process_3(colour_ternary_operator operator,
     {
         for(y=0; y<image_1_p->height; ++y)
         {
-            *(colour_struct_t*) image_1_p->image[y][x] =
-                    (*operator)( *(colour_struct_t*) image_1_p->image[y][x],
-                                 *(colour_struct_t*) image_2_p->image[y][x],
-                                 *(colour_struct_t*) image_3_p->image[y][x],
-                                 parameters_p);
+            image_1_p->image[y][x] =
+                    (*operator)(image_1_p->image[y][x],
+                                image_2_p->image[y][x],
+                                image_3_p->image[y][x],
+                                parameters_p);
         }
     }
 }
@@ -192,8 +192,8 @@ image_print(const image_t* image)
         for(y = 0; y < image->height; ++y)
         {
             printf("Point[%5d,%5d] = (%x,%x,%x)\n", x + 1, y + 1,
-                    image->image[y][x][0], image->image[y][x][1],
-                    image->image[y][x][2]);
+                    image->image[y][x].blue, image->image[y][x].green,
+                    image->image[y][x].red);
         }
     }
 }
@@ -211,7 +211,7 @@ image_draw_rect(colour_t color, int botLeftX, int botLeftY, int topRightX,
         {
             for(k = 0; k < 3; ++k)
             {
-                image->image[y][x][k] = color[k];
+                image->image[y][x].bytes[k] = color.bytes[k];
             }
         }
     }
@@ -227,7 +227,7 @@ draw_point(const point_t point, image_t* image_p)
     int y;
     x = point.vector.x;
     y = point.vector.y;
-    *(colour_struct_t*) image_p->image[y][x] = *(colour_struct_t*) &point.colour;
+    image_p->image[y][x] = point.colour;
 }
 
 void
@@ -237,7 +237,7 @@ or_point(const point_t point, image_t* image_p)
     int y;
     x = point.vector.x;
     y = point.vector.y;
-    uint32_t buffer = *(uint32_t*) image_p->image[y][x];
+    uint32_t buffer = *(uint32_t*) image_p->image[y][x].bytes;
     buffer ^= *(uint32_t*) &point.colour;
     memcpy(&image_p->image[y][x], &buffer, sizeof(image_p->image[y][x]));
 
@@ -251,7 +251,7 @@ xor_point(const point_t point, image_t* image_p)
     int y;
     x = point.vector.x;
     y = point.vector.y;
-    uint32_t buffer = *(uint32_t*) image_p->image[y][x];
+    uint32_t buffer = *(uint32_t*) image_p->image[y][x].bytes;
     buffer ^= *(uint32_t*) &point.colour;
     memcpy(&image_p->image[y][x], &buffer, sizeof(image_p->image[y][x]));
 
@@ -266,9 +266,9 @@ average_point(const point_t point, image_t* image_p)
     y = point.vector.y;
     for(int colour=0; colour<COLOUR_COUNT; ++colour)
     {
-    	image_p->image[y][x][colour] = (uint8_t) ((
-    					(uint32_t) image_p->image[y][x][colour]
-		                      + (uint32_t) ((uint8_t*) &point.colour)[colour])/2);
+        image_p->image[y][x].bytes[colour] =
+                (uint8_t) (((uint32_t) image_p->image[y][x].bytes[colour]
+                          + (uint32_t) point.colour.bytes[colour]) / 2);
     }
 }
 
@@ -299,9 +299,7 @@ scale_pixel_dumb(image_t* new_image_p, const image_t* image_p, uint32_t new_x, u
 {
     float x_source = new_x/scale;
     float y_source = new_y/scale;
-    memcpy(new_image_p->image[new_y][new_x],
-           image_p->image[(uint32_t) y_source][(uint32_t) x_source],
-           sizeof(colour_t));
+    new_image_p->image[new_y][new_x] = image_p->image[(uint32_t) y_source][(uint32_t) x_source];
 }
 
 static void
@@ -352,7 +350,7 @@ scale_pixel_linear(image_t* new_image_p, const image_t* image_p, uint32_t new_x,
                     ++colour_index)
                 {
                     colour_new[colour_index] +=
-                             colour_factor * (float) image_p->image[n_y + n_y_offset][n_x + n_x_offset][colour_index];
+                             colour_factor * (float) image_p->image[n_y + n_y_offset][n_x + n_x_offset].bytes[colour_index];
                 }
                 colour_factor_sum += colour_factor;
 
@@ -423,7 +421,7 @@ scale_pixel_linear(image_t* new_image_p, const image_t* image_p, uint32_t new_x,
                         ++colour_index)
                 {
                     colour_new[colour_index] +=
-                            y_coef * x_coef * (float) image_p->image[y_i][x_i][colour_index];
+                            y_coef * x_coef * (float) image_p->image[y_i][x_i].bytes[colour_index];
                 }
             }
         }
@@ -433,6 +431,6 @@ scale_pixel_linear(image_t* new_image_p, const image_t* image_p, uint32_t new_x,
         }
 
     }
-    colour_t colour = {dither(colour_new[0]), dither(colour_new[1]), dither(colour_new[2])};
-    memcpy(new_image_p->image[new_y][new_x], colour, sizeof(colour_t));
+    colour_t colour = {{dither(colour_new[0]), dither(colour_new[1]), dither(colour_new[2])}};
+    new_image_p->image[new_y][new_x] = colour;
 }

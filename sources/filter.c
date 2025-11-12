@@ -10,7 +10,7 @@
 #include "filter.h"
 #include "utility.h"
 
-static colour_struct_t get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius);
+static colour_t get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius);
 
 void
 flou(image_t* image_p, int radius)
@@ -28,7 +28,7 @@ flou(image_t* image_p, int radius)
     {
         for(y = 0; y < image_p->height; ++y)
         {
-            *(colour_struct_t*) image2->image[y][x] = get_blurred_pixel(image_p, x, y, radius);
+            image2->image[y][x] = get_blurred_pixel(image_p, x, y, radius);
         }
     }
 
@@ -45,12 +45,12 @@ symetry(image_t* image_p)
     {
         for(y = 0; y < image_p->height/2; ++y)
         {
-            *(colour_struct_t*) image_p->image[y][image_p->width - (1 + x)]
-                = *(colour_struct_t*) image_p->image[y][x];
-            *(colour_struct_t*) image_p->image[image_p->height - (1 + y)][x]
-                = *(colour_struct_t*) image_p->image[y][x];
-            *(colour_struct_t*) image_p->image[image_p->height - (1 + y)][image_p->width - (1 + x)]
-                = *(colour_struct_t*) image_p->image[y][x];
+            image_p->image[y][image_p->width - (1 + x)]
+                = image_p->image[y][x];
+            image_p->image[image_p->height - (1 + y)][x]
+                = image_p->image[y][x];
+            image_p->image[image_p->height - (1 + y)][image_p->width - (1 + x)]
+                = image_p->image[y][x];
         }
     }
 }
@@ -61,14 +61,14 @@ random_colour_shift(image_t* image_p, int delta)
     image_process_1(&colour_random_delta, image_p, &delta);
 }
 
-static colour_struct_t
+static colour_t
 get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius)
 {
     if(radius <= 0)
     {
-        return *(colour_struct_t*) image_p->image[pixel_y][pixel_x];
+        return image_p->image[pixel_y][pixel_x];
     }
-    colour_t return_colour = {0, 0, 0};
+    colour_t return_colour = {{0, 0, 0}};
     for (int colour = 0; colour < COLOUR_COUNT; colour++)
     {
         float sum = 0;
@@ -82,12 +82,12 @@ get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius)
                 {
                     continue;
                 }
-                sum += image_p->image[pixel_y + j][pixel_x + i][colour];
+                sum += image_p->image[pixel_y + j][pixel_x + i].bytes[colour];
                 ++count;
             }
         }
         sum /= count;
-        return_colour[colour] = dither(sum);
+        return_colour.bytes[colour] = dither(sum);
     }
-    return *(colour_struct_t*) return_colour;
+    return return_colour;
 }
