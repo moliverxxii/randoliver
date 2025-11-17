@@ -199,29 +199,23 @@ image_print(const image_t* image)
 }
 
 void
-image_draw_rect(colour_t color, int botLeftX, int botLeftY, int topRightX,
-                int topRightY, image_t* image)
+image_draw_rect(colour_t color, uint32_t botLeftX, uint32_t botLeftY, uint32_t topRightX,
+                uint32_t topRightY, image_t* image)
 {
-    int x;
-    int y;
-    int k;
-    for(x = botLeftX; x <= topRightX; ++x)
+    for(uint32_t x = botLeftX; x <= topRightX; ++x)
     {
-        for(y = botLeftY; y <= topRightY; ++y)
+        for(uint32_t y = botLeftY; y <= topRightY; ++y)
         {
-            for(k = 0; k < 3; ++k)
-            {
-                image->image[y][x].bytes[k] = color.bytes[k];
-            }
+            image->image[y][x] = color;
         }
     }
 }
 
 
-point_renderer public_point_renderer = &draw_point;
+image_point_renderer public_point_renderer = &image_draw_point;
 
 void
-draw_point(const point_t point, image_t* image_p)
+image_draw_point(image_t* image_p, point_t point)
 {
     int x;
     int y;
@@ -231,7 +225,7 @@ draw_point(const point_t point, image_t* image_p)
 }
 
 void
-or_point(const point_t point, image_t* image_p)
+image_or_point(image_t* image_p, point_t point)
 {
     int x;
     int y;
@@ -245,7 +239,7 @@ or_point(const point_t point, image_t* image_p)
 
 
 void
-xor_point(const point_t point, image_t* image_p)
+image_xor_point(image_t* image_p, point_t point)
 {
     int x;
     int y;
@@ -258,7 +252,7 @@ xor_point(const point_t point, image_t* image_p)
 }
 
 void
-average_point(const point_t point, image_t* image_p)
+image_average_point(image_t* image_p, point_t point)
 {
     int x;
     int y;
@@ -289,7 +283,7 @@ image_draw_figure(image_t* image, const figure_t* figure)
     {
         if(point_is_in_image(figure->sequence + i, image))
         {
-            (*public_point_renderer)(figure->sequence[i],image);
+            (*public_point_renderer)(image, figure->sequence[i]);
         }
     }
 }

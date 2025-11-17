@@ -80,7 +80,7 @@ camera_render_point(const camera_t* camera_p,
     point_t render_point = point_init(x_image, y_image, 0, point.colour);
     if(point_is_in_image(&render_point, image_p))
     {
-        (*public_point_renderer)(render_point, image_p);
+        (*public_point_renderer)(image_p, render_point);
     }
 }
 

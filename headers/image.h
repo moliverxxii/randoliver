@@ -38,9 +38,9 @@ typedef enum
  */
 extern const image_t SYSTEM_SCREEN;
 
-typedef void (*point_renderer)(const point_t, image_t*);
+typedef void (*image_point_renderer)(image_t*, point_t);
 
-extern point_renderer public_point_renderer;
+extern image_point_renderer public_point_renderer;
 
 /* Elementaires */
 //Returns a pointer to an image.
@@ -72,13 +72,13 @@ void image_add(image_t* image_1_p, const image_t* image_2_p);
 void image_print(const image_t* image);
 
 //Draws a colored rectangle in an image.
-void image_draw_rect(colour_t color, int botLeftX, int botLeftY, int topRightX,
-			   int topRightY, image_t* image);
+void image_draw_rect(colour_t color, uint32_t botLeftX, uint32_t botLeftY, uint32_t topRightX,
+			   uint32_t topRightY, image_t* image);
 
-void draw_point(const point_t point, image_t* image_p);
-void or_point(const point_t point, image_t* image_p);
-void xor_point(const point_t point, image_t* image_p);
-void average_point(const point_t point, image_t* image_p);
+void image_draw_point(image_t* image_p, point_t point);
+void image_or_point(image_t* image_p, point_t point);
+void image_xor_point(image_t* image_p, point_t point);
+void image_average_point(image_t* image_p, point_t point);
 
 int point_is_in_image(const point_t* point_p, const image_t* image_p);
 // Draws a sequence of points into an image.
