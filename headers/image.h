@@ -10,7 +10,7 @@
 
 #include "colours.h"
 #include "figure.h"
-#include "transform.h"
+#include "vector.h"
 
 #define RES 2835
 

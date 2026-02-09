@@ -8,8 +8,8 @@
 #ifndef HEADERS_POINT_H_
 #define HEADERS_POINT_H_
 
-#include "transform.h"
 #include "colours.h"
+#include "vector.h"
 
 /** Un point dans l'espace
  *

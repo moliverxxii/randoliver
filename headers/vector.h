@@ -5,8 +5,8 @@
  *      Author: moliver
  */
 
-#ifndef HEADERS_TRANSFORM_H_
-#define HEADERS_TRANSFORM_H_
+#ifndef HEADERS_VECTOR_H_
+#define HEADERS_VECTOR_H_
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -126,4 +126,4 @@ void vector_random_delta(vector_t* vector_p, int amplitude, int width, int heigh
 
 
 
-#endif /* HEADERS_TRANSFORM_H_ */
+#endif /* HEADERS_VECTOR_H_ */

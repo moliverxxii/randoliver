@@ -12,7 +12,7 @@
 
 #include "point.h"
 #include "colours.h"
-#include "transform.h"
+#include "vector.h"
 
 /** Une sequence de points
  *

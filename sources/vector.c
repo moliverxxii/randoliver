@@ -5,12 +5,13 @@
  *      Author: moliver
  */
 
+#include "../headers/vector.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 
-#include "transform.h"
 #include "utility.h"
 
 const vector_t VECTOR_X = {{1, 0, 0}};
