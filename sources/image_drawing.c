@@ -29,11 +29,11 @@ brownien1(image_t* image, int iterations, int spread, int x0, int y0)
         for(colour = 0; colour < 3; ++colour)
         {
 
-            image->image[y][x].bytes[colour] = pixels[0].bytes[colour];
+            image->image[y][x].array[colour] = pixels[0].array[colour];
             if(colour == 1)
             {
                 delta = rand() % 3 - 1;
-                pixels[0].bytes[colour] = saturator(pixels[0].bytes[colour] + delta,
+                pixels[0].array[colour] = saturator(pixels[0].array[colour] + delta,
                 COLOUR_MIN,
                 COLOUR_MAX);
             }

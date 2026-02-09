@@ -55,8 +55,8 @@ colour_add_2(colour_t colour_1, colour_t colour_2, void* parameters_p)
     colour_t return_colour;
     for(colour = 0; colour<COLOUR_COUNT; ++colour)
     {
-        uint16_t tmp_colour = (uint16_t) colour_1.bytes[colour] + (uint16_t) colour_2.bytes[colour];
-        return_colour.bytes[colour] = saturator(tmp_colour, COLOUR_MIN, COLOUR_MAX);
+        uint16_t tmp_colour = (uint16_t) colour_1.array[colour] + (uint16_t) colour_2.array[colour];
+        return_colour.array[colour] = saturator(tmp_colour, COLOUR_MIN, COLOUR_MAX);
     }
     return return_colour;
 }

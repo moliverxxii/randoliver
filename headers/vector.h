@@ -32,7 +32,7 @@ typedef union
         vector_axis_t y;
         vector_axis_t z;
     };
-    vector_axis_t axis[VECTOR_AXIS_COUNT];
+    vector_axis_t array[VECTOR_AXIS_COUNT];
 } vector_t;
 
 

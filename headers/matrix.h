@@ -16,7 +16,7 @@ typedef struct matrix_t
 {
     uint32_t lines;
     uint32_t columns;
-    matrix_data_t* array_p;
+    matrix_data_t* array;
 } matrix_t;
 
 matrix_t* matrix_init(uint32_t lines, uint32_t columns);

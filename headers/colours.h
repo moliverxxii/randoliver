@@ -34,7 +34,7 @@ typedef union
         colour_value_t green;
         colour_value_t red;
     };
-    colour_value_t bytes[COLOUR_COUNT];
+    colour_value_t array[COLOUR_COUNT];
 } colour_t;
 
 extern const colour_t BLACK;

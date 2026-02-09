@@ -30,7 +30,7 @@ vector_init(vector_axis_t x, vector_axis_t y, vector_axis_t z)
 vector_t vector_init_array(const vector_axis_t* array)
 {
     vector_t vector;
-    memcpy(vector.axis, array, sizeof(vector.axis));
+    memcpy(vector.array, array, sizeof(vector.array));
     return vector;
 }
 

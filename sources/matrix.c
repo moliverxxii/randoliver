@@ -31,14 +31,14 @@ matrix_t*
 matrix_copy(const matrix_t* a_p)
 {
     matrix_t* m_p = matrix_init(a_p->lines, a_p->lines);
-    memcpy(m_p->array_p, a_p->array_p, m_p->lines * m_p->columns * sizeof(matrix_data_t));
+    memcpy(m_p->array, a_p->array, m_p->lines * m_p->columns * sizeof(matrix_data_t));
     return m_p;
 }
 
 void
 matrix_free(matrix_t* matrix_p)
 {
-    free(matrix_p->array_p);
+    free(matrix_p->array);
     free(matrix_p);
 }
 
@@ -49,7 +49,7 @@ matrix_value_get(const matrix_t* matrix_p,
     matrix_data_t value = 0;
     if(line < matrix_p->lines && column < matrix_p->columns)
     {
-        value = matrix_p->array_p[line * matrix_p->columns + column];
+        value = matrix_p->array[line * matrix_p->columns + column];
     }
     return value;
 }
@@ -57,7 +57,7 @@ matrix_value_get(const matrix_t* matrix_p,
 void
 matrix_set(matrix_t* matrix_p, const matrix_data_t* restrict data_array)
 {
-    memcpy(matrix_p->array_p, data_array, matrix_p->lines * matrix_p->columns * sizeof(matrix_data_t));
+    memcpy(matrix_p->array, data_array, matrix_p->lines * matrix_p->columns * sizeof(matrix_data_t));
 }
 
 void
@@ -67,7 +67,7 @@ matrix_value_set(matrix_t* matrix_p,
 {
     if(line < matrix_p->lines && column < matrix_p->columns)
     {
-        matrix_p->array_p[line * matrix_p->columns + column] = value;
+        matrix_p->array[line * matrix_p->columns + column] = value;
     }
 
 }
@@ -80,7 +80,7 @@ matrix_t* matrix_add(const matrix_t* a_p, const matrix_t* b_p)
         m_p = matrix_copy(a_p);
         for(uint32_t index = 0; index < m_p->lines*m_p->columns; ++index)
         {
-            m_p->array_p[index] += b_p->array_p[index];
+            m_p->array[index] += b_p->array[index];
         }
     }
     return m_p;
@@ -95,7 +95,7 @@ matrix_t* matrix_subtract(const matrix_t* a_p, const matrix_t* b_p)
         m_p = matrix_copy(a_p);
         for(uint32_t index = 0; index < m_p->lines*m_p->columns; ++index)
         {
-            m_p->array_p[index] -= b_p->array_p[index];
+            m_p->array[index] -= b_p->array[index];
         }
     }
     return m_p;
@@ -109,7 +109,7 @@ matrix_t* matrix_scale(const matrix_t* a_p, matrix_data_t coefficient)
     m_p = matrix_copy(a_p);
     for(uint32_t index = 0; index < m_p->lines*m_p->columns; ++index)
     {
-        m_p->array_p[index] *= coefficient;
+        m_p->array[index] *= coefficient;
     }
     return m_p;
 }

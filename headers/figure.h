@@ -20,7 +20,7 @@
 typedef struct
 {
     uint32_t amount;
-    point_t* sequence;
+    point_t* array;
 } figure_t;
 typedef struct image_t image_t;
 //Initialise une sequence de nombre_point point_t.

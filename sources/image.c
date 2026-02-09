@@ -115,7 +115,7 @@ image_get_sum_colour(const image_t* image_p)
         {
             for(y=0; y<image_p->height; ++y)
             {
-                sum += image_p->image[y][x].bytes[colour];
+                sum += image_p->image[y][x].array[colour];
             }
         }
 
@@ -231,7 +231,7 @@ image_or_point(image_t* image_p, point_t point)
     int y;
     x = point.vector.x;
     y = point.vector.y;
-    uint32_t buffer = *(uint32_t*) image_p->image[y][x].bytes;
+    uint32_t buffer = *(uint32_t*) image_p->image[y][x].array;
     buffer ^= *(uint32_t*) &point.colour;
     memcpy(&image_p->image[y][x], &buffer, sizeof(image_p->image[y][x]));
 
@@ -245,7 +245,7 @@ image_xor_point(image_t* image_p, point_t point)
     int y;
     x = point.vector.x;
     y = point.vector.y;
-    uint32_t buffer = *(uint32_t*) image_p->image[y][x].bytes;
+    uint32_t buffer = *(uint32_t*) image_p->image[y][x].array;
     buffer ^= *(uint32_t*) &point.colour;
     memcpy(&image_p->image[y][x], &buffer, sizeof(image_p->image[y][x]));
 
@@ -260,9 +260,9 @@ image_average_point(image_t* image_p, point_t point)
     y = point.vector.y;
     for(int colour=0; colour<COLOUR_COUNT; ++colour)
     {
-        image_p->image[y][x].bytes[colour] =
-                (uint8_t) (((uint32_t) image_p->image[y][x].bytes[colour]
-                          + (uint32_t) point.colour.bytes[colour]) / 2);
+        image_p->image[y][x].array[colour] =
+                (uint8_t) (((uint32_t) image_p->image[y][x].array[colour]
+                          + (uint32_t) point.colour.array[colour]) / 2);
     }
 }
 
@@ -281,9 +281,9 @@ image_draw_figure(image_t* image, const figure_t* figure)
     unsigned int i;
     for(i = 0; i < figure->amount; ++i)
     {
-        if(point_is_in_image(figure->sequence + i, image))
+        if(point_is_in_image(figure->array + i, image))
         {
-            (*public_point_renderer)(image, figure->sequence[i]);
+            (*public_point_renderer)(image, figure->array[i]);
         }
     }
 }
@@ -344,7 +344,7 @@ scale_pixel_linear(image_t* new_image_p, const image_t* image_p, uint32_t new_x,
                     ++colour_index)
                 {
                     colour_new[colour_index] +=
-                             colour_factor * (float) image_p->image[n_y + n_y_offset][n_x + n_x_offset].bytes[colour_index];
+                             colour_factor * (float) image_p->image[n_y + n_y_offset][n_x + n_x_offset].array[colour_index];
                 }
                 colour_factor_sum += colour_factor;
 
@@ -415,7 +415,7 @@ scale_pixel_linear(image_t* new_image_p, const image_t* image_p, uint32_t new_x,
                         ++colour_index)
                 {
                     colour_new[colour_index] +=
-                            y_coef * x_coef * (float) image_p->image[y_i][x_i].bytes[colour_index];
+                            y_coef * x_coef * (float) image_p->image[y_i][x_i].array[colour_index];
                 }
             }
         }
