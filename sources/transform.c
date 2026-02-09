@@ -21,13 +21,13 @@ const vector_t VECTOR_0 = {0, 0, 0};
 
 
 float
-norm_vector(vector_t vector_p)
+vector_norm(vector_t vector_p)
 {
-    return (vector_axis_t) sqrt(scalar_vector(vector_p, vector_p));
+    return (vector_axis_t) sqrt(vector_scalar(vector_p, vector_p));
 }
 
 float
-scalar_vector(vector_t vector_a, vector_t vector_b)
+vector_scalar(vector_t vector_a, vector_t vector_b)
 {
     return vector_a.x*vector_b.x
          + vector_a.y*vector_b.y
@@ -36,7 +36,7 @@ scalar_vector(vector_t vector_a, vector_t vector_b)
 
 
 vector_t*
-add_vectors(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b)
+vector_add(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b)
 {
     if(!vector_r_p)
     {
@@ -50,16 +50,16 @@ add_vectors(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b)
 }
 
 vector_t*
-subtract_vectors(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b)
+vector_subtract(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b)
 {
     vector_t minus_vector_b;
-    return add_vectors(vector_r_p,
+    return vector_add(vector_r_p,
                        vector_a,
-                       *negative_vector(&minus_vector_b, vector_b));
+                       *vector_negative(&minus_vector_b, vector_b));
 }
 
 vector_t*
-scale_vector(vector_t* vector_r_p, vector_t vector, float scale)
+vector_scale(vector_t* vector_r_p, vector_t vector, float scale)
 {
     if(!vector_r_p)
     {
@@ -74,9 +74,9 @@ scale_vector(vector_t* vector_r_p, vector_t vector, float scale)
 }
 
 vector_t*
-negative_vector(vector_t* vector_r_p, vector_t vector)
+vector_negative(vector_t* vector_r_p, vector_t vector)
 {
-    return scale_vector(vector_r_p, vector, -1);
+    return vector_scale(vector_r_p, vector, -1);
 }
 
 void
@@ -107,7 +107,7 @@ space_operation(vector_t* result_p,
         for(row=0; row<3; row++)
         {
              ((float*) (result_p + column))[row]
-           = scalar_vector(*(vector_t*) operator[row], vectors_p[column]);
+           = vector_scalar(*(vector_t*) operator[row], vectors_p[column]);
         }
     }
 }
@@ -132,20 +132,20 @@ transpose_operator(matrix_3x3_t matrix_trans, const matrix_3x3_t matrix)
 void get_rotation(matrix_3x3_t rotation, vector_t vector_a, vector_t vector_b)
 {
     vector_t vector_z1;
-    subtract_vectors(&vector_z1, vector_b, vector_a);
-    scale_vector(&vector_z1, vector_z1, 1/norm_vector(vector_z1));
+    vector_subtract(&vector_z1, vector_b, vector_a);
+    vector_scale(&vector_z1, vector_z1, 1/vector_norm(vector_z1));
 
-    float cos_a1 = scalar_vector(vector_z1, VECTOR_Z);
+    float cos_a1 = vector_scalar(vector_z1, VECTOR_Z);
     float sin_a1 = sqrt(1 - pow(cos_a1, 2));
 
     vector_t vector_z2 = vector_z1;
     vector_z2.z = 0;
-    scale_vector(&vector_z2, vector_z2, 1/norm_vector(vector_z2));
+    vector_scale(&vector_z2, vector_z2, 1/vector_norm(vector_z2));
 
-    float cos_a2 = cos_a1 == 1.0f ? 1.0f : scalar_vector(vector_z2, VECTOR_X);
+    float cos_a2 = cos_a1 == 1.0f ? 1.0f : vector_scalar(vector_z2, VECTOR_X);
     float sin_a2 = sqrt(1 - pow(cos_a2, 2));
 
-    float sin_sign = scalar_vector(vector_z2, VECTOR_Y);
+    float sin_sign = vector_scalar(vector_z2, VECTOR_Y);
     if(sin_sign<0)
     {
         sin_a2 *= -1;
@@ -163,18 +163,18 @@ void get_rotation(matrix_3x3_t rotation, vector_t vector_a, vector_t vector_b)
 
 
 void
-translate_vector(vector_t* vector_p, vector_t direction)
+vector_translate(vector_t* vector_p, vector_t direction)
 {
-	add_vectors(vector_p, *vector_p, direction);
+	vector_add(vector_p, *vector_p, direction);
 }
 
 void
-rotate_vector(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle)
+vector_rotate(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle)
 {
     //Calcul de la base de l'axe de rotation
     vector_t z_1;
-    subtract_vectors(&z_1, axis_b, axis_a);
-    scale_vector(&z_1, z_1, 1/norm_vector(z_1));
+    vector_subtract(&z_1, axis_b, axis_a);
+    vector_scale(&z_1, z_1, 1/vector_norm(z_1));
 
     matrix_3x3_t base_rotation;
     get_rotation(base_rotation, axis_a, axis_b);
@@ -206,11 +206,11 @@ rotate_vector(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle)
 
 
     vector_t vector_axis_point;
-    project_vector(&vector_axis_point, axis_a, axis_b);
+    vector_project(&vector_axis_point, axis_a, axis_b);
 
     vector_t vector_pr0;
 
-    subtract_vectors(&vector_pr0, *vector_p, vector_axis_point);
+    vector_subtract(&vector_pr0, *vector_p, vector_axis_point);
 
     //base 0->1
     vector_t vector_pr1;
@@ -232,54 +232,54 @@ rotate_vector(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle)
     space_operation(&vector_pr0_rot, base_1_to_0, &vector_pr1_rot, 1);
 
     vector_t vector_p_rot;
-    add_vectors(&vector_p_rot, vector_pr0_rot, vector_axis_point);
+    vector_add(&vector_p_rot, vector_pr0_rot, vector_axis_point);
 
     *vector_p = vector_p_rot;
 }
 
 
 void
-project_vector(vector_t* vector_p, vector_t axis_a, vector_t axis_b)
+vector_project(vector_t* vector_p, vector_t axis_a, vector_t axis_b)
 {
     vector_t vect_ab;
 	vector_t vect_ap;
-	subtract_vectors(&vect_ab, axis_b, axis_a);
-	subtract_vectors(&vect_ap, *vector_p, axis_a);
+	vector_subtract(&vect_ab, axis_b, axis_a);
+	vector_subtract(&vect_ap, *vector_p, axis_a);
 
-	float scale = scalar_vector(vect_ab, vect_ap)/scalar_vector(vect_ab, vect_ab);
+	float scale = vector_scalar(vect_ab, vect_ap)/vector_scalar(vect_ab, vect_ab);
 
 	vector_t vect_temp;
-	scale_vector(&vect_temp, vect_ab, scale);
-	add_vectors(vector_p, axis_a, vect_temp);
+	vector_scale(&vect_temp, vect_ab, scale);
+	vector_add(vector_p, axis_a, vect_temp);
 }
 
 
 void
-radial_scale_vector(vector_t* vector_p, vector_t reference, float scale)
+vector_scale_radial(vector_t* vector_p, vector_t reference, float scale)
 {
     vector_t vector_temp = VECTOR_0;
 
-	subtract_vectors(&vector_temp, *vector_p, reference);
-	scale_vector(&vector_temp, vector_temp, scale);
-	add_vectors(vector_p, vector_temp, reference);
+	vector_subtract(&vector_temp, *vector_p, reference);
+	vector_scale(&vector_temp, vector_temp, scale);
+	vector_add(vector_p, vector_temp, reference);
 }
 
 void
-axial_scale_vector(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float scale)
+vector_scale_axial(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float scale)
 {
     vector_t vector_r = *vector_p;
-	project_vector(&vector_r, axis_a, axis_b);
+	vector_project(&vector_r, axis_a, axis_b);
 
 	vector_t vect_rp;
-	subtract_vectors(&vect_rp, *vector_p, vector_r);
-	scale_vector(&vect_rp, vect_rp, scale);
+	vector_subtract(&vect_rp, *vector_p, vector_r);
+	vector_scale(&vect_rp, vect_rp, scale);
 
-	add_vectors(vector_p, vect_rp, *vector_p);
+	vector_add(vector_p, vect_rp, *vector_p);
 
 }
 
 void
-planar_scale_vector(vector_t* point_p, vector_t plane_a, vector_t normal_b, float scale)
+vector_scale_planar(vector_t* point_p, vector_t plane_a, vector_t normal_b, float scale)
 {
     OLI_UNUSED(point_p);
     OLI_UNUSED(plane_a);
@@ -288,7 +288,7 @@ planar_scale_vector(vector_t* point_p, vector_t plane_a, vector_t normal_b, floa
 }
 
 void
-rand_coord_vector(vector_t* point_p, int height, int width)
+vector_random(vector_t* point_p, int height, int width)
 {
     int randX = rand() % width;
     int randY = rand() % height;
@@ -297,7 +297,7 @@ rand_coord_vector(vector_t* point_p, int height, int width)
 }
 
 void
-rand_delta_vector(vector_t* point_p, int amplitude, int width, int height)
+vector_random_delta(vector_t* point_p, int amplitude, int width, int height)
 {
     point_p->x += rand() % (2 * amplitude + 1) - amplitude;
     modulo(point_p->x, width);

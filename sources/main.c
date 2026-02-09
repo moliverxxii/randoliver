@@ -16,6 +16,7 @@
 #include "image_drawing.h"
 #include "camera.h"
 #include "utility.h"
+#include "matrix.h"
 
 //#define OLI_TEST_PATTERN
 //#define OLI_3D
@@ -137,7 +138,7 @@ main(int argc, char* argv[])
         printf("Image %u\n", frame);
         for(uint32_t i=0; i<fig.amount;++i)
         {
-           rand_delta_vector(&fig.sequence[i].vector,
+           vector_random_delta(&fig.sequence[i].vector,
                              1,
                              image_p->width,
                              image_p->height);
@@ -164,7 +165,7 @@ main(int argc, char* argv[])
         figure_t figure = figure_from_image(image_p);
         for(uint32_t point=0; point<figure.amount;++point)
         {
-           rand_delta_vector(&figure.sequence[point].vector,
+           vector_random_delta(&figure.sequence[point].vector,
                              8,
                              image_p->width,
                              image_p->height);

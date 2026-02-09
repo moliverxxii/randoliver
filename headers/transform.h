@@ -10,8 +10,8 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-
-typedef float vector_axis_t;
+#include "matrix.h"
+typedef matrix_data_t vector_axis_t;
 
 /**
  * Un type pour la representation dans l'espace.
@@ -52,33 +52,33 @@ extern const vector_t VECTOR_0;
 /**
  * ||vector_p||
  */
-float norm_vector(vector_t vector_p);
+float vector_norm(vector_t vector_p);
 
 /**
  * <vector_a|vector_b>
  */
-float scalar_vector(vector_t vector_a, vector_t vector_b);
+float vector_scalar(vector_t vector_a, vector_t vector_b);
 
 
 /** *vector_r_p = vector_a + vector_b
  *
  */
-vector_t* add_vectors(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b);
+vector_t* vector_add(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b);
 
 /** *vector_r_p = vector_a - vector_b
  *
  */
-vector_t* subtract_vectors(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b);
+vector_t* vector_subtract(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b);
 
 /** *vector_r_p = scale * vector
  *
  */
-vector_t* scale_vector(vector_t* vector_r_p, vector_t vector, float scale);
+vector_t* vector_scale(vector_t* vector_r_p, vector_t vector, float scale);
 
 /** *vector_r_p = scale - vector
  *
  */
-vector_t* negative_vector(vector_t* vector_r_p, vector_t vector);
+vector_t* vector_negative(vector_t* vector_r_p, vector_t vector);
 
 void print_operator(const matrix_3x3_t operator);
 
@@ -98,21 +98,21 @@ void transpose_operator(matrix_3x3_t matrix_trans, const matrix_3x3_t matrix);
 void get_rotation(matrix_3x3_t rotation, vector_t vector_a, vector_t vector_b);
 
 
-void translate_vector(vector_t* vector_p, vector_t direction);
-void rotate_vector(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle);
+void vector_translate(vector_t* vector_p, vector_t direction);
+void vector_rotate(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle);
 
-void project_vector(vector_t* vector_p, vector_t axis_a, vector_t axis_b);
+void vector_project(vector_t* vector_p, vector_t axis_a, vector_t axis_b);
 
-void radial_scale_vector(vector_t* vector_p, vector_t reference, float scale);
-void axial_scale_vector(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float scale);
-void planar_scale_vector(vector_t* vector_p, vector_t plane_a, vector_t normal_b, float scale);
+void vector_scale_radial(vector_t* vector_p, vector_t reference, float scale);
+void vector_scale_axial(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float scale);
+void vector_scale_planar(vector_t* vector_p, vector_t plane_a, vector_t normal_b, float scale);
 
-void rand_coord_vector(vector_t* vector_p, int height, int width);
+void vector_random(vector_t* vector_p, int height, int width);
 
 /**
  * Randomly moves a vector.
  */
-void rand_delta_vector(vector_t* vector_p, int amplitude, int width, int height);
+void vector_random_delta(vector_t* vector_p, int amplitude, int width, int height);
 
 
 

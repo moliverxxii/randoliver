@@ -61,11 +61,11 @@ camera_render_point(const camera_t* camera_p,
     vector_t p = point.vector;
 
     vector_t op;
-    subtract_vectors(&op, p, camera_context.o);
+    vector_subtract(&op, p, camera_context.o);
 
-    float op_u_scalaire = scalar_vector(op, camera_context.u);
-    float op_v_scalaire = scalar_vector(op, camera_context.v);
-    float op_w_scalaire = scalar_vector(op, camera_context.w);
+    float op_u_scalaire = vector_scalar(op, camera_context.u);
+    float op_v_scalaire = vector_scalar(op, camera_context.v);
+    float op_w_scalaire = vector_scalar(op, camera_context.w);
 
     int x_image = SYSTEM_SCREEN.width / 2
             + camera_context.distance * op_v_scalaire / op_u_scalaire;
@@ -106,11 +106,11 @@ camera_context_update(const camera_t* camera_p)
     vector_t o = camera_p->origin;
     vector_t f = camera_p->direction;
     vector_t of;
-    subtract_vectors(&of, f, o);
+    vector_subtract(&of, f, o);
 
-    float norme_of = norm_vector(of);
+    float norme_of = vector_norm(of);
     vector_t u;
-    scale_vector(&u, of, 1/norme_of);
+    vector_scale(&u, of, 1/norme_of);
 
     vector_t v;
     v.x = -u.y / sqrt(pow(u.x, 2) + pow(u.y, 2));
