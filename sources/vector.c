@@ -44,9 +44,12 @@ vector_norm(vector_t vector_p)
 float
 vector_scalar(vector_t vector_a, vector_t vector_b)
 {
-    return vector_a.x*vector_b.x
-         + vector_a.y*vector_b.y
-         + vector_a.z*vector_b.z;
+    float scalar = 0;
+    for(int axis = 0; axis < VECTOR_AXIS_COUNT; ++axis)
+    {
+         scalar += vector_a.array[axis]*vector_b.array[axis];
+    }
+    return scalar;
 }
 
 
@@ -57,10 +60,11 @@ vector_add(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b)
     {
         return NULL;
     }
-    memcpy(vector_r_p, &vector_a, sizeof(vector_t));
-    vector_r_p->x += vector_b.x;
-    vector_r_p->y += vector_b.y;
-    vector_r_p->z += vector_b.z;
+    *vector_r_p = vector_a;
+    for(int axis = 0; axis < VECTOR_AXIS_COUNT; ++axis)
+    {
+         vector_r_p->array[axis] += vector_b.array[axis];
+    }
     return vector_r_p;
 }
 
@@ -80,10 +84,11 @@ vector_scale(vector_t* vector_r_p, vector_t vector, float scale)
     {
         return vector_r_p;
     }
-    memcpy(vector_r_p, &vector, sizeof(vector));
-    vector_r_p->x *= scale;
-    vector_r_p->y *= scale;
-    vector_r_p->z *= scale;
+    *vector_r_p = vector;
+    for(int axis = 0; axis < VECTOR_AXIS_COUNT; ++axis)
+    {
+         vector_r_p->array[axis] *= scale;
+    }
     return vector_r_p;
 
 }

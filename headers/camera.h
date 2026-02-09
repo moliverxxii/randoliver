@@ -10,6 +10,8 @@
 
 #include "figure.h"
 #include "image.h"
+#include "edge.h"
+#include "triangle.h"
 
 /** Une camera a utiliser pour le rendu 3D
  *
@@ -32,6 +34,12 @@ void camera_render_point(const camera_t* camera_p,
 void camera_render_figure(const camera_t* camera_p,
                           image_t* image_p,
                           figure_t figure);
+void camera_render_edge(const camera_t* camera_p,
+                        image_t* image_p,
+                        edge_t edge);
+void camera_render_triangle(const camera_t* camera_p,
+                            image_t* image_p,
+                            triangle_t triangle);
 
 
 

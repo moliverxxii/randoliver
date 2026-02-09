@@ -82,12 +82,12 @@ get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius)
                 {
                     continue;
                 }
-                sum += image_p->image[pixel_y + j][pixel_x + i].bytes[colour];
+                sum += image_p->image[pixel_y + j][pixel_x + i].array[colour];
                 ++count;
             }
         }
         sum /= count;
-        return_colour.bytes[colour] = dither(sum);
+        return_colour.array[colour] = dither(sum);
     }
     return return_colour;
 }

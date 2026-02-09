@@ -97,11 +97,26 @@ camera_render_figure(const camera_t* camera_p,
 
     for(uint32_t point = 0; point < figure.amount; ++point)
     {
-        camera_render_point(camera_p, image_p, figure.sequence[point]);
+        camera_render_point(camera_p, image_p, figure.array[point]);
     }
     printf("Render end.\n");
 
 }
+
+void camera_render_edge(const camera_t* camera_p,
+                        image_t* image_p,
+                        edge_t edge)
+{
+
+}
+
+void camera_render_triangle(const camera_t* camera_p,
+                            image_t* image_p,
+                            triangle_t triangle)
+{
+
+}
+
 
 static void
 camera_context_update(const camera_t* camera_p)

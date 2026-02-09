@@ -85,10 +85,10 @@ main(int argc, char* argv[])
     camera_t camera = camera_init(350, 0, 100, 350, 10, 100, 100);
     for(uint32_t point_n = 0; point_n < point_count; ++point_n)
     {
-        figure.sequence[point_n].vector.x = (point_n % 8) * dist_x;
-        figure.sequence[point_n].vector.y = (dist_x * (float) (point_n - point_n % 8)) / 8 - 100;
-        figure.sequence[point_n].vector.z = 0;
-        figure.sequence[point_n].colour = colour_get_random();
+        figure.array[point_n].vector.x = (point_n % 8) * dist_x;
+        figure.array[point_n].vector.y = (dist_x * (float) (point_n - point_n % 8)) / 8 - 100;
+        figure.array[point_n].vector.z = 0;
+        figure.array[point_n].colour = colour_get_random();
     }
 
     vector_t centre_grave = figure_get_average_point(&figure);
@@ -116,7 +116,7 @@ main(int argc, char* argv[])
         performance_try_start(&process_performance);
         for(uint32_t point_n = 0; point_n< figure.amount; point_n++)
         {
-            vector_rotate(&figure.sequence[point_n].vector,
+            vector_rotate(&figure.array[point_n].vector,
                           centre_grave,
                           centre_grave_z,
                           2.*M_PI/360.);
@@ -135,9 +135,9 @@ main(int argc, char* argv[])
 #ifdef OLI_FIG
     for(uint32_t point_n=0; point_n<figure.amount; ++point_n)
     {
-        figure.sequence[point_n].vector.x = image_p->width/2;
-        figure.sequence[point_n].vector.y = image_p->height/2;
-        figure.sequence[point_n].colour = colour_get_random();
+        figure.array[point_n].vector.x = image_p->width/2;
+        figure.array[point_n].vector.y = image_p->height/2;
+        figure.array[point_n].colour = colour_get_random();
     }
     
 
@@ -147,7 +147,7 @@ main(int argc, char* argv[])
         printf("Image %u\n", frame);
         for(uint32_t point_n=0; point_n<figure.amount;++point_n)
         {
-           vector_random_delta(&figure.sequence[point_n].vector,
+           vector_random_delta(&figure.array[point_n].vector,
                              point_n,
                              image_p->width,
                              image_p->height);
@@ -176,7 +176,7 @@ main(int argc, char* argv[])
         figure_t figure = figure_from_image(image_p);
         for(uint32_t point=0; point<figure.amount;++point)
         {
-           vector_random_delta(&figure.sequence[point].vector,
+           vector_random_delta(&figure.array[point].vector,
                              8,
                              image_p->width,
                              image_p->height);
