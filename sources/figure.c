@@ -45,7 +45,7 @@ figure_from_image(const image_t* image_p)
         figure.sequence[point] 
             = (point_t) 
             {
-                {point%image_p->width, point/image_p->height, 0},
+                vector_init(point%image_p->width, point/image_p->height, 0),
                 image_data_p[point]
             };
     }
@@ -55,11 +55,11 @@ figure_from_image(const image_t* image_p)
 vector_t
 figure_get_average_point(const figure_t* figure_p)
 {
-    vector_t average = {0, 0, 0};
+    vector_t average = VECTOR_0;
 
     for(uint32_t point_count = 0; point_count<figure_p->amount; ++point_count)
     {
-        for(int axis=0; axis<3; ++axis)
+        for(int axis=0; axis<VECTOR_AXIS_COUNT; ++axis)
         {
             (&average.x)[axis] += (&figure_p->sequence[point_count].vector.x)[axis];
         }

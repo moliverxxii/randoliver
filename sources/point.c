@@ -13,7 +13,7 @@ point_init(vector_axis_t x, vector_axis_t y, vector_axis_t z, colour_t colour)
 {
     point_t point =
     {
-        {x, y, z},
+        vector_init(x, y, z),
         colour
     };
     return point;

@@ -16,13 +16,14 @@
 #include "image_drawing.h"
 #include "camera.h"
 #include "utility.h"
-#include "matrix.h"
+#include "performance.h"
 
-//#define OLI_TEST_PATTERN
-//#define OLI_3D
 //#define OLI_BROWN
+//#define OLI_TEST_PATTERN
+
+#define OLI_3D
 //#define OLI_FIG
-#define OLI_FIG_2
+//#define OLI_FIG_2
 
 int
 main(int argc, char* argv[])
@@ -51,6 +52,17 @@ main(int argc, char* argv[])
 
     interface_state_save();
 
+
+#ifdef OLI_BROWN
+    brownien1(image_p, point_count, 1, width/2, height/2);
+    image_file_p = image_file_init(file_name_prefix_p, image_p);
+
+    image_file_write(image_file_p, image_p);
+    image_file_free(image_file_p);
+    image_set(image_p);
+#endif /* OLI_BROWN */
+
+
 #ifdef OLI_TEST_PATTERN
     image_scale(&image_p, 1.0f/height, SCALE_ALGORITHM_LINEAR);
     test_pattern_squares(image_p, 1);
@@ -61,85 +73,82 @@ main(int argc, char* argv[])
     image_file_free(image_file_p);
 #endif //OLI_TEST_PATTERN
 
-
-#ifdef OLI_3D
-    uint32_t nb = 400;
-    int dist_x = 100;
-    figure_t test = figure_init(nb);
-    colour_t colour;
-    *(colour_struct_t*) &colour = RED;
-    camera_t camera = camera_init(350, 0, 100, 350, 10, 100, 100);
-    for(uint32_t point_n = 0; point_n < nb; ++point_n)
-    {
-        test.sequence[point_n].vector.x = (point_n % 8) * dist_x;
-        test.sequence[point_n].vector.y = (dist_x * (float) (point_n - point_n % 8)) / 8 - 100;
-        test.sequence[point_n].vector.z = 0;
-        test.sequence[point_n].colour = colour_get_random();
-//        printf("x,y = %d,%d\n",test.sequence[i].x,test.sequence[i].y);
-    }
+//Animation
     int frame_count = 360;
-
-    vector_t centre_grave = figure_get_average_point(&test);
-    vector_t centre_grave_z;
-    add_vectors(&centre_grave_z, centre_grave, (vector_t) {0,0,1});
-    int frame=0;
-    interface_state_save();
-    do
+    unsigned int point_count = 20000;
+    figure_t figure = figure_init(point_count);
+    performance_t render_performance = performance_init("rendu");
+    performance_t process_performance = performance_init("processus");
+    performance_t frame_performance = performance_init("image");
+    #ifdef OLI_3D
+    int dist_x = 100;
+    camera_t camera = camera_init(350, 0, 100, 350, 10, 100, 100);
+    for(uint32_t point_n = 0; point_n < point_count; ++point_n)
     {
+        figure.sequence[point_n].vector.x = (point_n % 8) * dist_x;
+        figure.sequence[point_n].vector.y = (dist_x * (float) (point_n - point_n % 8)) / 8 - 100;
+        figure.sequence[point_n].vector.z = 0;
+        figure.sequence[point_n].colour = colour_get_random();
+    }
+
+    vector_t centre_grave = figure_get_average_point(&figure);
+    vector_t centre_grave_z;
+    vector_add(&centre_grave_z, centre_grave, VECTOR_Z);
+    interface_state_save();
+    for(int frame=0; frame<frame_count; ++frame)
+    {
+        performance_try_start(&frame_performance);
         interface_state_restore();
         printf("Image %u\n", frame);
-        camera_render_figure(&camera, image_p, test);
+        performance_print(&render_performance);
+        performance_print(&process_performance);
+        performance_print(&frame_performance);
+
+        performance_try_start(&render_performance);
+        camera_render_figure(&camera, image_p, figure);
+        performance_try_add(&render_performance);
 
         char* file_name_p = num_extension(file_name_prefix_p, frame);
 
         image_file_p = image_file_init(file_name_p, image_p);
 
         //OPERATION
-        for(uint32_t point_n = 0; point_n< test.amount; point_n++)
+        performance_try_start(&process_performance);
+        for(uint32_t point_n = 0; point_n< figure.amount; point_n++)
         {
-            rotate_vector(&test.sequence[point_n].vector,
+            vector_rotate(&figure.sequence[point_n].vector,
                           centre_grave,
                           centre_grave_z,
                           2.*M_PI/360.);
         }
+        performance_try_add(&process_performance);
 
         free(file_name_p);
         image_file_free(image_file_p);
         image_file_p = NULL;
         image_set(image_p);
-        ++frame;
-    } while (frame<frame_count);
+        performance_try_add(&frame_performance);
+    }
 
 #endif /* OLI_3D */
 
-#ifdef OLI_BROWN
-    brownien1(image_p, 30000, 1, width/2, height/2);
-    image_file_p = image_file_init(file_name_prefix_p, image_p);
-
-    image_file_write(image_file_p, image_p);
-    image_file_free(image_file_p);
-    image_set(image_p);
-#endif /* OLI_BROWN */
-
 #ifdef OLI_FIG
-    unsigned int num_points = 20000;
-    figure_t fig = figure_init(num_points);
-    for(uint32_t i=0; i<fig.amount; ++i)
+    for(uint32_t point_n=0; point_n<figure.amount; ++point_n)
     {
-         fig.sequence[i].vector.x = image_p->width/2;
-         fig.sequence[i].vector.y = image_p->height/2;
-         fig.sequence[i].colour = colour_get_random();
+        figure.sequence[point_n].vector.x = image_p->width/2;
+        figure.sequence[point_n].vector.y = image_p->height/2;
+        figure.sequence[point_n].colour = colour_get_random();
     }
     
 
-    for(int frame=0; frame<200; ++frame)
+    for(int frame=0; frame<frame_count; ++frame)
     {
         interface_state_restore();
         printf("Image %u\n", frame);
-        for(uint32_t i=0; i<fig.amount;++i)
+        for(uint32_t point_n=0; point_n<figure.amount;++point_n)
         {
-           vector_random_delta(&fig.sequence[i].vector,
-                             1,
+           vector_random_delta(&figure.sequence[point_n].vector,
+                             point_n,
                              image_p->width,
                              image_p->height);
         }
@@ -147,17 +156,19 @@ main(int argc, char* argv[])
 
         image_file_p = image_file_init(file_name_p, image_p);
 
-        image_draw_figure(image_p, &fig);
+        image_draw_figure(image_p, &figure);
         image_file_write(image_file_p, image_p);
         free(file_name_p);
         image_file_free(image_file_p);
         image_set(image_p);
     }
+    figure_free(&figure);
 #endif
+
 #ifdef OLI_FIG_2
     test_pattern_squares(image_p, 1);
 
-    for(uint32_t frame = 0; frame < 2000; ++frame)
+    for(int frame = 0; frame < frame_count; ++frame)
     {
         interface_state_restore();
         printf("Image %u\n", frame);

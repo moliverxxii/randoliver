@@ -131,7 +131,7 @@ test_pattern_squares(image_t* image_p, uint32_t period)
         {
             image_draw_point(image_p,
                              (point_t) {
-                                          {x, y, 0},
+                                          vector_init(x, y, 0),
                                           square_colours_p[x/period + (y/period)*x_squares]
                                        }
                             );

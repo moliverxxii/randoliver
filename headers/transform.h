@@ -13,16 +13,6 @@
 #include "matrix.h"
 typedef matrix_data_t vector_axis_t;
 
-/**
- * Un type pour la representation dans l'espace.
- */
-typedef struct
-{
-    vector_axis_t x;
-    vector_axis_t y;
-    vector_axis_t z;
-} vector_t;
-
 typedef enum
 {
     VECTOR_AXIS_X = 0,
@@ -30,6 +20,21 @@ typedef enum
     VECTOR_AXIS_Z,
     VECTOR_AXIS_COUNT
 } vector_axis_e;
+
+/**
+ * Un type pour la representation dans l'espace.
+ */
+typedef union
+{
+    struct
+    {
+        vector_axis_t x;
+        vector_axis_t y;
+        vector_axis_t z;
+    };
+    vector_axis_t axis[VECTOR_AXIS_COUNT];
+} vector_t;
+
 
 #define VECTOR_AXIS_MASK(AXIS) VECTOR_AXIS_MASK_##AXIS = 1 << VECTOR_AXIS_##AXIS
 
@@ -41,13 +46,16 @@ typedef enum
     VECTOR_AXIS_MASK_ALL = VECTOR_AXIS_MASK_X | VECTOR_AXIS_MASK_Y | VECTOR_AXIS_MASK_Z
 } vector_axis_mask_e;
 
-typedef vector_axis_t matrix_3x3_t [3][3];
-typedef vector_axis_t matrix_3x1_t [3];
+typedef vector_axis_t matrix_3x3_t [VECTOR_AXIS_COUNT][VECTOR_AXIS_COUNT];
+typedef vector_axis_t matrix_3x1_t [VECTOR_AXIS_COUNT];
 
 extern const vector_t VECTOR_X;
 extern const vector_t VECTOR_Y;
 extern const vector_t VECTOR_Z;
 extern const vector_t VECTOR_0;
+
+vector_t vector_init(vector_axis_t x, vector_axis_t y, vector_axis_t z);
+vector_t vector_init_array(const vector_axis_t* array);
 
 /**
  * ||vector_p||
