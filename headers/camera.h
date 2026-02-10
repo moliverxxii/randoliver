@@ -20,13 +20,13 @@ typedef struct
 {
     vector_t origin;
     vector_t direction;
-    float distance;
+    float angle; //[0, pi]
 } camera_t;
 
 /* Rendu */
 camera_t camera_init(float origin_x, float origin_y, float origin_z,
                      float destin_x, float destin_y, float destin_z,
-                     float distance);
+                     float angle);
 
 void camera_render_point(const camera_t* camera_p,
                          image_t* image_p,

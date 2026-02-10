@@ -1,4 +1,4 @@
-/*
+/*&cam
  * main.c
  *
  *  Created on: 13 févr. 2019
@@ -17,7 +17,7 @@
 #include "camera.h"
 #include "utility.h"
 #include "performance.h"
-
+#include "edge.h"
 //#define OLI_BROWN
 //#define OLI_TEST_PATTERN
 
@@ -39,8 +39,8 @@ main(int argc, char* argv[])
     {
         strcpy(file_name_prefix_p, "sans titre");
     }
-    int width = 1920;
-    int height = 960;
+    int width = 1280;
+    int height = 720;
 
     image_file_t* image_file_p;
 
@@ -75,28 +75,53 @@ main(int argc, char* argv[])
 
 //Animation
     int frame_count = 360;
-    unsigned int point_count = 20000;
+    uint32_t point_count = 6;
     figure_t figure = figure_init(point_count);
     performance_t render_performance = performance_init("rendu");
     performance_t process_performance = performance_init("processus");
     performance_t frame_performance = performance_init("image");
     #ifdef OLI_3D
-    int dist_x = 100;
-    camera_t camera = camera_init(350, 0, 100, 350, 10, 100, 100);
-    for(uint32_t point_n = 0; point_n < point_count; ++point_n)
+    figure.array[0].vector = vector_init( 1,  0,  0);
+    figure.array[1].vector = vector_init( 0,  1,  0);
+    figure.array[2].vector = vector_init( 0,  0,  1);
+    figure.array[3].vector = vector_init(-1,  0,  0);
+    figure.array[4].vector = vector_init( 0, -1,  0);
+    figure.array[5].vector = vector_init( 0,  0, -1);
+
+
+    for(uint32_t point = 0; point < point_count; ++point)
     {
-        figure.array[point_n].vector.x = (point_n % 8) * dist_x;
-        figure.array[point_n].vector.y = (dist_x * (float) (point_n - point_n % 8)) / 8 - 100;
-        figure.array[point_n].vector.z = 0;
-        figure.array[point_n].colour = colour_get_random();
+        figure.array[point].colour = WHITE;
     }
 
     vector_t centre_grave = figure_get_average_point(&figure);
+    vector_print(centre_grave);
+
+    camera_t camera = camera_init(2, 10, 2, centre_grave.x, centre_grave.y, centre_grave.z, M_PI_2);
+
     vector_t centre_grave_z;
     vector_add(&centre_grave_z, centre_grave, VECTOR_Z);
     interface_state_save();
+    figure_t figure_bis = figure_copy(figure);
     for(int frame=0; frame<frame_count; ++frame)
     {
+        edge_t edge_array[12] =
+        {
+            edge_init(&figure_bis.array[0].vector, &figure_bis.array[1].vector, WHITE),
+            edge_init(&figure_bis.array[0].vector, &figure_bis.array[2].vector, WHITE),
+            edge_init(&figure_bis.array[0].vector, &figure_bis.array[4].vector, WHITE),
+            edge_init(&figure_bis.array[0].vector, &figure_bis.array[5].vector, WHITE),
+
+            edge_init(&figure_bis.array[1].vector, &figure_bis.array[2].vector, GREEN),
+            edge_init(&figure_bis.array[1].vector, &figure_bis.array[3].vector, GREEN),
+            edge_init(&figure_bis.array[1].vector, &figure_bis.array[5].vector, GREEN)
+            ,
+            edge_init(&figure_bis.array[2].vector, &figure_bis.array[3].vector, BLUE),
+            edge_init(&figure_bis.array[2].vector, &figure_bis.array[4].vector, BLUE),
+            edge_init(&figure_bis.array[3].vector, &figure_bis.array[4].vector, RED),
+            edge_init(&figure_bis.array[3].vector, &figure_bis.array[5].vector, RED),
+            edge_init(&figure_bis.array[4].vector, &figure_bis.array[5].vector, YELLOW),
+        };
         performance_try_start(&frame_performance);
         interface_state_restore();
         printf("Image %u\n", frame);
@@ -105,7 +130,12 @@ main(int argc, char* argv[])
         performance_print(&frame_performance);
 
         performance_try_start(&render_performance);
-        camera_render_figure(&camera, image_p, figure);
+        camera_render_figure(&camera, image_p, figure_bis);
+        for(int edge=0; edge<12; ++edge)
+        {
+            camera_render_edge(&camera, image_p, edge_array[edge]);
+        }
+        figure_free(&figure_bis);
         performance_try_add(&render_performance);
 
         char* file_name_p = num_extension(file_name_prefix_p, frame);
@@ -114,12 +144,13 @@ main(int argc, char* argv[])
 
         //OPERATION
         performance_try_start(&process_performance);
+        figure_bis = figure_copy(figure);
         for(uint32_t point_n = 0; point_n< figure.amount; point_n++)
         {
-            vector_rotate(&figure.array[point_n].vector,
+            vector_rotate(&figure_bis.array[point_n].vector,
                           centre_grave,
                           centre_grave_z,
-                          2.*M_PI/360.);
+                          (float) frame * 2.*M_PI/frame_count);
         }
         performance_try_add(&process_performance);
 
@@ -129,6 +160,7 @@ main(int argc, char* argv[])
         image_set(image_p);
         performance_try_add(&frame_performance);
     }
+    figure_free(&figure_bis);
 
 #endif /* OLI_3D */
 

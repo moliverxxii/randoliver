@@ -34,6 +34,11 @@ vector_t vector_init_array(const vector_axis_t* array)
     return vector;
 }
 
+void vector_print(vector_t vector)
+{
+    printf(" (% 10.3f, % 10.3f, % 10.3f)\n",vector.x, vector.y, vector.z);
+}
+
 
 float
 vector_norm(vector_t vector_p)
@@ -50,6 +55,14 @@ vector_scalar(vector_t vector_a, vector_t vector_b)
          scalar += vector_a.array[axis]*vector_b.array[axis];
     }
     return scalar;
+}
+
+vector_t vector_product(vector_t vector_a, vector_t vector_b)
+{
+    return vector_init(
+            vector_a.y * vector_b.z - vector_a.z * vector_b.y,
+            vector_a.z * vector_b.x - vector_a.x * vector_b.z,
+            vector_a.x * vector_b.y - vector_a.y * vector_b.x);
 }
 
 

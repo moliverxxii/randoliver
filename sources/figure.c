@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "figure.h"
 #include "image.h"
@@ -25,6 +26,14 @@ figure_init(uint32_t point_count)
         figure.array[point] = point_init(0, 0, 0, BLACK);
     }
     return figure;
+}
+
+figure_t
+figure_copy(figure_t figure)
+{
+    figure_t copy = figure_init(figure.amount);
+    memcpy(copy.array, figure.array, figure.amount * sizeof(point_t));
+    return copy;
 }
 
 void

@@ -8,12 +8,15 @@
 #ifndef HEADERS_EDGE_H_
 #define HEADERS_EDGE_H_
 
-#include "point.h"
+#include "vector.h"
+#include "colours.h"
 
 typedef struct
 {
-    point_t* array[2];
+    vector_t* array[2];
     colour_t colour;
 } edge_t;
+
+edge_t edge_init(vector_t* a_p, vector_t* b_p, colour_t colour);
 
 #endif /* HEADERS_EDGE_H_ */

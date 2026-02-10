@@ -25,6 +25,7 @@ typedef struct
 typedef struct image_t image_t;
 //Initialise une sequence de nombre_point point_t.
 figure_t figure_init(uint32_t nombre_point);
+figure_t figure_copy(figure_t figure);
 void     figure_free(figure_t* figure_p);
 figure_t figure_from_image(const image_t*);
 vector_t figure_get_average_point(const figure_t* figure_p);
