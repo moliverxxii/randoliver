@@ -97,10 +97,9 @@ main(int argc, char* argv[])
     vector_t centre_grave = figure_get_average_point(&figure);
     vector_print(centre_grave);
 
-    camera_t camera = camera_init(2, 10, 2, centre_grave.x, centre_grave.y, centre_grave.z, M_PI_2);
+    camera_t camera = camera_init(0, -10, 2, centre_grave.x, centre_grave.y, centre_grave.z, M_PI_2/2);
 
-    vector_t centre_grave_z;
-    vector_add(&centre_grave_z, centre_grave, VECTOR_Z);
+    vector_t centre_grave_z = vector_add(centre_grave, VECTOR_Z);
     interface_state_save();
     figure_t figure_bis = figure_copy(figure);
     for(int frame=0; frame<frame_count; ++frame)
@@ -147,7 +146,7 @@ main(int argc, char* argv[])
         figure_bis = figure_copy(figure);
         for(uint32_t point_n = 0; point_n< figure.amount; point_n++)
         {
-            vector_rotate(&figure_bis.array[point_n].vector,
+            vector_rotate_axial(&figure_bis.array[point_n].vector,
                           centre_grave,
                           centre_grave_z,
                           (float) frame * 2.*M_PI/frame_count);

@@ -68,8 +68,7 @@ camera_render_point(const camera_t* camera_p,
     vector_t p = point.vector;
 
     //II PO /1
-    vector_t op;
-    vector_subtract(&op, p, camera_context.o);
+    vector_t op = vector_subtract(p, camera_context.o);
 
     //III PO /2
     float op_u_scalaire = vector_scalar(op, camera_context.u);
@@ -110,7 +109,7 @@ camera_render_figure(const camera_t* camera_p,
     }
 }
 
-const uint32_t CAMERA_SUBDIVISION = 1000;
+const uint32_t CAMERA_SUBDIVISION = 400;
 
 void camera_render_edge(const camera_t* camera_p,
                         image_t* image_p,
@@ -123,12 +122,12 @@ void camera_render_edge(const camera_t* camera_p,
         float fraction = (float) point/(edge_figure.amount - 1);
 
         vector_t average_0 = *edge.array[0];
-        vector_scale(&average_0, average_0, fraction);
+        average_0 = vector_scale(average_0, fraction);
 
         vector_t average_1 = *edge.array[1];
-        vector_scale(&average_1, average_1, (float) 1 - fraction);
+        average_1 = vector_scale(average_1, (float) 1 - fraction);
 
-        vector_add(&average_0, average_0, average_1);
+        average_0 = vector_add(average_0, average_1);
         edge_figure.array[point] = point_init(average_0.x, average_0.y, average_0.z, edge.colour);
     }
     camera_render_figure(camera_p, image_p, edge_figure);
@@ -149,12 +148,10 @@ camera_context_update(const camera_t* camera_p)
     float angle = camera_p->angle;
     vector_t o = camera_p->origin;
     vector_t f = camera_p->direction;
-    vector_t of;
-    vector_subtract(&of, f, o);
+    vector_t of = vector_subtract(f, o);
 
     float norme_of = vector_norm(of);
-    vector_t u;
-    vector_scale(&u, of, 1/norme_of);
+    vector_t u = vector_scale(of, 1/norme_of);
 
     vector_t v;
     v.x = -u.y / sqrt(pow(u.x, 2) + pow(u.y, 2));

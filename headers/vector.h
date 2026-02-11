@@ -77,22 +77,28 @@ vector_t vector_product(vector_t vector_a, vector_t vector_b);
 /** *vector_r_p = vector_a + vector_b
  *
  */
-vector_t* vector_add(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b);
+vector_t vector_add(vector_t vector_a, vector_t vector_b);
 
 /** *vector_r_p = vector_a - vector_b
  *
  */
-vector_t* vector_subtract(vector_t* vector_r_p, vector_t vector_a, vector_t vector_b);
+vector_t vector_subtract(vector_t vector_a, vector_t vector_b);
 
 /** *vector_r_p = scale * vector
  *
  */
-vector_t* vector_scale(vector_t* vector_r_p, vector_t vector, float scale);
+vector_t vector_scale(vector_t vector, float scale);
+
+/** tourne le vecteur vector dans le sens direct angle dans le plan normal au vecteur normal.
+ *
+ */
+vector_t vector_rotate(vector_t vector, vector_t normal, float angle);
+
 
 /** *vector_r_p = scale - vector
  *
  */
-vector_t* vector_negative(vector_t* vector_r_p, vector_t vector);
+vector_t vector_negative(vector_t vector);
 
 void print_operator(const matrix_3x3_t operator);
 
@@ -113,7 +119,7 @@ void get_rotation(matrix_3x3_t rotation, vector_t vector_a, vector_t vector_b);
 
 
 void vector_translate(vector_t* vector_p, vector_t direction);
-void vector_rotate(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle);
+void vector_rotate_axial(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle);
 
 void vector_project(vector_t* vector_p, vector_t axis_a, vector_t axis_b);
 
