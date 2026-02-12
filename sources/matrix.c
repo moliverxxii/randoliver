@@ -11,7 +11,14 @@
 #include "matrix.h"
 #include "utility.h"
 
-matrix_t*
+const matrix_t MATRIX_NULL =
+{
+        0,
+        0,
+        NULL
+};
+
+matrix_t
 matrix_init(uint32_t lines, uint32_t columns)
 {
     matrix_data_t* matrix_data_p = malloc(lines*columns*sizeof(matrix_data_t));
@@ -22,161 +29,180 @@ matrix_init(uint32_t lines, uint32_t columns)
             matrix_data_p
     };
 
-    matrix_t* m_p = malloc(sizeof(matrix_t));
-    *m_p = m;
-    return m_p;
+    return m;
 }
 
-matrix_t*
-matrix_copy(const matrix_t* a_p)
+matrix_t
+matrix_copy(const matrix_t a)
 {
-    matrix_t* m_p = matrix_init(a_p->lines, a_p->lines);
-    memcpy(m_p->array, a_p->array, m_p->lines * m_p->columns * sizeof(matrix_data_t));
-    return m_p;
+    matrix_t m = matrix_init(a.lines, a.columns);
+    memcpy(m.array, a.array, matrix_size(m));
+    return m;
 }
+
+uint32_t matrix_length(const matrix_t m)
+{
+    return m.lines * m.columns;
+}
+
+size_t matrix_size(const matrix_t m)
+{
+    return matrix_length(m) * sizeof(matrix_data_t);
+}
+
+int
+matrix_is_allocated(const matrix_t m)
+{
+    return m.array != NULL;
+}
+
+int
+matrix_is_dimensions_equal(const matrix_t a, const matrix_t b)
+{
+    return a.columns == b.columns && a.lines == b.lines;
+}
+
 
 void
 matrix_free(matrix_t* matrix_p)
 {
     free(matrix_p->array);
-    free(matrix_p);
+    matrix_p->array = NULL;
+    matrix_p->lines = 0;
+    matrix_p->columns = 0;
 }
 
 matrix_data_t
-matrix_value_get(const matrix_t* matrix_p,
+matrix_value_get(const matrix_t m,
                  uint32_t line, uint32_t column)
 {
     matrix_data_t value = 0;
-    if(line < matrix_p->lines && column < matrix_p->columns)
+    if(line < m.lines && column < m.columns)
     {
-        value = matrix_p->array[line * matrix_p->columns + column];
+        value = m.array[line * m.columns + column];
     }
     return value;
 }
 
 void
-matrix_set(matrix_t* matrix_p, const matrix_data_t* restrict data_array)
+matrix_set(matrix_t m, const matrix_data_t* restrict data_array)
 {
-    memcpy(matrix_p->array, data_array, matrix_p->lines * matrix_p->columns * sizeof(matrix_data_t));
+    memcpy(m.array, data_array, matrix_size(m));
 }
 
 void
-matrix_value_set(matrix_t* matrix_p,
+matrix_value_set(matrix_t m,
                  uint32_t line, uint32_t column,
                  matrix_data_t value)
 {
-    if(line < matrix_p->lines && column < matrix_p->columns)
+    if(line < m.lines && column < m.columns)
     {
-        matrix_p->array[line * matrix_p->columns + column] = value;
+        m.array[line * m.columns + column] = value;
     }
 
 }
 //m = a + b
-matrix_t* matrix_add(const matrix_t* a_p, const matrix_t* b_p)
+matrix_t
+matrix_add(const matrix_t a, const matrix_t b)
 {
-    matrix_t* m_p = NULL;
-    if(a_p->columns == b_p->columns && a_p->lines == b_p->lines)
+    matrix_t m = matrix_copy(a);
+    if(matrix_is_dimensions_equal(a, b))
     {
-        m_p = matrix_copy(a_p);
-        for(uint32_t index = 0; index < m_p->lines*m_p->columns; ++index)
+        for(uint32_t index = 0; index < matrix_length(m); ++index)
         {
-            m_p->array[index] += b_p->array[index];
+            m.array[index] += b.array[index];
         }
     }
-    return m_p;
+    return m;
 }
 
 //m = a - b
-matrix_t* matrix_subtract(const matrix_t* a_p, const matrix_t* b_p)
+matrix_t
+matrix_subtract(const matrix_t a, const matrix_t b)
 {
-    matrix_t* m_p = NULL;
-    if(a_p->columns == b_p->columns && a_p->lines == b_p->lines)
-    {
-        m_p = matrix_copy(a_p);
-        for(uint32_t index = 0; index < m_p->lines*m_p->columns; ++index)
-        {
-            m_p->array[index] -= b_p->array[index];
-        }
-    }
-    return m_p;
+    matrix_t b_m1 = matrix_scale(b, -1);
+    matrix_t m = matrix_add(a, b_m1);
+    matrix_free(&b_m1);
+    return m;
 }
 
 
 //m = coefficient * a
-matrix_t* matrix_scale(const matrix_t* a_p, matrix_data_t coefficient)
+matrix_t
+matrix_scale(const matrix_t a, matrix_data_t coefficient)
 {
-    matrix_t* m_p = NULL;
-    m_p = matrix_copy(a_p);
-    for(uint32_t index = 0; index < m_p->lines*m_p->columns; ++index)
+    matrix_t m = matrix_copy(a);
+    for(uint32_t index = 0; index < matrix_length(m); ++index)
     {
-        m_p->array[index] *= coefficient;
+        m.array[index] *= coefficient;
     }
-    return m_p;
+    return m;
 }
 
 
 //m = a x b
-matrix_t* matrix_multiply(const matrix_t* a_p, const matrix_t* b_p)
+matrix_t matrix_multiply(const matrix_t a, const matrix_t b)
 {
-    matrix_t* m_p = NULL;
-    if(a_p->columns == b_p->lines)
+    matrix_t m = MATRIX_NULL;
+    if(a.columns == b.lines)
     {
-        m_p = matrix_init(a_p->lines, b_p->columns);
-        for(uint32_t line = 0; line< m_p->lines; ++line)
+        m = matrix_init(a.lines, b.columns);
+        for(uint32_t line = 0; line< m.lines; ++line)
         {
-
-            for(uint32_t column = 0; column< m_p->columns; ++column)
+            for(uint32_t column = 0; column< m.columns; ++column)
             {
                 matrix_data_t value = 0;
-                for(uint32_t index = 0; index < a_p->columns; ++index)
+                for(uint32_t index = 0; index < a.columns; ++index)
                 {
-                    value += matrix_value_get(a_p, line, index)
-                           * matrix_value_get(b_p, index, column);
+                    value += matrix_value_get(a, line, index)
+                           * matrix_value_get(b, index, column);
                 }
-                matrix_value_set(m_p, line, column, value);
+                matrix_value_set(m, line, column, value);
             }
         }
     }
-    return m_p;
+    return m;
 }
 
 //m = t_a
-matrix_t* matrix_transpose(const matrix_t* a_p)
+matrix_t
+matrix_transpose(const matrix_t a)
 {
-    matrix_t* m_p = matrix_init(a_p->columns, a_p->lines);
-    for(uint32_t line = 0; line< m_p->lines; ++line)
+    matrix_t m = matrix_init(a.columns, a.lines);
+    for(uint32_t line = 0; line< m.lines; ++line)
     {
-
-        for(uint32_t column = 0; column< m_p->columns; ++column)
+        for(uint32_t column = 0; column< m.columns; ++column)
         {
-            matrix_data_t value = matrix_value_get(a_p, column, line);
-            matrix_value_set(m_p, line, column, value);
+            matrix_data_t value = matrix_value_get(a, column, line);
+            matrix_value_set(m, line, column, value);
         }
     }
-    return m_p;
+    return m;
 }
 
 
-matrix_t* matrix_slice_get(const matrix_t* a_p,
-                           uint32_t line_start, uint32_t line_end, uint32_t line_step,
-                           uint32_t column_start, uint32_t column_end, uint32_t column_step)
+matrix_t
+matrix_slice_get(const matrix_t m,
+                 uint32_t line_start, uint32_t line_end, uint32_t line_step,
+                 uint32_t column_start, uint32_t column_end, uint32_t column_step)
 {
-    OLI_UNUSED(a_p);
+    OLI_UNUSED(m);
     OLI_UNUSED(line_start);
     OLI_UNUSED(line_end);
     OLI_UNUSED(line_step);
     OLI_UNUSED(column_start);
     OLI_UNUSED(column_end);
     OLI_UNUSED(column_step);
-    return NULL;
+    return MATRIX_NULL;
 }
 
 //a[slice] = m
-void matrix_slice_set(matrix_t* a_p, const matrix_t m_p,
-                      uint32_t line_start, uint32_t line_end, uint32_t line_step,
-                      uint32_t column_start, uint32_t column_end, uint32_t column_step)
+void
+matrix_slice_set(matrix_t m, const matrix_t m_p,
+                 uint32_t line_start, uint32_t line_end, uint32_t line_step,
+                 uint32_t column_start, uint32_t column_end, uint32_t column_step)
 {
-    OLI_UNUSED(a_p);
+    OLI_UNUSED(m);
     OLI_UNUSED(m_p);
     OLI_UNUSED(line_start);
     OLI_UNUSED(line_end);
@@ -188,20 +214,21 @@ void matrix_slice_set(matrix_t* a_p, const matrix_t m_p,
 
 
 //m = { {m_0, m_1}, {m_2, m_3} }
-matrix_t* matrix_concatenate(const matrix_t* matrix_array)
+matrix_t
+matrix_concatenate(const matrix_t* matrix_array)
 {
     OLI_UNUSED(matrix_array);
-    return NULL;
+    return MATRIX_NULL;
 }
 
 
-void matrix_print(const matrix_t* matrix_p)
+void matrix_print(const matrix_t m)
 {
-    for(uint32_t line = 0; line < matrix_p->lines; ++line)
+    for(uint32_t line = 0; line < m.lines; ++line)
     {
-        for(uint32_t column=0; column<matrix_p->columns; ++column)
+        for(uint32_t column=0; column<m.columns; ++column)
         {
-            printf("|%# 9.1e", matrix_value_get(matrix_p, line, column));
+            printf("|%# 9.1e", matrix_value_get(m, line, column));
         }
         printf("|\n");
     }

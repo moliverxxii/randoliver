@@ -84,8 +84,8 @@ camera_render_point(const camera_t* camera_p,
     //V
     float scale = (float) image_p->width / (2 * op_u_scalaire * tan(camera_context.angle/2));
 
-    float x_image_scale = scale * op_v_scalaire;
-    float y_image_scale = scale * op_w_scalaire;
+    float x_image_scale = -scale * op_v_scalaire;
+    float y_image_scale =  scale * op_w_scalaire;
 
     //VI
     int x_image = dither(x_image_scale + image_p->width / 2);

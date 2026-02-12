@@ -101,11 +101,35 @@ vector_scale(vector_t vector, float scale)
 vector_t
 vector_rotate(vector_t vector, vector_t normal, float angle)
 {
-    vector_t vector_r;
     //base de roation
-    vector_t rot_z = vector_scale(normal, 1/vector_norm(normal));
-    vector_t rot_x;
-    //vector - rot_z * <vector|rot_z>;
+    //rot_z // normal
+    vector_t rot_z = vector_normalise(normal);
+
+    //rot_x = vector - rot_z * <vector|rot_z>;
+    float vector_rot_z = vector_scalar(vector, rot_z);
+    vector_t rot_x = vector_subtract(vector, vector_scale(rot_z, vector_rot_z));
+    rot_x = vector_normalise(rot_x);
+
+    vector_t rot_y = vector_product(rot_z, rot_x);
+
+    matrix_3x3_t base_change_r_0;
+
+    memcpy(base_change_r_0[VECTOR_AXIS_X], &rot_x, sizeof(rot_x));
+    memcpy(base_change_r_0[VECTOR_AXIS_Y], &rot_y, sizeof(rot_y));
+    memcpy(base_change_r_0[VECTOR_AXIS_Z], &rot_y, sizeof(rot_z));
+
+    matrix_3x3_t base_change_0_r;
+    operator_transpose(base_change_0_r, base_change_r_0);
+
+    matrix_3x3_t rotation =
+    {
+        {cos(angle), -sin(angle), 0},
+        {sin(angle),  cos(angle), 0},
+        {         0,           0, 1}
+    };
+
+    vector_t vector_r;
+
     return vector_r;
 }
 
@@ -116,12 +140,18 @@ vector_negative(vector_t vector)
     return vector_scale(vector, -1);
 }
 
-void
-print_operator(const matrix_3x3_t operator)
+vector_t
+vector_normalise(vector_t vector)
 {
-    for(int n=0; n<3; ++n)
+    return vector_scale(vector, vector_norm(vector));
+}
+
+void
+operator_print(const matrix_3x3_t operator)
+{
+    for(int n=0; n<VECTOR_AXIS_COUNT; ++n)
     {
-        for(int m=0; m<3; ++m)
+        for(int m=0; m<VECTOR_AXIS_COUNT; ++m)
         {
             printf("% 2.3f |", operator[n][m]);
         }
@@ -132,33 +162,32 @@ print_operator(const matrix_3x3_t operator)
 
 
 void
-space_operation(vector_t* result_p,
+operator_operation(vector_t* result_p,
                 const matrix_3x3_t operator,
                 const vector_t* vectors_p,
                 uint32_t vector_count)
 {
-    uint32_t column;
-    uint32_t row;
-    for (column = 0; column < vector_count; ++column)
+    for (uint32_t column = 0; column < vector_count; ++column)
     {
-        for(row=0; row<3; row++)
+        for(uint32_t row=0; row<VECTOR_AXIS_COUNT; row++)
         {
-             ((float*) (result_p + column))[row]
-           = vector_scalar(*(vector_t*) operator[row], vectors_p[column]);
+            vector_t operator_row = *(vector_t*) operator[row];
+
+            result_p[column].array[row] = vector_scalar(operator_row, vectors_p[column]);
         }
     }
 }
 
 void
-transpose_operator(matrix_3x3_t matrix_trans, const matrix_3x3_t matrix)
+operator_transpose(matrix_3x3_t matrix_trans, const matrix_3x3_t matrix)
 {
     if(!matrix_trans || !matrix)
     {
         return;
     }
-    for(int row = 0; row <3; ++row)
+    for(int row = 0; row <VECTOR_AXIS_COUNT; ++row)
     {
-        for(int column = 0; column<3; ++column)
+        for(int column = 0; column<VECTOR_AXIS_COUNT; ++column)
         {
             matrix_trans[row][column] = matrix[column][row];
         }
@@ -227,7 +256,7 @@ vector_rotate_axial(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float 
     };
 
     struct vector_xy xy_1;
-    space_operation((vector_t*) &xy_1,
+    operator_operation((vector_t*) &xy_1,
                     base_rotation,
                     (vector_t*) &xy_0,
                     sizeof(struct vector_xy)/sizeof(vector_t));
@@ -237,7 +266,7 @@ vector_rotate_axial(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float 
     *(struct vector_xy*) &base_1_to_0[0] = xy_1;
     *(vector_t*)         &base_1_to_0[2] = z_1;
     matrix_3x3_t base_0_to_1;
-    transpose_operator(base_0_to_1, base_1_to_0);
+    operator_transpose(base_0_to_1, base_1_to_0);
 
 
     vector_t vector_axis_point;
@@ -247,7 +276,7 @@ vector_rotate_axial(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float 
 
     //base 0->1
     vector_t vector_pr1;
-    space_operation(&vector_pr1, base_0_to_1, &vector_pr0, 1);
+    operator_operation(&vector_pr1, base_0_to_1, &vector_pr0, 1);
 
     matrix_3x3_t rotation =
     {
@@ -258,11 +287,11 @@ vector_rotate_axial(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float 
 
     //rotation
     vector_t vector_pr1_rot;
-    space_operation(&vector_pr1_rot, rotation, &vector_pr1, 1);
+    operator_operation(&vector_pr1_rot, rotation, &vector_pr1, 1);
 
     //base 1->0
     vector_t vector_pr0_rot;
-    space_operation(&vector_pr0_rot, base_1_to_0, &vector_pr1_rot, 1);
+    operator_operation(&vector_pr0_rot, base_1_to_0, &vector_pr1_rot, 1);
 
     vector_t vector_p_rot = vector_add(vector_pr0_rot, vector_axis_point);
 
