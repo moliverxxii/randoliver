@@ -53,6 +53,11 @@ matrix_init(uint32_t lines, uint32_t columns)
     return m_p;
 }
 
+matrix_t* matrix_init_null()
+{
+    return matrix_init(0, 0);
+}
+
 void
 matrix_copy(matrix_t* m_p, const matrix_t* a_p)
 {
@@ -122,8 +127,17 @@ matrix_value_get(const matrix_t* m_p,
 }
 
 void
-matrix_set(matrix_t* m_p, const matrix_data_t* restrict data_array)
+matrix_set(matrix_t* m_p, const matrix_data_t* restrict data_array,
+           uint32_t lines, uint32_t columns)
 {
+    if(matrix_is_allocated(m_p))
+    {
+        matrix_deallocate(m_p);
+    }
+    m_p->lines = lines;
+    m_p->columns = columns;
+    matrix_allocate(m_p);
+
     memcpy(m_p->array, data_array, matrix_size(m_p));
 }
 

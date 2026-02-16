@@ -113,7 +113,7 @@ vector_scale(vector_t vector, float scale)
 vector_t
 vector_rotate(vector_t vector, vector_t normal, float angle)
 {
-    if(vector_norm(vector_product(vector, normal)) == 0)
+    if(vector_norm(vector_product(vector, normal)) == 0 || angle == 0)
     {
         return vector;
     }
@@ -125,15 +125,15 @@ vector_rotate(vector_t vector, vector_t normal, float angle)
     static matrix_t* matrix_base_0r_p = NULL;
     if(matrix_base_0r_p == NULL)
     {
-        matrix_base_0r_p = matrix_init(VECTOR_AXIS_COUNT, VECTOR_AXIS_COUNT);
+        matrix_base_0r_p = matrix_init_null();
     }
     static matrix_t* matrix_base_r0_p = NULL;
     if(matrix_base_r0_p == NULL)
     {
-        matrix_base_r0_p = matrix_init(VECTOR_AXIS_COUNT, VECTOR_AXIS_COUNT);
+        matrix_base_r0_p = matrix_init_null();
     }
 
-    if(!vector_is_equal(normal, previous_normal))
+    if(!vector_is_equal(normal, previous_normal) || !matrix_is_allocated(matrix_base_0r_p))
     {
         get_rotation_base(matrix_base_0r_p, vector, normal);
 
@@ -145,9 +145,9 @@ vector_rotate(vector_t vector, vector_t normal, float angle)
     static matrix_t* matrix_rotation_p = NULL;
     if(matrix_rotation_p == NULL)
     {
-        matrix_rotation_p = matrix_init(VECTOR_AXIS_COUNT, VECTOR_AXIS_COUNT);
+        matrix_rotation_p = matrix_init_null();
     }
-    if(angle != previous_angle)
+    if(angle != previous_angle || !matrix_is_allocated(matrix_rotation_p))
     {
         get_rotation(matrix_rotation_p, angle);
         updated = 1;
@@ -157,9 +157,10 @@ vector_rotate(vector_t vector, vector_t normal, float angle)
     static matrix_t* matrix_rotation_total_p = NULL;
     if(matrix_rotation_total_p == NULL)
     {
-        matrix_rotation_total_p = matrix_init(VECTOR_AXIS_COUNT, VECTOR_AXIS_COUNT);
+        matrix_rotation_total_p = matrix_init_null();
     }
-    if(updated)
+
+    if(updated || !matrix_is_allocated(matrix_rotation_total_p))
     {
         matrix_t* matrix_temp_p = matrix_init(VECTOR_AXIS_COUNT, VECTOR_AXIS_COUNT);
         matrix_multiply(matrix_temp_p, matrix_rotation_p, matrix_base_0r_p);
@@ -170,7 +171,7 @@ vector_rotate(vector_t vector, vector_t normal, float angle)
 
     //calcul du vecteur;
     matrix_t* matrix_vector_p = matrix_init(VECTOR_AXIS_COUNT, 1);
-    matrix_set(matrix_vector_p, vector.array);
+    matrix_set(matrix_vector_p, vector.array, VECTOR_AXIS_COUNT, 1);
 
     matrix_t* matrix_vector_r_p = matrix_init(VECTOR_AXIS_COUNT, 1);
 
@@ -286,7 +287,8 @@ get_rotation(matrix_t* r_p, float angle)
         vector_init(sin(angle),  cos(angle), 0),
         vector_init(         0,           0, 1)
     );
-    matrix_set(r_p, operator_data(rotation_p));
+    matrix_set(r_p, operator_data(rotation_p),
+               VECTOR_AXIS_COUNT, VECTOR_AXIS_COUNT);
     operator_free(rotation_p);
 }
 
@@ -303,10 +305,11 @@ get_rotation_base(matrix_t* b_p, vector_t vector, vector_t normal)
 
     vector_t rot_y = vector_product(rot_z, rot_x);
 
-    operator_t* base_change_0r = operator_init_columns(rot_x, rot_y, rot_z);
+    operator_t* base_change_0r = operator_init_lines(rot_x, rot_y, rot_z);
 
 
-    matrix_set(b_p, operator_data(base_change_0r));
+    matrix_set(b_p, operator_data(base_change_0r),
+               VECTOR_AXIS_COUNT, VECTOR_AXIS_COUNT);
     operator_free(base_change_0r);
 }
 

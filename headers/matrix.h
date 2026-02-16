@@ -16,6 +16,7 @@ typedef float matrix_data_t;
 typedef struct matrix_t matrix_t;
 
 matrix_t* matrix_init(uint32_t lines, uint32_t columns);
+matrix_t* matrix_init_null();
 //m_p = a_p
 void     matrix_copy(matrix_t* m_p, const matrix_t* a_p);
 void     matrix_free(matrix_t* m_p);
@@ -31,7 +32,8 @@ const matrix_data_t* matrix_data(const matrix_t* m_p);
 matrix_data_t matrix_value_get(const matrix_t* m_p,
                                uint32_t line, uint32_t column);
 
-void matrix_set(matrix_t* m, const matrix_data_t* restrict data_array);
+void matrix_set(matrix_t* m, const matrix_data_t* restrict data_array,
+                uint32_t lines, uint32_t columns);
 
 void matrix_value_set(matrix_t* m_p,
                       uint32_t line, uint32_t column,
