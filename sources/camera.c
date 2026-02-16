@@ -27,6 +27,31 @@ static camera_t local_camera;
 
 static void camera_context_update(const camera_t* camera_p);
 
+typedef struct camera_cache_t
+{
+    uint32_t width;
+    uint32_t height;
+    const image_t* current_image_p;
+    vector_axis_t* pixel_u_index;
+    vector_axis_t** pixel_u_row;
+} camera_cache_t;
+
+static camera_cache_t camera_cache =
+{
+    0,
+    0,
+    NULL,
+    NULL,
+    NULL
+};
+
+static int  camera_cache_is_same_image(const camera_cache_t* camera_cache_p, const image_t* image_p);
+static void camera_cache_allocate(camera_cache_t* camera_cache_p, const image_t* image_p);
+static void camera_cache_deallocate(camera_cache_t* camera_cache_p);
+static int  camera_cache_is_allocated(const camera_cache_t* camera_cache_p);
+static vector_axis_t camera_cache_u_index_get(const camera_cache_t* camera_cache_p, uint32_t x, uint32_t y);
+static void camera_cache_u_index_set(camera_cache_t* camera_cache_p, uint32_t x, uint32_t y, vector_axis_t u_index);
+
 camera_t
 camera_init(float origin_x, float origin_y, float origin_z,
             float destin_x, float destin_y, float destin_z,
@@ -54,15 +79,7 @@ camera_init(float origin_x, float origin_y, float origin_z,
 }
 
 vector_t
-camera_render_point_position(const camera_t* camera_p, image_t* image_p, point_t point)
-{
-    return VECTOR_0;
-}
-
-void
-camera_render_point(const camera_t* camera_p,
-                    image_t* image_p,
-                    point_t point)
+camera_render_point_position(const camera_t* camera_p, image_t* image_p, vector_t point)
 {
     if(memcmp(camera_p, &local_camera, sizeof(local_camera)) != 0)
     {
@@ -71,7 +88,7 @@ camera_render_point(const camera_t* camera_p,
     }
 
     //I P /1
-    vector_t p = point.vector;
+    vector_t p = point;
 
     //II PO /1
     vector_t op = vector_subtract(p, camera_context.o);
@@ -84,7 +101,7 @@ camera_render_point(const camera_t* camera_p,
     //IV u>0
     if(op_u_scalaire <= 0)
     {
-        return;
+        return vector_init(0, 0, -1);
     }
 
     //V
@@ -93,15 +110,48 @@ camera_render_point(const camera_t* camera_p,
     float x_image_scale = -scale * op_v_scalaire;
     float y_image_scale =  scale * op_w_scalaire;
 
-    //VI
-    int x_image = dither(x_image_scale + image_width(image_p) / 2);
-    int y_image = dither(y_image_scale + image_height(image_p) / 2);
+    x_image_scale += (float) image_width(image_p)  / 2;
+    y_image_scale += (float) image_height(image_p) / 2;
 
-    point_t render_point = point_init(x_image, y_image, 0, point.colour);
+    return vector_init(x_image_scale, y_image_scale, op_u_scalaire);
+}
+
+void
+camera_render_point(const camera_t* camera_p,
+                    image_t* image_p,
+                    point_t point)
+{
+    vector_t image_point = camera_render_point_position(camera_p, image_p, point.vector);
+    if(image_point.z < 0)
+    {
+        return;
+    }
+    //VI
+    int x_image = dither(image_point.x);
+    int y_image = dither(image_point.y);
+
+    if(!camera_cache_is_same_image(&camera_cache, image_p))
+    {
+        if(camera_cache_is_allocated(&camera_cache))
+        {
+            camera_cache_deallocate(&camera_cache);
+        }
+        camera_cache_allocate(&camera_cache, image_p);
+    }
+
+    point_t render_point = point_init(x_image, y_image, image_point.z, point.colour);
     if(point_is_in_image(&render_point, image_p))
     {
-        (*public_point_renderer)(image_p, render_point);
+        if(image_point.z < camera_cache_u_index_get(&camera_cache, x_image, y_image))
+        {
+            camera_cache_u_index_set(&camera_cache, x_image, y_image, image_point.z);
+
+            (*public_point_renderer)(image_p, render_point);
+        }
     }
+
+
+
 }
 
 void
@@ -121,20 +171,23 @@ void camera_render_edge(const camera_t* camera_p,
                         image_t* image_p,
                         edge_t edge)
 {
-    figure_t edge_figure = figure_init((uint32_t) CAMERA_SUBDIVISION);
+
+    vector_t image_points[]=
+    {
+        camera_render_point_position(camera_p, image_p, *edge.array[0]),
+        camera_render_point_position(camera_p, image_p, *edge.array[1])
+    };
+
+    float edge_length = vector_norm(vector_subtract(image_points[1], image_points[0]));
+    figure_t edge_figure = figure_init((uint32_t) edge_length);
 
     for(uint32_t point = 0; point < edge_figure.amount; ++point)
     {
         float fraction = (float) point/(edge_figure.amount - 1);
 
-        vector_t average_0 = *edge.array[0];
-        average_0 = vector_scale(average_0, fraction);
+        vector_t average = edge_get_vector(&edge, fraction);
 
-        vector_t average_1 = *edge.array[1];
-        average_1 = vector_scale(average_1, (float) 1 - fraction);
-
-        average_0 = vector_add(average_0, average_1);
-        edge_figure.array[point] = point_init(average_0.x, average_0.y, average_0.z, edge.colour);
+        edge_figure.array[point] = point_init(average.x, average.y, average.z, edge.colour);
     }
     camera_render_figure(camera_p, image_p, edge_figure);
     figure_free(&edge_figure);
@@ -147,6 +200,13 @@ void camera_render_triangle(const camera_t* camera_p,
 
 }
 
+void camera_cache_clear()
+{
+    if(camera_cache_is_allocated(&camera_cache))
+    {
+        camera_cache_deallocate(&camera_cache);
+    }
+}
 
 static void
 camera_context_update(const camera_t* camera_p)
@@ -179,4 +239,76 @@ camera_context_update(const camera_t* camera_p)
     };
     camera_context = context;
 }
+
+static int
+camera_cache_is_same_image(const camera_cache_t* camera_cache_p, const image_t* image_p)
+{
+    return camera_cache_p->current_image_p == image_p;
+}
+
+static void
+camera_cache_allocate(camera_cache_t* camera_cache_p, const image_t* image_p)
+{
+    camera_cache_t cache =
+    {
+            image_width(image_p),
+            image_height(image_p),
+            image_p,
+            NULL,
+            NULL
+    };
+    cache.pixel_u_index = malloc(image_width(image_p) * image_height(image_p) * sizeof(vector_axis_t));
+    if(cache.pixel_u_index != NULL)
+    {
+        for(uint32_t pixel=0; pixel<cache.width * cache.height; ++pixel)
+        {
+            cache.pixel_u_index[pixel] = INFINITY;
+        }
+        cache.pixel_u_row = malloc(image_height(image_p) * sizeof(vector_axis_t*));
+        if(cache.pixel_u_row != NULL)
+        {
+            vector_axis_t* row_p = cache.pixel_u_index;
+            for(uint32_t row=0; row<cache.height; ++row)
+            {
+                cache.pixel_u_row[row] = row_p;
+                row_p += cache.width;
+            }
+        }
+    }
+    *camera_cache_p = cache;
+}
+
+static void
+camera_cache_deallocate(camera_cache_t* camera_cache_p)
+{
+    free(camera_cache_p->pixel_u_row);
+    free(camera_cache_p->pixel_u_index);
+    *camera_cache_p = (camera_cache_t)
+    {
+        0, 0,
+        NULL, NULL, NULL
+    };
+}
+
+static int
+camera_cache_is_allocated(const camera_cache_t* camera_cache_p)
+{
+    return camera_cache_p->current_image_p != NULL
+        && camera_cache_p->pixel_u_index   != NULL
+        && camera_cache_p->pixel_u_row     != NULL;
+}
+
+static vector_axis_t
+camera_cache_u_index_get(const camera_cache_t* camera_cache_p, uint32_t x, uint32_t y)
+{
+    return camera_cache_p->pixel_u_row[y][x];
+}
+
+
+static void
+camera_cache_u_index_set(camera_cache_t* camera_cache_p, uint32_t x, uint32_t y, vector_axis_t u_index)
+{
+    camera_cache_p->pixel_u_row[y][x] = u_index;
+}
+
 

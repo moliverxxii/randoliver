@@ -41,6 +41,8 @@ void camera_render_triangle(const camera_t* camera_p,
                             image_t* image_p,
                             triangle_t triangle);
 
+void camera_cache_clear();
+
 
 
 #endif /* HEADERS_CAMERA_H_ */

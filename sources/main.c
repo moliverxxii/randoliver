@@ -127,6 +127,7 @@ main(int argc, char* argv[])
         performance_print(&frame_performance);
 
         performance_try_start(&render_performance);
+        camera_cache_clear();
         camera_render_figure(&camera, image_p, figure_bis);
         for(uint32_t edge=0; edge<sizeof(edge_array)/sizeof(edge_array[0]); ++edge)
         {

@@ -19,4 +19,6 @@ typedef struct
 
 edge_t edge_init(vector_t* a_p, vector_t* b_p, colour_t colour);
 
+vector_t edge_get_vector(const edge_t* edge_p, float fraction);
+
 #endif /* HEADERS_EDGE_H_ */
