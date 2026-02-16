@@ -36,12 +36,6 @@ typedef union
     vector_axis_t array[VECTOR_AXIS_COUNT];
 } vector_t;
 
-typedef union
-{
-    vector_axis_t* data_p;
-    vector_t* vector_p;
-} vector_pointer_t;
-
 #define VECTOR_AXIS_MASK(AXIS) VECTOR_AXIS_MASK_##AXIS = 1 << VECTOR_AXIS_##AXIS
 
 typedef enum
