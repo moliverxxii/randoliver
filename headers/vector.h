@@ -22,9 +22,6 @@ typedef enum
 } vector_axis_e;
 
 
-typedef vector_axis_t matrix_3x3_t [VECTOR_AXIS_COUNT][VECTOR_AXIS_COUNT];
-typedef vector_axis_t matrix_3x1_t [VECTOR_AXIS_COUNT];
-
 /**
  * Un type pour la representation dans l'espace.
  */
@@ -36,7 +33,7 @@ typedef union
         vector_axis_t y;
         vector_axis_t z;
     };
-    matrix_3x1_t array;
+    vector_axis_t array[VECTOR_AXIS_COUNT];
 } vector_t;
 
 typedef union
@@ -110,26 +107,6 @@ vector_t vector_negative(vector_t vector);
 
 // r = vector/||vector||
 vector_t vector_normalise(vector_t vector);
-
-void operator_print(const matrix_3x3_t operator);
-
-/** result_p[i] = operator X vectors_p[i], int i, 0<=i <vector_count
- *
- */
-void operator_operation(vector_t* result_p, const matrix_3x3_t operator, const vector_t* vectors_p, uint32_t vector_count);
-
-/** matrix_trans = matrix^T
- *
- */
-void operator_transpose(matrix_3x3_t matrix_trans, const matrix_3x3_t matrix);
-
-void operator_product(matrix_3x3_t product, const matrix_3x3_t a, const matrix_3x3_t);
-
-/**
- * Calculer la matrice de rotation pour obtenir l'opération qui a donné z0 -> z1 = AB/||AB||
- */
-void get_rotation(matrix_3x3_t rotation, vector_t vector_a, vector_t vector_b);
-
 
 void vector_translate(vector_t* vector_p, vector_t direction);
 void vector_rotate_axial(vector_t* vector_p, vector_t axis_a, vector_t axis_b, float angle);

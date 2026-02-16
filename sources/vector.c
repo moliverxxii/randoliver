@@ -13,6 +13,7 @@
 
 #include "utility.h"
 #include "vector.h"
+#include "operator.h"
 
 const vector_t VECTOR_X = {{1, 0, 0}};
 const vector_t VECTOR_Y = {{0, 1, 0}};
@@ -126,29 +127,26 @@ vector_rotate(vector_t vector, vector_t normal, float angle)
 
     vector_t rot_y = vector_product(rot_z, rot_x);
 
-    matrix_3x3_t base_change_0r;
-
-    memcpy(base_change_0r[VECTOR_AXIS_X], &rot_x, sizeof(rot_x));
-    memcpy(base_change_0r[VECTOR_AXIS_Y], &rot_y, sizeof(rot_y));
-    memcpy(base_change_0r[VECTOR_AXIS_Z], &rot_z, sizeof(rot_z));
+    operator_t* base_change_0r = operator_init_columns(rot_x, rot_y, rot_z);
 
     static float previous_angle = 0;
     OLI_UNUSED(previous_angle);
     matrix_t* matrix_base_0r_p = matrix_init(VECTOR_AXIS_COUNT, VECTOR_AXIS_COUNT);
-    matrix_set(matrix_base_0r_p, &base_change_0r[0][0]);
+    matrix_set(matrix_base_0r_p, operator_data(base_change_0r));
+    operator_free(base_change_0r);
 
     matrix_t* matrix_base_r0_p = matrix_init(VECTOR_AXIS_COUNT, VECTOR_AXIS_COUNT);
     matrix_transpose(matrix_base_r0_p, matrix_base_0r_p);
 
     //calcul de la matrice de rotation
-    matrix_3x3_t rotation =
-    {
-        {cos(angle), -sin(angle), 0},
-        {sin(angle),  cos(angle), 0},
-        {         0,           0, 1}
-    };
+    operator_t* rotation_p = operator_init_lines(
+        vector_init(cos(angle), -sin(angle), 0),
+        vector_init(sin(angle),  cos(angle), 0),
+        vector_init(         0,           0, 1)
+    );
     matrix_t* matrix_rotation_p = matrix_init(VECTOR_AXIS_COUNT, VECTOR_AXIS_COUNT);
-    matrix_set(matrix_rotation_p, &rotation[0][0]);
+    matrix_set(matrix_rotation_p, operator_data(rotation_p));
+    operator_free(rotation_p);
 
     matrix_t* matrix_temp_p = matrix_init(VECTOR_AXIS_COUNT, VECTOR_AXIS_COUNT);
     matrix_multiply(matrix_temp_p, matrix_rotation_p, matrix_base_0r_p);
@@ -188,87 +186,6 @@ vector_normalise(vector_t vector)
 {
     return vector_scale(vector, 1.0f/vector_norm(vector));
 }
-
-void
-operator_print(const matrix_3x3_t operator)
-{
-    for(int n=0; n<VECTOR_AXIS_COUNT; ++n)
-    {
-        for(int m=0; m<VECTOR_AXIS_COUNT; ++m)
-        {
-            printf("% 2.3f |", operator[n][m]);
-        }
-        printf("\n");
-    }
-    printf("\n");
-}
-
-
-void
-operator_operation(vector_t* result_p,
-                const matrix_3x3_t operator,
-                const vector_t* vectors_p,
-                uint32_t vector_count)
-{
-    for (uint32_t column = 0; column < vector_count; ++column)
-    {
-        for(uint32_t row=0; row<VECTOR_AXIS_COUNT; row++)
-        {
-            vector_t operator_row = *(vector_t*) operator[row];
-
-            result_p[column].array[row] = vector_scalar(operator_row, vectors_p[column]);
-        }
-    }
-}
-
-void
-operator_transpose(matrix_3x3_t matrix_trans, const matrix_3x3_t matrix)
-{
-    if(!matrix_trans || !matrix)
-    {
-        return;
-    }
-    for(int row = 0; row <VECTOR_AXIS_COUNT; ++row)
-    {
-        for(int column = 0; column<VECTOR_AXIS_COUNT; ++column)
-        {
-            matrix_trans[row][column] = matrix[column][row];
-        }
-    }
-}
-
-
-void get_rotation(matrix_3x3_t rotation, vector_t vector_a, vector_t vector_b)
-{
-    vector_t vector_z1 = vector_subtract(vector_b, vector_a);
-    vector_z1 = vector_scale(vector_z1, 1/vector_norm(vector_z1));
-
-    float cos_a1 = vector_scalar(vector_z1, VECTOR_Z);
-    float sin_a1 = sqrt(1 - pow(cos_a1, 2));
-
-    vector_t vector_z2 = vector_z1;
-    vector_z2.z = 0;
-    vector_z2 = vector_scale(vector_z2, 1/vector_norm(vector_z2));
-
-    float cos_a2 = cos_a1 == 1.0f ? 1.0f : vector_scalar(vector_z2, VECTOR_X);
-    float sin_a2 = sqrt(1 - pow(cos_a2, 2));
-
-    float sin_sign = vector_scalar(vector_z2, VECTOR_Y);
-    if(sin_sign<0)
-    {
-        sin_a2 *= -1;
-    }
-
-    matrix_3x3_t temp_rotation =
-    {
-        {cos_a2 * cos_a1, -sin_a2, cos_a2 * sin_a1},
-        {sin_a2 * cos_a1,  cos_a2, sin_a2 * sin_a1},
-        {        -sin_a1,       0,          cos_a1}
-    };
-
-    memcpy(rotation, temp_rotation, sizeof(matrix_3x3_t));
-}
-
 
 void
 vector_translate(vector_t* vector_p, vector_t direction)

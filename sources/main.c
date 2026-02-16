@@ -99,8 +99,6 @@ main(int argc, char* argv[])
 
     camera_t camera = camera_init(centre_grave.x, -10, 1, centre_grave.x, centre_grave.y, centre_grave.z, M_PI_2/2);
 
-    vector_t centre_grave_z = vector_add(centre_grave, VECTOR_Z);
-    interface_state_save();
     figure_t figure_bis = figure_copy(figure);
     for(int frame=0; frame<frame_count; ++frame)
     {
@@ -130,7 +128,7 @@ main(int argc, char* argv[])
 
         performance_try_start(&render_performance);
         camera_render_figure(&camera, image_p, figure_bis);
-        for(int edge=0; edge<sizeof(edge_array)/sizeof(edge_array[0]); ++edge)
+        for(uint32_t edge=0; edge<sizeof(edge_array)/sizeof(edge_array[0]); ++edge)
         {
             camera_render_edge(&camera, image_p, edge_array[edge]);
         }
@@ -144,17 +142,18 @@ main(int argc, char* argv[])
         //OPERATION
         performance_try_start(&process_performance);
         figure_bis = figure_copy(figure);
+        const vector_t rotation_axis = vector_add(VECTOR_X, VECTOR_Z);
         for(uint32_t point_n = 0; point_n< figure.amount; point_n++)
         {
-            figure_bis.array[point_n].vector =
-            vector_rotate(figure.array[point_n].vector,
-                          vector_add(VECTOR_X, VECTOR_Z),
-                          (float) frame * 2. * M_PI/frame_count);
+//            figure_bis.array[point_n].vector =
+//            vector_rotate(figure.array[point_n].vector,
+//                          rotation_axis,
+//                          (float) frame * 2. * M_PI/frame_count);
 
-//           vector_rotate_axial(&figure_bis.array[point_n].vector,
-//                               figure.array[0].vector,
-//                               vector_add(figure.array[0].vector, VECTOR_Z),
-//                               (float) frame * 2.*M_PI/frame_c∂ount);
+             vector_rotate_axial(&figure_bis.array[point_n].vector,
+                                 VECTOR_0,
+                                 rotation_axis,
+                                 (float) frame * 2.*M_PI/frame_count);
         }
 //        break;
         performance_try_add(&process_performance);
