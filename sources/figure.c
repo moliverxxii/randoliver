@@ -47,14 +47,14 @@ figure_free(figure_t* figure_p)
 figure_t
 figure_from_image(const image_t* image_p)
 {
-    figure_t figure = figure_init(image_p->width*image_p->height);
+    figure_t figure = figure_init(image_width(image_p) * image_height(image_p));
     for(uint32_t point = 0; point<figure.amount; point++)
     {
-        colour_t* image_data_p = *image_p->image;
+        colour_t* image_data_p = image_data(image_p);
         figure.array[point]
             = (point_t) 
             {
-                vector_init(point%image_p->width, point/image_p->height, 0),
+                vector_init(point%image_width(image_p), point/image_height(image_p), 0),
                 image_data_p[point]
             };
     }

@@ -12,6 +12,13 @@
 #include "image.h"
 #include "interface.h"
 
+typedef struct image_t
+{
+    uint32_t width;
+    uint32_t height;
+    row_t*   image;
+} image_t;
+
 const image_t SYSTEM_SCREEN =
 {
     1280,
@@ -20,8 +27,6 @@ const image_t SYSTEM_SCREEN =
 };
 
 typedef void (*scale_function_t)(image_t* new_image_p, const image_t* image_p, uint32_t new_x, uint32_t new_y, float scale);
-
-
 
 static void scale_pixel_dumb(image_t* new_image_p, const image_t* image_p, uint32_t new_x, uint32_t new_y, float scale);
 static void scale_pixel_linear(image_t* new_image_p, const image_t* image_p, uint32_t new_x, uint32_t new_y, float scale);
@@ -38,37 +43,73 @@ image_init(uint32_t width, uint32_t height)
 
     colour_t* image_data_p = malloc(height * width * sizeof(colour_t));
 
-    image_t* image = malloc(sizeof(image_t));
-    image->width   = width;
-    image->height  = height;
-    image->image   = malloc(height * sizeof(row_t));
+    image_t* image_p = malloc(sizeof(image_t));
+    image_p->width   = width;
+    image_p->height  = height;
+    image_p->image   = malloc(height * sizeof(row_t));
 
     uint32_t y;
 	row_t row_p = image_data_p;
     for(y = 0; y < height; ++y)
     {
-        image->image[y] = row_p;
+        image_p->image[y] = row_p;
         row_p += width;
     }
-    return image;
+    return image_p;
 }
 
 void
-image_free(image_t* image)
+image_free(image_t* image_p)
 {
-    free(*(image->image));
-    free(image->image);
-    free(image);
+    free(*(image_p->image));
+    free(image_p->image);
+    free(image_p);
 }
 
 
 
 void
-image_set(image_t* image)
+image_set(image_t* image_p)
 {
-    memset(*image->image, 0, image->width * image->height * sizeof(colour_t) );
+    memset(*image_p->image, 0, image_p->width * image_p->height * sizeof(colour_t) );
 }
 
+colour_t*
+image_row(const image_t* image_p, uint32_t y)
+{
+    return image_p->image[y];
+}
+
+colour_t*
+image_data(const image_t* image_p)
+{
+    return image_row(image_p, 0);
+}
+
+
+uint32_t
+image_width(const image_t* image_p)
+{
+    return image_p->width;
+}
+
+uint32_t
+image_height(const image_t* image_p)
+{
+    return image_p->height;
+}
+
+colour_t
+image_pixel_get(const image_t* image_p, uint32_t x, uint32_t y)
+{
+    return image_p->image[y][x];
+}
+
+void
+image_pixel_set(image_t* image_p, uint32_t x, uint32_t y, colour_t colour)
+{
+    image_p->image[y][x] = colour;
+}
 void
 image_scale(image_t** image_pp, float scale, image_scale_algorithm_t algorithm)
 {

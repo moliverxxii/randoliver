@@ -86,15 +86,15 @@ void
 image_file_write(image_file_t* image_file_p , const image_t* image_p)
 {
     fseek(image_file_p->file_p, HEADER_SIZE, SEEK_SET);
-    image_file_init_header(image_file_p->file_p, image_p->width, image_p->height);
-    for(uint32_t y = 0; y<image_p->height; ++y)
+    image_file_init_header(image_file_p->file_p, image_width(image_p), image_height(image_p));
+    for(uint32_t y = 0; y<image_height(image_p); ++y)
     {
-        fwrite(image_p->image[y],
+        fwrite(image_row(image_p, y),
                sizeof(colour_t),
-               image_p->width,
+               image_width(image_p),
                image_file_p->file_p);
         uint8_t pad[3] = {0, 0, 0};
-        uint8_t pad_length = (ROW_PADDING - (sizeof(colour_t) * image_p->width) % ROW_PADDING) % ROW_PADDING;
+        uint8_t pad_length = (ROW_PADDING - (sizeof(colour_t) * image_width(image_p)) % ROW_PADDING) % ROW_PADDING;
         fwrite(pad, sizeof(uint8_t), pad_length, image_file_p->file_p);
     }
 }

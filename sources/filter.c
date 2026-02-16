@@ -19,20 +19,20 @@ flou(image_t* image_p, int radius)
     {
         return;
     }
-    image_t* image2 = image_init(image_p->width, image_p->height);
+    image_t* image2 = image_init(image_width(image_p), image_height(image_p));
     image_set(image2);
 
     uint32_t x;
     uint32_t y;
-    for(x = 0; x < image_p->width; ++x)
+    for(x = 0; x < image_width(image_p); ++x)
     {
-        for(y = 0; y < image_p->height; ++y)
+        for(y = 0; y < image_height(image_p); ++y)
         {
-            image2->image[y][x] = get_blurred_pixel(image_p, x, y, radius);
+            image_pixel_set(image2, x, y, get_blurred_pixel(image_p, x, y, radius));
         }
     }
 
-    memcpy(*image_p->image, *image2->image, image_p->width*image_p->height*sizeof(colour_t));
+    memcpy(image_data(image_p), image_data(image2), image_width(image_p) * image_height(image_p) * sizeof(colour_t));
 
     image_free(image2);
 }
@@ -41,16 +41,13 @@ void
 symetry(image_t* image_p)
 {
     uint32_t x, y;
-    for(x = 0; x < image_p->width/2; ++x)
+    for(x = 0; x < image_width(image_p)/2; ++x)
     {
-        for(y = 0; y < image_p->height/2; ++y)
+        for(y = 0; y < image_height(image_p)/2; ++y)
         {
-            image_p->image[y][image_p->width - (1 + x)]
-                = image_p->image[y][x];
-            image_p->image[image_p->height - (1 + y)][x]
-                = image_p->image[y][x];
-            image_p->image[image_p->height - (1 + y)][image_p->width - (1 + x)]
-                = image_p->image[y][x];
+            image_pixel_set(image_p, image_width(image_p) - (1 + x),                                   y, image_pixel_get(image_p, x, y));
+            image_pixel_set(image_p,                                  x, image_height(image_p) - (1 + y), image_pixel_get(image_p, x, y));
+            image_pixel_set(image_p, image_width(image_p) - (1 + x), image_height(image_p) - (1 + y), image_pixel_get(image_p, x, y));
         }
     }
 }
@@ -66,7 +63,7 @@ get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius)
 {
     if(radius <= 0)
     {
-        return image_p->image[pixel_y][pixel_x];
+        return image_pixel_get(image_p, pixel_x, pixel_y);
     }
     colour_t return_colour = {{0, 0, 0}};
     for (int colour = 0; colour < COLOUR_COUNT; colour++)
@@ -82,7 +79,7 @@ get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius)
                 {
                     continue;
                 }
-                sum += image_p->image[pixel_y + j][pixel_x + i].array[colour];
+                sum += image_pixel_get(image_p, pixel_x + i, pixel_y + j).array[colour];
                 ++count;
             }
         }

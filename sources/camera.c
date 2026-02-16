@@ -53,6 +53,12 @@ camera_init(float origin_x, float origin_y, float origin_z,
     return camera;
 }
 
+vector_t
+camera_render_point_position(const camera_t* camera_p, image_t* image_p, point_t point)
+{
+    return VECTOR_0;
+}
+
 void
 camera_render_point(const camera_t* camera_p,
                     image_t* image_p,
@@ -82,14 +88,14 @@ camera_render_point(const camera_t* camera_p,
     }
 
     //V
-    float scale = (float) image_p->width / (2 * op_u_scalaire * tan(camera_context.angle/2));
+    float scale = (float) image_width(image_p) / (2 * op_u_scalaire * tan(camera_context.angle/2));
 
     float x_image_scale = -scale * op_v_scalaire;
     float y_image_scale =  scale * op_w_scalaire;
 
     //VI
-    int x_image = dither(x_image_scale + image_p->width / 2);
-    int y_image = dither(y_image_scale + image_p->height / 2);
+    int x_image = dither(x_image_scale + image_width(image_p) / 2);
+    int y_image = dither(y_image_scale + image_height(image_p) / 2);
 
     point_t render_point = point_init(x_image, y_image, 0, point.colour);
     if(point_is_in_image(&render_point, image_p))

@@ -19,12 +19,7 @@ typedef colour_t* row_t;
 /** Conteneur avec les donnees de bases d'une image.
  *  Doit être utilisé pour tous les traitements d'images.
  */
-typedef struct image_t
-{
-    uint32_t width;
-    uint32_t height;
-    row_t*   image;
-} image_t;
+typedef struct image_t image_t;
 
 typedef enum
 {
@@ -51,6 +46,13 @@ void image_free(image_t* image);
 
 //Turns the image black.
 void image_set(image_t* image);
+
+colour_t* image_row(const image_t* image_p, uint32_t y);
+colour_t* image_data(const image_t* image_p);
+uint32_t image_width(const image_t* image_p);
+uint32_t image_height(const image_t* image_p);
+colour_t image_pixel_get(const image_t* image_p, uint32_t x, uint32_t y);
+void     image_pixel_set(image_t* image_p, uint32_t x, uint32_t y, colour_t colour);
 
 void image_scale(image_t** image_pp, float scale, image_scale_algorithm_t algorithm);
 

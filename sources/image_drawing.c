@@ -12,10 +12,7 @@
 void
 brownien1(image_t* image, int iterations, int spread, int x0, int y0)
 {
-    colour_t pixels[1] =
-    {
-        {{0, 0xFF, 0}}
-    };
+    colour_t pixel = {{0, 0xFF, 0}};
     int y = y0;
     int x = x0;
     int colour = 0;
@@ -26,25 +23,25 @@ brownien1(image_t* image, int iterations, int spread, int x0, int y0)
     printf("Début du processus\n");
     for(i = 0; i < iterations; ++i)
     {
+        image_pixel_set(image, x, y, pixel);
         for(colour = 0; colour < 3; ++colour)
         {
 
-            image->image[y][x].array[colour] = pixels[0].array[colour];
             if(colour == 1)
             {
                 delta = rand() % 3 - 1;
-                pixels[0].array[colour] = saturator(pixels[0].array[colour] + delta,
+                pixel.array[colour] = saturator(pixel.array[colour] + delta,
                 COLOUR_MIN,
                 COLOUR_MAX);
             }
         }
         delta = rand() % (2 * spread + 1) - spread;
         y += delta;
-        y = modulo(y, image->height);
+        y = modulo(y, image_height(image));
 
         delta = rand() % (2 * spread + 1) - spread;
         x += delta;
-        x = modulo(x, image->width);
+        x = modulo(x, image_width(image));
     }
     printf("Processus terminé\n");
 }
@@ -60,7 +57,7 @@ barres1(image_t* image, int spread)
     uint32_t x_prime;
     int bool = 1;
 
-    for(y = 0; y < image->height; ++y)
+    for(y = 0; y < image_height(image); ++y)
     {
         x = 2;
         x_prime = x;
@@ -70,11 +67,11 @@ barres1(image_t* image, int spread)
 
             for(i = 0; i < 3; ++i)
             {
-                image->image[y][x_prime] = WHITE;
+                image_pixel_set(image, x_prime, y, WHITE);
             }
             x += spread;
             x_prime = x + (rand() % 5 - 2);
-            bool = x_prime < image->width;
+            bool = x_prime < image_width(image);
         }
     }
     printf("Processus terminé\n");
@@ -92,7 +89,7 @@ barres2(image_t* image, int spread)
     uint32_t x_prime[3];
     int bool;
 
-    for(y = 0; y < image->height; ++y)
+    for(y = 0; y < image_height(image); ++y)
     {
         x = 2;
         for(i = 0; i < 3; ++i)
@@ -103,13 +100,13 @@ barres2(image_t* image, int spread)
 
             for(i = 0; i < 3; ++i)
             {
-                image->image[y][x_prime[i]] = WHITE;
+                image_pixel_set(image, x_prime[i], y, WHITE);
             }
             x += spread;
             for(i = 0; i < 3; ++i)
                 x_prime[i] = x + (rand() % 5 - 2);
-            bool = (x_prime[0] < image->width) & (x_prime[1] < image->width)
-                    & (x_prime[2] < image->width);
+            bool = (x_prime[0] < image_width(image)) && (x_prime[1] < image_width(image))
+                 && (x_prime[2] < image_width(image));
         }
     }
     printf("Processus terminé\n");
@@ -118,16 +115,16 @@ barres2(image_t* image, int spread)
 void
 test_pattern_squares(image_t* image_p, uint32_t period)
 {
-    uint32_t x_squares = (image_p->width + period - 1) / period;
-    uint32_t y_squares = (image_p->height + period - 1) / period;
+    uint32_t x_squares = (image_width(image_p)  + period - 1) / period;
+    uint32_t y_squares = (image_height(image_p) + period - 1) / period;
     colour_t* square_colours_p = malloc(x_squares*y_squares*sizeof(colour_t));
     for(uint32_t square = 0; square < x_squares * y_squares; ++ square)
     {
         square_colours_p[square] = colour_get_random();
     }
-    for(uint32_t y=0; y < image_p->height; ++y)
+    for(uint32_t y=0; y < image_height(image_p); ++y)
     {
-        for(uint32_t x=0; x < image_p->width; ++x)
+        for(uint32_t x=0; x < image_width(image_p); ++x)
         {
             image_draw_point(image_p,
                              (point_t) {
