@@ -75,7 +75,7 @@ main(int argc, char* argv[])
 
 //Animation
     int frame_count = 360;
-    uint32_t point_count = 16;
+    uint32_t point_count = 6;
     figure_t figure = figure_init(point_count);
     performance_t render_performance = performance_init("rendu");
     performance_t process_performance = performance_init("processus");
@@ -83,25 +83,11 @@ main(int argc, char* argv[])
     #ifdef OLI_3D
     //3
     figure.array[0].vector = vector_init( 1,  0,  0);
-    figure.array[1].vector = vector_init( 1,  0,  2);
-    figure.array[2].vector = vector_init( 0,  0,  2);
-    figure.array[3].vector = vector_init( 0,  0,  0);
-    figure.array[4].vector = vector_init( 1,  0,  1);
-    figure.array[5].vector = vector_init( 0,  0,  1);
-
-    //0
-    figure.array[6].vector = vector_init( 2,  0,  0);
-    figure.array[7].vector = vector_init( 3,  0,  0);
-    figure.array[8].vector = vector_init( 2,  0,  2);
-    figure.array[9].vector = vector_init( 3,  0,  2);
-
-    //!
-    figure.array[10].vector = vector_init(4, 0, 0.5);
-    figure.array[11].vector = vector_init(4, 0, 2);
-    figure.array[12].vector = vector_init(4.3, 0,  0.3);
-    figure.array[13].vector = vector_init(3.7, 0, -0.3);
-    figure.array[14].vector = vector_init(3.7, 0,  0.3);
-    figure.array[15].vector = vector_init(4.3, 0, -0.3);
+    figure.array[1].vector = vector_init( 0,  1,  0);
+    figure.array[2].vector = vector_init(-1,  0,  0);
+    figure.array[3].vector = vector_init( 0, -1,  0);
+    figure.array[4].vector = vector_init( 0,  0,  1);
+    figure.array[5].vector = vector_init( 0,  0, -1);
 
     for(uint32_t point = 0; point < point_count; ++point)
     {
@@ -121,18 +107,19 @@ main(int argc, char* argv[])
         edge_t edge_array[] =
         {
             edge_init(&figure_bis.array[0].vector, &figure_bis.array[1].vector, RED),
-            edge_init(&figure_bis.array[0].vector, &figure_bis.array[3].vector, RED),
-            edge_init(&figure_bis.array[4].vector, &figure_bis.array[5].vector, RED),
             edge_init(&figure_bis.array[1].vector, &figure_bis.array[2].vector, RED),
+            edge_init(&figure_bis.array[2].vector, &figure_bis.array[3].vector, RED),
+            edge_init(&figure_bis.array[3].vector, &figure_bis.array[0].vector, RED),
 
-            edge_init(&figure_bis.array[6].vector, &figure_bis.array[7].vector, RED),
-            edge_init(&figure_bis.array[7].vector, &figure_bis.array[9].vector, RED),
-            edge_init(&figure_bis.array[9].vector, &figure_bis.array[8].vector, RED),
-            edge_init(&figure_bis.array[8].vector, &figure_bis.array[6].vector, RED),
+            edge_init(&figure_bis.array[0].vector, &figure_bis.array[4].vector, BLUE),
+            edge_init(&figure_bis.array[4].vector, &figure_bis.array[2].vector, BLUE),
+            edge_init(&figure_bis.array[2].vector, &figure_bis.array[5].vector, BLUE),
+            edge_init(&figure_bis.array[5].vector, &figure_bis.array[0].vector, BLUE),
 
-            edge_init(&figure_bis.array[10].vector, &figure_bis.array[11].vector, RED),
-            edge_init(&figure_bis.array[12].vector, &figure_bis.array[13].vector, RED),
-            edge_init(&figure_bis.array[14].vector, &figure_bis.array[15].vector, RED),
+            edge_init(&figure_bis.array[1].vector, &figure_bis.array[4].vector, GREEN),
+            edge_init(&figure_bis.array[4].vector, &figure_bis.array[3].vector, GREEN),
+            edge_init(&figure_bis.array[3].vector, &figure_bis.array[5].vector, GREEN),
+            edge_init(&figure_bis.array[5].vector, &figure_bis.array[1].vector, GREEN),
         };
         performance_try_start(&frame_performance);
         interface_state_restore();
@@ -159,11 +146,17 @@ main(int argc, char* argv[])
         figure_bis = figure_copy(figure);
         for(uint32_t point_n = 0; point_n< figure.amount; point_n++)
         {
-            vector_rotate_axial(&figure_bis.array[point_n].vector,
-                          centre_grave,
-                          centre_grave_z,
-                          (float) frame * 2.*M_PI/frame_count);
+            figure_bis.array[point_n].vector =
+            vector_rotate(figure.array[point_n].vector,
+                          vector_add(VECTOR_X, VECTOR_Z),
+                          (float) frame * 2. * M_PI/frame_count);
+
+//           vector_rotate_axial(&figure_bis.array[point_n].vector,
+//                               figure.array[0].vector,
+//                               vector_add(figure.array[0].vector, VECTOR_Z),
+//                               (float) frame * 2.*M_PI/frame_c∂ount);
         }
+//        break;
         performance_try_add(&process_performance);
 
         free(file_name_p);

@@ -115,7 +115,7 @@ void camera_render_edge(const camera_t* camera_p,
                         image_t* image_p,
                         edge_t edge)
 {
-    figure_t edge_figure = figure_init(CAMERA_SUBDIVISION);
+    figure_t edge_figure = figure_init((uint32_t) CAMERA_SUBDIVISION);
 
     for(uint32_t point = 0; point < edge_figure.amount; ++point)
     {

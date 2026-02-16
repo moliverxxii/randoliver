@@ -26,6 +26,7 @@ uint32_t matrix_length(const matrix_t* m_p);
 size_t   matrix_size(const matrix_t* m_p);
 int      matrix_is_allocated(const matrix_t* m_p);
 int      matrix_is_dimensions_equal(const matrix_t* a_p, const matrix_t* b_p);
+const matrix_data_t* matrix_data(const matrix_t* m_p);
 
 matrix_data_t matrix_value_get(const matrix_t* m_p,
                                uint32_t line, uint32_t column);

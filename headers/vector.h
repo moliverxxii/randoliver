@@ -39,6 +39,11 @@ typedef union
     matrix_3x1_t array;
 } vector_t;
 
+typedef union
+{
+    vector_axis_t* data_p;
+    vector_t* vector_p;
+} vector_pointer_t;
 
 #define VECTOR_AXIS_MASK(AXIS) VECTOR_AXIS_MASK_##AXIS = 1 << VECTOR_AXIS_##AXIS
 
@@ -59,6 +64,8 @@ vector_t vector_init(vector_axis_t x, vector_axis_t y, vector_axis_t z);
 vector_t vector_init_array(const vector_axis_t* array);
 
 void vector_print(vector_t vector);
+
+int vector_is_equal(vector_t a, vector_t b);
 
 /**
  * ||vector_p||

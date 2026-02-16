@@ -103,6 +103,10 @@ matrix_is_dimensions_equal(const matrix_t* a_p, const matrix_t* b_p)
     return a_p->columns == b_p->columns && a_p->lines == b_p->lines;
 }
 
+const matrix_data_t* matrix_data(const matrix_t* m_p)
+{
+    return m_p->array;
+}
 
 matrix_data_t
 matrix_value_get(const matrix_t* m_p,
