@@ -119,6 +119,19 @@ main(int argc, char* argv[])
             edge_init(&figure_bis.array[3].vector, &figure_bis.array[5].vector, GREEN),
             edge_init(&figure_bis.array[5].vector, &figure_bis.array[1].vector, GREEN),
         };
+
+        triangle_t solid[] =
+        {
+            triangle_init(&figure_bis.array[0].vector, &figure_bis.array[1].vector, &figure_bis.array[4].vector, GREEN),
+            triangle_init(&figure_bis.array[2].vector, &figure_bis.array[1].vector, &figure_bis.array[4].vector, MAGENTA),
+            triangle_init(&figure_bis.array[2].vector, &figure_bis.array[3].vector, &figure_bis.array[4].vector, BLUE),
+            triangle_init(&figure_bis.array[0].vector, &figure_bis.array[3].vector, &figure_bis.array[4].vector, RED),
+
+            triangle_init(&figure_bis.array[0].vector, &figure_bis.array[1].vector, &figure_bis.array[5].vector, BLUE),
+            triangle_init(&figure_bis.array[2].vector, &figure_bis.array[1].vector, &figure_bis.array[5].vector, RED),
+            triangle_init(&figure_bis.array[2].vector, &figure_bis.array[3].vector, &figure_bis.array[5].vector, GREEN),
+            triangle_init(&figure_bis.array[0].vector, &figure_bis.array[3].vector, &figure_bis.array[5].vector, MAGENTA),
+        };
         performance_try_start(&frame_performance);
         interface_state_restore();
         printf("Image %u\n", frame);
@@ -132,6 +145,10 @@ main(int argc, char* argv[])
         for(uint32_t edge=0; edge<sizeof(edge_array)/sizeof(edge_array[0]); ++edge)
         {
             camera_render_edge(&camera, image_p, edge_array[edge]);
+        }
+        for(uint32_t triangle=0; triangle<sizeof(solid)/sizeof(solid[0]); ++triangle)
+        {
+            camera_render_triangle(&camera, image_p, solid[triangle]);
         }
         figure_free(&figure_bis);
         performance_try_add(&render_performance);

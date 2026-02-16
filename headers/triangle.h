@@ -1,13 +1,16 @@
 #ifndef TRIANGLE_H_
 #define TRIANGLE_H_
 
-#include "point.h"
+#include "vector.h"
+#include "colours.h"
 
 typedef struct
 {
-    point_t* array[3];
+    vector_t* array[3];
     colour_t colour;
 } triangle_t;
 
+triangle_t triangle_init(vector_t* a_p, vector_t* b_p, vector_t* c_p,
+                         colour_t colour);
 
 #endif //TRIANGLE_H_
