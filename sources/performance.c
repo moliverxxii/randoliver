@@ -16,7 +16,8 @@ const performance_t PERFORMANCE_NULL =
    0, 0, 0, 0
 };
 
-performance_t performance_init(const char* name_p)
+performance_t
+performance_init(const char* name_p)
 {
     performance_t performance = PERFORMANCE_NULL;
     char* performance_name_p = malloc(strlen(name_p) + 1);
@@ -26,18 +27,21 @@ performance_t performance_init(const char* name_p)
 }
 
 
-void performance_free(performance_t* perfomance_p)
+void
+performance_free(performance_t* perfomance_p)
 {
     free(perfomance_p->name_p);
     *perfomance_p = PERFORMANCE_NULL;
 }
 
-void performance_try_start(performance_t* performance_p)
+void
+performance_try_start(performance_t* performance_p)
 {
     performance_p->try_start = clock();
 }
 
-void performance_try_add(performance_t* performance_p)
+void
+performance_try_add(performance_t* performance_p)
 {
     performance_p->try_end = clock();
     clock_t operation_time = performance_p->try_end - performance_p->try_start;
@@ -46,7 +50,8 @@ void performance_try_add(performance_t* performance_p)
     ++performance_p->total_operations;
 }
 
-void performance_print(const performance_t* performance_p)
+void
+performance_print(const performance_t* performance_p)
 {
     printf("%s: %8.2f ms/operation\n",
            performance_p->name_p,

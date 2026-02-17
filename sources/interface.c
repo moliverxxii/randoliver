@@ -153,7 +153,8 @@ interface_deinit()
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &original_terminal);
 }
 
-void interface_state_save()
+void
+interface_state_save()
 {
     set_cursor_escape(DEVICE_STATUS_REPORT);
     fflush(stdout); //On s'assure que les donnees sortent.
@@ -162,7 +163,8 @@ void interface_state_save()
 }
 
 
-void interface_state_restore()
+void
+interface_state_restore()
 {
     set_cursor_escape(HORIZONTAL_VERTICAL_POSITION, interface.row, interface.column);
     set_cursor_escape(ERASE_IN_DISPLAY, 0);

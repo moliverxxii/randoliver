@@ -30,7 +30,8 @@ static command_file_t* command_file_p = NULL;
 
 static command_file_t* command_file_init(const char* file_name_p);
 
-void interpreter_parse_arguments(int argc, char* argv[])
+void
+interpreter_parse_arguments(int argc, char* argv[])
 {
     if(argc > 1)
     {
@@ -38,7 +39,8 @@ void interpreter_parse_arguments(int argc, char* argv[])
     }
 }
 
-static command_file_t* command_file_init(const char* file_name_p)
+static command_file_t*
+command_file_init(const char* file_name_p)
 {
     char* command_file_name_p = malloc((strlen(file_name_p) + 1) * sizeof(char));
     strcpy(command_file_name_p, file_name_p);

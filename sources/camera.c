@@ -167,9 +167,10 @@ camera_render_figure(const camera_t* camera_p,
 
 const uint32_t CAMERA_SUBDIVISION = 3;
 
-void camera_render_edge(const camera_t* camera_p,
-                        image_t* image_p,
-                        edge_t edge)
+void
+camera_render_edge(const camera_t* camera_p,
+                   image_t* image_p,
+                   edge_t edge)
 {
 
     vector_t image_points[]=
@@ -193,9 +194,10 @@ void camera_render_edge(const camera_t* camera_p,
     figure_free(&edge_figure);
 }
 
-void camera_render_triangle(const camera_t* camera_p,
-                            image_t* image_p,
-                            triangle_t triangle)
+void
+camera_render_triangle(const camera_t* camera_p,
+                       image_t* image_p,
+                       triangle_t triangle)
 {
     vector_t pivot = *triangle.array[2];
 
@@ -220,7 +222,8 @@ void camera_render_triangle(const camera_t* camera_p,
 
 }
 
-void camera_cache_clear()
+void
+camera_cache_clear()
 {
     if(camera_cache_is_allocated(&camera_cache))
     {

@@ -53,7 +53,8 @@ matrix_init(uint32_t lines, uint32_t columns)
     return m_p;
 }
 
-matrix_t* matrix_init_null()
+matrix_t*
+matrix_init_null()
 {
     return matrix_init(0, 0);
 }

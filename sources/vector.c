@@ -69,7 +69,8 @@ vector_scalar(vector_t vector_a, vector_t vector_b)
     return scalar;
 }
 
-vector_t vector_product(vector_t vector_a, vector_t vector_b)
+vector_t
+vector_product(vector_t vector_a, vector_t vector_b)
 {
     return vector_init(
             vector_a.y * vector_b.z - vector_a.z * vector_b.y,

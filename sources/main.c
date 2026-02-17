@@ -18,6 +18,7 @@
 #include "utility.h"
 #include "performance.h"
 #include "edge.h"
+
 //#define OLI_BROWN
 //#define OLI_TEST_PATTERN
 
@@ -53,6 +54,8 @@ main(int argc, char* argv[])
     interface_state_save();
 
 
+    uint32_t point_count = 6;
+
 #ifdef OLI_BROWN
     brownien1(image_p, point_count, 1, width/2, height/2);
     image_file_p = image_file_init(file_name_prefix_p, image_p);
@@ -75,7 +78,6 @@ main(int argc, char* argv[])
 
 //Animation
     int frame_count = 360;
-    uint32_t point_count = 6;
     figure_t figure = figure_init(point_count);
     performance_t render_performance = performance_init("rendu");
     performance_t process_performance = performance_init("processus");
@@ -141,10 +143,10 @@ main(int argc, char* argv[])
 
         performance_try_start(&render_performance);
         camera_cache_clear();
-        camera_render_figure(&camera, image_p, figure_bis);
+//        camera_render_figure(&camera, image_p, figure_bis);
         for(uint32_t edge=0; edge<sizeof(edge_array)/sizeof(edge_array[0]); ++edge)
         {
-            camera_render_edge(&camera, image_p, edge_array[edge]);
+//            camera_render_edge(&camera, image_p, edge_array[edge]);
         }
         for(uint32_t triangle=0; triangle<sizeof(solid)/sizeof(solid[0]); ++triangle)
         {
@@ -182,15 +184,13 @@ main(int argc, char* argv[])
         image_set(image_p);
         performance_try_add(&frame_performance);
     }
-    figure_free(&figure_bis);
-
 #endif /* OLI_3D */
 
 #ifdef OLI_FIG
     for(uint32_t point_n=0; point_n<figure.amount; ++point_n)
     {
-        figure.array[point_n].vector.x = image_p->width/2;
-        figure.array[point_n].vector.y = image_p->height/2;
+        figure.array[point_n].vector.x = image_width(image_p)/2;
+        figure.array[point_n].vector.y = image_height(image_p)/2;
         figure.array[point_n].colour = colour_get_random();
     }
     
@@ -203,8 +203,8 @@ main(int argc, char* argv[])
         {
            vector_random_delta(&figure.array[point_n].vector,
                              point_n,
-                             image_p->width,
-                             image_p->height);
+                             image_width(image_p),
+                             image_height(image_p));
         }
         char* file_name_p = num_extension(file_name_prefix_p, frame);
 
@@ -216,8 +216,8 @@ main(int argc, char* argv[])
         image_file_free(image_file_p);
         image_set(image_p);
     }
-    figure_free(&figure);
 #endif
+    figure_free(&figure);
 
 #ifdef OLI_FIG_2
     test_pattern_squares(image_p, 1);
@@ -232,8 +232,8 @@ main(int argc, char* argv[])
         {
            vector_random_delta(&figure.array[point].vector,
                              8,
-                             image_p->width,
-                             image_p->height);
+                             image_width(image_p),
+                             image_height(image_p));
         }
 
         image_draw_figure(image_p, &figure);
