@@ -9,7 +9,6 @@
 #define IMGUTIL_H_
 
 #include "colours.h"
-#include "figure.h"
 #include "vector.h"
 
 #define RES 2835
@@ -32,10 +31,6 @@ typedef enum
  *
  */
 extern const image_t SYSTEM_SCREEN;
-
-typedef void (*image_point_renderer)(image_t*, point_t);
-
-extern image_point_renderer public_point_renderer;
 
 /* Elementaires */
 //Returns a pointer to an image.
@@ -77,13 +72,5 @@ void image_print(const image_t* image);
 void image_draw_rect(colour_t color, uint32_t botLeftX, uint32_t botLeftY, uint32_t topRightX,
 			   uint32_t topRightY, image_t* image);
 
-void image_draw_point(image_t* image_p, point_t point);
-void image_or_point(image_t* image_p, point_t point);
-void image_xor_point(image_t* image_p, point_t point);
-void image_average_point(image_t* image_p, point_t point);
-
-int point_is_in_image(const point_t* point_p, const image_t* image_p);
-// Draws a sequence of points into an image.
-void image_draw_figure(image_t* image, const figure_t* figure);
 
 #endif /* IMGUTIL_H_ */

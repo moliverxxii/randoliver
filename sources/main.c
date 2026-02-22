@@ -18,6 +18,8 @@
 #include "utility.h"
 #include "performance.h"
 #include "edge.h"
+#include "figure.h"
+#include "triangle.h"
 
 //#define OLI_BROWN
 //#define OLI_TEST_PATTERN

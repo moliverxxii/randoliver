@@ -10,6 +10,7 @@
 
 #include "vector.h"
 #include "colours.h"
+#include "renderable.h"
 
 typedef struct
 {
@@ -19,6 +20,11 @@ typedef struct
 
 edge_t edge_init(vector_t* a_p, vector_t* b_p, colour_t colour);
 
+
 vector_t edge_get_vector(const edge_t* edge_p, float fraction);
+
+void camera_render_edge(const camera_t* camera_p,
+                        image_t* image_p,
+                        edge_t edge);
 
 #endif /* HEADERS_EDGE_H_ */

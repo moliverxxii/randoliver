@@ -8,10 +8,7 @@
 #ifndef HEADERS_CAMERA_H_
 #define HEADERS_CAMERA_H_
 
-#include "figure.h"
-#include "image.h"
-#include "edge.h"
-#include "triangle.h"
+#include "vector.h"
 
 /** Une camera a utiliser pour le rendu 3D
  *
@@ -28,20 +25,7 @@ camera_t camera_init(float origin_x, float origin_y, float origin_z,
                      float destin_x, float destin_y, float destin_z,
                      float angle);
 
-void camera_render_point(const camera_t* camera_p,
-                         image_t* image_p,
-                         point_t point);
-void camera_render_figure(const camera_t* camera_p,
-                          image_t* image_p,
-                          figure_t figure);
-void camera_render_edge(const camera_t* camera_p,
-                        image_t* image_p,
-                        edge_t edge);
-void camera_render_triangle(const camera_t* camera_p,
-                            image_t* image_p,
-                            triangle_t triangle);
 
-void camera_cache_clear();
 
 
 

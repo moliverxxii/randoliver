@@ -81,3 +81,27 @@ figure_get_average_point(const figure_t* figure_p)
     return average;
 }
 
+void
+camera_render_figure(const camera_t* camera_p,
+                     image_t* image_p,
+                     figure_t figure)
+{
+    for(uint32_t point = 0; point < figure.amount; ++point)
+    {
+        camera_render_point(camera_p, image_p, figure.array[point]);
+    }
+}
+
+void
+image_draw_figure(image_t* image, const figure_t* figure)
+{
+    unsigned int i;
+    for(i = 0; i < figure->amount; ++i)
+    {
+        if(point_is_in_image(figure->array + i, image))
+        {
+            (*public_point_renderer)(image, figure->array[i]);
+        }
+    }
+}
+

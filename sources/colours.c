@@ -60,3 +60,15 @@ colour_add_2(colour_t colour_1, colour_t colour_2, void* parameters_p)
     }
     return return_colour;
 }
+
+colour_t colour_average(colour_t a, colour_t b)
+{
+    colour_t new_colour = BLACK;
+
+    for(int colour = 0; colour < COLOUR_COUNT; colour++)
+    {
+        float new_value = (float) a.array[colour] + (float) b.array[colour];
+        new_colour.array[colour] = dither(new_value/2);
+    }
+    return new_colour;
+}

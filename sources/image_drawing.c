@@ -8,7 +8,7 @@
 
 #include "image_drawing.h"
 #include "utility.h"
-
+#include "point.h"
 void
 brownien1(image_t* image, int iterations, int spread, int x0, int y0)
 {
@@ -127,10 +127,7 @@ test_pattern_squares(image_t* image_p, uint32_t period)
         for(uint32_t x=0; x < image_width(image_p); ++x)
         {
             image_draw_point(image_p,
-                             (point_t) {
-                                          vector_init(x, y, 0),
-                                          square_colours_p[x/period + (y/period)*x_squares]
-                                       }
+                             point_init(x, y, 0, square_colours_p[x/period + (y/period)*x_squares])
                             );
         }
 

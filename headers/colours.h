@@ -56,6 +56,7 @@ colour_t colour_get_random();
 
 colour_t colour_random_delta(colour_t colour, void* parameters_p);
 
-colour_t colour_add_2(colour_t colour_1, colour_t colour_2, void* parameters_p);
+colour_t colour_add_2(colour_t a, colour_t b, void* parameters_p);
+colour_t colour_average(colour_t a, colour_t b);
 
 #endif /* HEADERS_COLOURS_H_ */

@@ -30,5 +30,11 @@ void     figure_free(figure_t* figure_p);
 figure_t figure_from_image(const image_t*);
 vector_t figure_get_average_point(const figure_t* figure_p);
 
+void camera_render_figure(const camera_t* camera_p,
+                          image_t* image_p,
+                          figure_t figure);
+
+// Draws a sequence of points into an image.
+void image_draw_figure(image_t* image, const figure_t* figure);
 
 #endif /* HEADERS_FIGURE_H_ */
