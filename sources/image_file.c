@@ -105,7 +105,7 @@ bmp_extension(const char* input)
     char* output = NULL;
     int length = strlen(input);
     length += 4;
-    output = malloc(length);
+    output = malloc(length+1);
     strcpy(output, input);
     strcat(output, ".bmp");
     return output;
