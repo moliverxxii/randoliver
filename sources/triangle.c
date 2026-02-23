@@ -61,8 +61,8 @@ static void triangle_render_tent(const triangle_t* triangle_p,
     edge_t* slide_edge = edge_init(triangle_p->array[0], triangle_p->array[1], triangle_p->colour);
     vector_t image_vectors[]=
     {
-        camera_render_point_position(camera_p, image_p, edge_get_vector(slide_edge, 0)),
-        camera_render_point_position(camera_p, image_p, edge_get_vector(slide_edge, 1))
+        renderable_vector_position(edge_get_vector(slide_edge, 0), image_p, camera_p),
+        renderable_vector_position(edge_get_vector(slide_edge, 1), image_p, camera_p)
     };
 
     float edge_length = vector_norm(vector_subtract(image_vectors[1], image_vectors[0]));
@@ -93,8 +93,8 @@ triangle_render_crystal(const triangle_t* triangle_p,
 
     vector_t image_vectors[]=
     {
-        camera_render_point_position(camera_p, image_p, edge_get_vector(slide_edge_1, 0)),
-        camera_render_point_position(camera_p, image_p, edge_get_vector(slide_edge_1, 1))
+        renderable_vector_position(edge_get_vector(slide_edge_1, 0), image_p, camera_p),
+        renderable_vector_position(edge_get_vector(slide_edge_1, 1), image_p, camera_p)
     };
     float edge_length = vector_norm(vector_subtract(image_vectors[1], image_vectors[0]));
     uint32_t slide_points = CAMERA_SUBDIVISION*(uint32_t) edge_length;

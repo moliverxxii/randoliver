@@ -26,16 +26,20 @@ typedef struct renderable_i
 
 extern const float CAMERA_SUBDIVISION;
 
-
-
 renderable_i renderable_init(renderable_render_f render_function, void* this_p);
-void render_vector(vector_t vector, colour_t colour, image_t* image_p, const camera_t* camera_p);
+void         renderable_render(const renderable_i* renderable_p,
+                               image_t* image_p,
+                               const camera_t* camera_p);
+void         renderable_cache_clear();
 
-void renderable_cache_clear();
-vector_t camera_render_point_position(const camera_t* camera_p, image_t* image_p, vector_t point);
+void render_vector(vector_t vector, colour_t colour,
+                   image_t* image_p,
+                   const camera_t* camera_p);
+vector_t renderable_vector_position(vector_t point,
+                                    image_t* image_p,
+                                    const camera_t* camera_p);
 
-void renderable_render(const renderable_i* this_p, image_t* image_p, const camera_t* camera_p);
-void renderable_cache_clear();
+
 
 
 #endif /* HEADERS_RENDERABLE_H_ */

@@ -54,8 +54,8 @@ edge_render(const edge_t* edge_p,
 
     vector_t image_points[]=
     {
-        camera_render_point_position(camera_p, image_p, *edge_p->array[0]),
-        camera_render_point_position(camera_p, image_p, *edge_p->array[1])
+        renderable_vector_position(*edge_p->array[0], image_p, camera_p),
+        renderable_vector_position(*edge_p->array[1], image_p, camera_p)
     };
 
     float edge_length = vector_norm(vector_subtract(image_points[1], image_points[0]));
