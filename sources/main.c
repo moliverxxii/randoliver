@@ -106,7 +106,7 @@ main(int argc, char* argv[])
     figure_t* figure_bis_p = figure_copy(figure_p);
     for(int frame=0; frame<frame_count; ++frame)
     {
-        edge_t edge_array[] =
+        edge_t* edge_array[] =
         {
             edge_init(point_vector(figure_point(figure_bis_p, 0)), point_vector(figure_point(figure_bis_p, 1)), RED),
             edge_init(point_vector(figure_point(figure_bis_p, 1)), point_vector(figure_point(figure_bis_p, 2)), RED),
@@ -161,7 +161,7 @@ main(int argc, char* argv[])
         figure_render(figure_bis_p, image_p, &camera);
         for(uint32_t edge=0; edge<sizeof(edge_array)/sizeof(edge_array[0]); ++edge)
         {
-            edge_render(&camera, image_p, edge_array[edge]);
+            edge_render(edge_array[edge], image_p, &camera);
         }
         for(uint32_t triangle=0; triangle<sizeof(solid)/sizeof(solid[0]); ++triangle)
         {
