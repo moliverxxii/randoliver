@@ -81,11 +81,11 @@ main(int argc, char* argv[])
 //Animation
     int frame_count = 20;
     figure_t figure = figure_init(point_count);
+    #ifdef OLI_3D
+    //3
     performance_t render_performance = performance_init("rendu");
     performance_t process_performance = performance_init("processus");
     performance_t frame_performance = performance_init("image");
-    #ifdef OLI_3D
-    //3
     *point_vector(figure.array[0]) = vector_init( 1,  0,  0);
     *point_vector(figure.array[1]) = vector_init( 0,  1,  0);
     *point_vector(figure.array[2]) = vector_init(-1,  0,  0);
@@ -189,9 +189,8 @@ main(int argc, char* argv[])
 #ifdef OLI_FIG
     for(uint32_t point_n=0; point_n<figure.amount; ++point_n)
     {
-        figure.array[point_n].vector.x = image_width(image_p)/2;
-        figure.array[point_n].vector.y = image_height(image_p)/2;
-        figure.array[point_n].colour = colour_get_random();
+        *point_vector(figure.array[point_n]) = vector_init(image_width(image_p)/2, image_height(image_p)/2, 0);
+        *point_colour(figure.array[point_n]) = colour_get_random();
     }
     
 
@@ -201,7 +200,7 @@ main(int argc, char* argv[])
         printf("Image %u\n", frame);
         for(uint32_t point_n=0; point_n<figure.amount;++point_n)
         {
-           vector_random_delta(&figure.array[point_n].vector,
+           vector_random_delta(point_vector(figure.array[point_n]),
                              point_n,
                              image_width(image_p),
                              image_height(image_p));
@@ -210,7 +209,7 @@ main(int argc, char* argv[])
 
         image_file_p = image_file_init(file_name_p, image_p);
 
-        image_draw_figure(image_p, &figure);
+        figure_draw(&figure, image_p);
         image_file_write(image_file_p, image_p);
         free(file_name_p);
         image_file_free(image_file_p);
@@ -230,13 +229,13 @@ main(int argc, char* argv[])
         figure_t figure = figure_from_image(image_p);
         for(uint32_t point=0; point<figure.amount;++point)
         {
-           vector_random_delta(&figure.array[point].vector,
+           vector_random_delta(point_vector(figure.array[point]),
                              8,
                              image_width(image_p),
                              image_height(image_p));
         }
 
-        image_draw_figure(image_p, &figure);
+        figure_draw(&figure, image_p);
         figure_free(&figure);
         image_scale(&image_p, 1.0f/8, SCALE_ALGORITHM_DUMB);
         image_scale(&image_p, 8, SCALE_ALGORITHM_DUMB);
