@@ -10,20 +10,25 @@
 
 #include "camera.h"
 #include "image.h"
+#include "vector.h"
 
 typedef struct renderable_i renderable_i;
 
-typedef void (*renderable_render_f)(const renderable_i* item,
+typedef void (*renderable_render_f)(const void* this_p,
                                     image_t* image_p,
                                     const camera_t* camera_p);
 
 typedef struct renderable_i
 {
     renderable_render_f render;
+    void* this_p;
 } renderable_i;
 
-renderable_i renderable_init(renderable_render_f render_function);
+renderable_i renderable_init(renderable_render_f render_function, void* this_p);
 
+void renderable_cache_clear();
 vector_t camera_render_point_position(const camera_t* camera_p, image_t* image_p, vector_t point);
+
+void renderable_render(const renderable_i* this_p, image_t* image_p, const camera_t* camera_p);
 
 #endif /* HEADERS_RENDERABLE_H_ */

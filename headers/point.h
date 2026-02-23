@@ -15,30 +15,32 @@
 /** Un point dans l'espace
  *
  */
-typedef struct
-{
-    vector_t vector;
-    colour_t colour;
-} point_t;
+typedef struct point_t point_t;
 
-point_t point_init(vector_axis_t x, vector_axis_t y, vector_axis_t z, colour_t colour);
-void point_print(point_t point);
+point_t* point_init(vector_axis_t x, vector_axis_t y, vector_axis_t z, colour_t colour);
+void point_free(point_t* point_p);
+void point_print(const point_t* point_p);
+void point_copy(point_t* this_p, const point_t* point_p);
 
-void camera_render_point(const camera_t* camera_p,
-                         image_t* image_p,
-                         point_t point);
+void point_render(const void* this_p,
+                  image_t* image_p,
+                  const camera_t* camera_p);
+renderable_i* point_renderable(point_t* point_p);
 
-typedef void (*image_point_renderer)(image_t*, point_t);
+vector_t* point_vector(point_t* point_p);
+colour_t* point_colour(point_t* point_p);
 
-extern image_point_renderer public_point_renderer;
+typedef void (*point_renderer_f)(const point_t*, image_t*);
 
-void image_draw_point(image_t* image_p, point_t point);
-void image_or_point(image_t* image_p, point_t point);
-void image_xor_point(image_t* image_p, point_t point);
-void image_average_point(image_t* image_p, point_t point);
+extern point_renderer_f public_point_renderer;
+
+void point_draw(const point_t* point_p, image_t* image_p);
+void point_or(const point_t* point_p, image_t* image_p);
+void point_xor(const point_t* point_p, image_t* image_p);
+void point_average(const point_t* point_p, image_t* image_p);
 
 int point_is_in_image(const point_t* point_p, const image_t* image_p);
 
-void camera_cache_clear();
+void renderable_cache_clear();
 
 #endif /* HEADERS_POINT_H_ */

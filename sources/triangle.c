@@ -22,7 +22,7 @@ triangle_init(vector_t* a_p, vector_t* b_p, vector_t* c_p,
 static uint32_t CAMERA_SUBDIVISION = 3;
 
 void
-camera_render_triangle(const camera_t* camera_p,
+triangle_render(const camera_t* camera_p,
                        image_t* image_p,
                        triangle_t triangle)
 {
@@ -44,7 +44,7 @@ camera_render_triangle(const camera_t* camera_p,
 
         vector_t average = edge_get_vector(&slide_edge, fraction);
         edge_t render_edge = edge_init(&pivot, &average, triangle.colour);
-        camera_render_edge(camera_p, image_p, render_edge);
+        edge_render(camera_p, image_p, render_edge);
     }
 
 }

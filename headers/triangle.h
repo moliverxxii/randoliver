@@ -15,9 +15,9 @@ typedef struct
 triangle_t triangle_init(vector_t* a_p, vector_t* b_p, vector_t* c_p,
                          colour_t colour);
 
-void camera_render_triangle(const camera_t* camera_p,
-                            image_t* image_p,
-                            triangle_t triangle);
+void triangle_render(const camera_t* camera_p,
+                     image_t* image_p,
+                     triangle_t triangle);
 
 
 #endif //TRIANGLE_H_

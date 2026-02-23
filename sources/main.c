@@ -49,7 +49,7 @@ main(int argc, char* argv[])
 
     //Initialisation de l'image.
     image_t* image_p  = image_init(width, height);
-
+    image_set(image_p);
     //Initialisation des particules
     srand(time(NULL));
 
@@ -79,23 +79,23 @@ main(int argc, char* argv[])
 #endif //OLI_TEST_PATTERN
 
 //Animation
-    int frame_count = 360;
+    int frame_count = 20;
     figure_t figure = figure_init(point_count);
     performance_t render_performance = performance_init("rendu");
     performance_t process_performance = performance_init("processus");
     performance_t frame_performance = performance_init("image");
     #ifdef OLI_3D
     //3
-    figure.array[0].vector = vector_init( 1,  0,  0);
-    figure.array[1].vector = vector_init( 0,  1,  0);
-    figure.array[2].vector = vector_init(-1,  0,  0);
-    figure.array[3].vector = vector_init( 0, -1,  0);
-    figure.array[4].vector = vector_init( 0,  0,  1);
-    figure.array[5].vector = vector_init( 0,  0, -1);
+    *point_vector(figure.array[0]) = vector_init( 1,  0,  0);
+    *point_vector(figure.array[1]) = vector_init( 0,  1,  0);
+    *point_vector(figure.array[2]) = vector_init(-1,  0,  0);
+    *point_vector(figure.array[3]) = vector_init( 0, -1,  0);
+    *point_vector(figure.array[4]) = vector_init( 0,  0,  1);
+    *point_vector(figure.array[5]) = vector_init( 0,  0, -1);
 
     for(uint32_t point = 0; point < point_count; ++point)
     {
-        figure.array[point].colour = WHITE;
+        *point_colour(figure.array[point]) = WHITE;
     }
 
     vector_t centre_grave = figure_get_average_point(&figure);
@@ -108,33 +108,33 @@ main(int argc, char* argv[])
     {
         edge_t edge_array[] =
         {
-            edge_init(&figure_bis.array[0].vector, &figure_bis.array[1].vector, RED),
-            edge_init(&figure_bis.array[1].vector, &figure_bis.array[2].vector, RED),
-            edge_init(&figure_bis.array[2].vector, &figure_bis.array[3].vector, RED),
-            edge_init(&figure_bis.array[3].vector, &figure_bis.array[0].vector, RED),
+            edge_init(point_vector(figure_bis.array[0]), point_vector(figure_bis.array[1]), RED),
+            edge_init(point_vector(figure_bis.array[1]), point_vector(figure_bis.array[2]), RED),
+            edge_init(point_vector(figure_bis.array[2]), point_vector(figure_bis.array[3]), RED),
+            edge_init(point_vector(figure_bis.array[3]), point_vector(figure_bis.array[0]), RED),
 
-            edge_init(&figure_bis.array[0].vector, &figure_bis.array[4].vector, BLUE),
-            edge_init(&figure_bis.array[4].vector, &figure_bis.array[2].vector, BLUE),
-            edge_init(&figure_bis.array[2].vector, &figure_bis.array[5].vector, BLUE),
-            edge_init(&figure_bis.array[5].vector, &figure_bis.array[0].vector, BLUE),
+            edge_init(point_vector(figure_bis.array[0]), point_vector(figure_bis.array[4]), BLUE),
+            edge_init(point_vector(figure_bis.array[4]), point_vector(figure_bis.array[2]), BLUE),
+            edge_init(point_vector(figure_bis.array[2]), point_vector(figure_bis.array[5]), BLUE),
+            edge_init(point_vector(figure_bis.array[5]), point_vector(figure_bis.array[0]), BLUE),
 
-            edge_init(&figure_bis.array[1].vector, &figure_bis.array[4].vector, GREEN),
-            edge_init(&figure_bis.array[4].vector, &figure_bis.array[3].vector, GREEN),
-            edge_init(&figure_bis.array[3].vector, &figure_bis.array[5].vector, GREEN),
-            edge_init(&figure_bis.array[5].vector, &figure_bis.array[1].vector, GREEN),
+            edge_init(point_vector(figure_bis.array[1]), point_vector(figure_bis.array[4]), GREEN),
+            edge_init(point_vector(figure_bis.array[4]), point_vector(figure_bis.array[3]), GREEN),
+            edge_init(point_vector(figure_bis.array[3]), point_vector(figure_bis.array[5]), GREEN),
+            edge_init(point_vector(figure_bis.array[5]), point_vector(figure_bis.array[1]), GREEN),
         };
 
         triangle_t solid[] =
         {
-            triangle_init(&figure_bis.array[0].vector, &figure_bis.array[1].vector, &figure_bis.array[4].vector, GREEN),
-            triangle_init(&figure_bis.array[2].vector, &figure_bis.array[1].vector, &figure_bis.array[4].vector, MAGENTA),
-            triangle_init(&figure_bis.array[2].vector, &figure_bis.array[3].vector, &figure_bis.array[4].vector, BLUE),
-            triangle_init(&figure_bis.array[0].vector, &figure_bis.array[3].vector, &figure_bis.array[4].vector, RED),
+            triangle_init(point_vector(figure_bis.array[0]), point_vector(figure_bis.array[1]), point_vector(figure_bis.array[4]), GREEN),
+            triangle_init(point_vector(figure_bis.array[2]), point_vector(figure_bis.array[1]), point_vector(figure_bis.array[4]), MAGENTA),
+            triangle_init(point_vector(figure_bis.array[2]), point_vector(figure_bis.array[3]), point_vector(figure_bis.array[4]), BLUE),
+            triangle_init(point_vector(figure_bis.array[0]), point_vector(figure_bis.array[3]), point_vector(figure_bis.array[4]), RED),
 
-            triangle_init(&figure_bis.array[0].vector, &figure_bis.array[1].vector, &figure_bis.array[5].vector, BLUE),
-            triangle_init(&figure_bis.array[2].vector, &figure_bis.array[1].vector, &figure_bis.array[5].vector, RED),
-            triangle_init(&figure_bis.array[2].vector, &figure_bis.array[3].vector, &figure_bis.array[5].vector, GREEN),
-            triangle_init(&figure_bis.array[0].vector, &figure_bis.array[3].vector, &figure_bis.array[5].vector, MAGENTA),
+            triangle_init(point_vector(figure_bis.array[0]), point_vector(figure_bis.array[1]), point_vector(figure_bis.array[5]), BLUE),
+            triangle_init(point_vector(figure_bis.array[2]), point_vector(figure_bis.array[1]), point_vector(figure_bis.array[5]), RED),
+            triangle_init(point_vector(figure_bis.array[2]), point_vector(figure_bis.array[3]), point_vector(figure_bis.array[5]), GREEN),
+            triangle_init(point_vector(figure_bis.array[0]), point_vector(figure_bis.array[3]), point_vector(figure_bis.array[5]), MAGENTA),
         };
         performance_try_start(&frame_performance);
         interface_state_restore();
@@ -144,15 +144,15 @@ main(int argc, char* argv[])
         performance_print(&frame_performance);
 
         performance_try_start(&render_performance);
-        camera_cache_clear();
-//        camera_render_figure(&camera, image_p, figure_bis);
+        renderable_cache_clear();
+        figure_render(&camera, image_p, figure_bis);
         for(uint32_t edge=0; edge<sizeof(edge_array)/sizeof(edge_array[0]); ++edge)
         {
-//            camera_render_edge(&camera, image_p, edge_array[edge]);
+            edge_render(&camera, image_p, edge_array[edge]);
         }
         for(uint32_t triangle=0; triangle<sizeof(solid)/sizeof(solid[0]); ++triangle)
         {
-            camera_render_triangle(&camera, image_p, solid[triangle]);
+            triangle_render(&camera, image_p, solid[triangle]);
         }
         figure_free(&figure_bis);
         performance_try_add(&render_performance);
@@ -165,19 +165,13 @@ main(int argc, char* argv[])
         performance_try_start(&process_performance);
         figure_bis = figure_copy(figure);
         const vector_t rotation_axis = vector_add(VECTOR_X, VECTOR_Z);
-        for(uint32_t point_n = 0; point_n< figure.amount; point_n++)
+        for(uint32_t point_n = 0; point_n< figure_bis.amount; point_n++)
         {
-//            figure_bis.array[point_n].vector =
-//            vector_rotate(figure.array[point_n].vector,
-//                          rotation_axis,
-//                          (float) frame * 2. * M_PI/frame_count);
-
-             vector_rotate_axial(&figure_bis.array[point_n].vector,
+             vector_rotate_axial(point_vector(figure_bis.array[point_n]),
                                  VECTOR_0,
                                  rotation_axis,
                                  (float) frame * 2.*M_PI/frame_count);
         }
-//        break;
         performance_try_add(&process_performance);
 
         free(file_name_p);
@@ -186,6 +180,10 @@ main(int argc, char* argv[])
         image_set(image_p);
         performance_try_add(&frame_performance);
     }
+    figure_free(&figure_bis);
+    performance_free(&render_performance);
+    performance_free(&process_performance);
+    performance_free(&frame_performance);
 #endif /* OLI_3D */
 
 #ifdef OLI_FIG

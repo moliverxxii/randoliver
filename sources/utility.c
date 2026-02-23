@@ -52,7 +52,7 @@ modulo(int input, int modulo)
 int
 dither(float value)
 {
-    float noise = ((float) rand() * (RAND_MAX - 1)) / ((float) (RAND_MAX) * (RAND_MAX));
+    float noise = ((double) rand() * (RAND_MAX - 1)) / ((double)(RAND_MAX) * (double)(RAND_MAX));
     return (int) (value + noise);
 }
 

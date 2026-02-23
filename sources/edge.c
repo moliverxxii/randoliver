@@ -33,7 +33,7 @@ edge_get_vector(const edge_t* edge_p, float fraction)
 const uint32_t CAMERA_SUBDIVISION = 3;
 
 void
-camera_render_edge(const camera_t* camera_p,
+edge_render(const camera_t* camera_p,
                    image_t* image_p,
                    edge_t edge)
 {
@@ -45,17 +45,15 @@ camera_render_edge(const camera_t* camera_p,
     };
 
     float edge_length = vector_norm(vector_subtract(image_points[1], image_points[0]));
-    figure_t edge_figure = figure_init(CAMERA_SUBDIVISION*(uint32_t) edge_length);
-
-    for(uint32_t point = 0; point < edge_figure.amount; ++point)
+    uint32_t point_count = CAMERA_SUBDIVISION * (uint32_t) edge_length;
+    for(uint32_t point = 0; point < point_count; ++point)
     {
-        float fraction = (float) point/(edge_figure.amount - 1);
+        float fraction = (float) point/(point_count - 1);
 
         vector_t average = edge_get_vector(&edge, fraction);
-
-        edge_figure.array[point] = point_init(average.x, average.y, average.z, edge.colour);
+        point_t* edge_point_p = point_init(average.x, average.y, average.z, edge.colour);
+        renderable_render(point_renderable(edge_point_p), image_p, camera_p);
+        point_free(edge_point_p);
     }
-    camera_render_figure(camera_p, image_p, edge_figure);
-    figure_free(&edge_figure);
 }
 

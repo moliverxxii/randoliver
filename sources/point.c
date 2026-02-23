@@ -5,11 +5,19 @@
  *      Author: moliver
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <math.h>
 
 #include "point.h"
 #include "utility.h"
+
+typedef struct point_t
+{
+    renderable_i renderable;
+    vector_t vector;
+    colour_t colour;
+} point_t;
 
 typedef struct camera_cache_t
 {
@@ -35,49 +43,80 @@ static void camera_cache_deallocate(camera_cache_t* camera_cache_p);
 static int  camera_cache_is_allocated(const camera_cache_t* camera_cache_p);
 static vector_axis_t camera_cache_u_index_get(const camera_cache_t* camera_cache_p, uint32_t x, uint32_t y);
 static void camera_cache_u_index_set(camera_cache_t* camera_cache_p, uint32_t x, uint32_t y, vector_axis_t u_index);
-static void camera_context_update(const camera_t* camera_p);
 
-image_point_renderer public_point_renderer = &image_draw_point;
-
+point_renderer_f public_point_renderer = &point_draw;
 
 
-
-point_t
+point_t*
 point_init(vector_axis_t x, vector_axis_t y, vector_axis_t z, colour_t colour)
 {
+    point_t* point_p = malloc(sizeof(point_t));
+
     point_t point =
     {
+        renderable_init(&point_render, point_p),
         vector_init(x, y, z),
         colour
     };
-    return point;
+    if(point_p != NULL)
+    {
+        *point_p = point;
+    }
+    return point_p;
 }
 
 void
-point_print(point_t point)
+point_free(point_t* point_p)
+{
+    free(point_p);
+}
+
+void
+point_print(const point_t* point_p)
 {
     printf("(x y z) = (%4f %4f %4f | (R G B) = (%02X %02X %02X))\n",
-            point.vector.x, point.vector.y, point.vector.z,
-            point.colour.red, point.colour.green, point.colour.blue);
+            point_p->vector.x, point_p->vector.y, point_p->vector.z,
+            point_p->colour.red, point_p->colour.green, point_p->colour.blue);
 }
 
 void
-image_draw_point(image_t* image_p, point_t point)
+point_copy(point_t* this_p, const point_t* point_p)
 {
-    int x = point.vector.x;
-    int y = point.vector.y;
-    image_pixel_set(image_p, x, y, point.colour);
+    *this_p = *point_p;
 }
 
 void
-image_or_point(image_t* image_p, point_t point)
+point_draw(const point_t* point_p, image_t* image_p)
 {
-    int x = point.vector.x;
-    int y = point.vector.y;
+    int x = point_p->vector.x;
+    int y = point_p->vector.y;
+    image_pixel_set(image_p, x, y, point_p->colour);
+}
+
+void
+point_or(const point_t* point_p, image_t* image_p)
+{
+    int x = point_p->vector.x;
+    int y = point_p->vector.y;
     colour_t colour = image_pixel_get(image_p, x, y);
     uint32_t buffer = *(uint32_t*) colour.array;
 
-    buffer |= *(uint32_t*) &point.colour;
+    buffer |= *(uint32_t*) &point_p->colour;
+
+    memcpy(&colour, &buffer, sizeof(colour));
+
+    image_pixel_set(image_p, x, y, colour);
+}
+
+void
+point_xor(const point_t* point_p, image_t* image_p)
+{
+    int x = point_p->vector.x;
+    int y = point_p->vector.y;
+    colour_t colour = image_pixel_get(image_p, x, y);
+    uint32_t buffer = *(uint32_t*) colour.array;
+
+    buffer ^= *(uint32_t*) &point_p->colour;
 
     memcpy(&colour, &buffer, sizeof(colour));
 
@@ -86,26 +125,11 @@ image_or_point(image_t* image_p, point_t point)
 
 
 void
-image_xor_point(image_t* image_p, point_t point)
+point_average(const point_t* point_p, image_t* image_p)
 {
-    int x = point.vector.x;
-    int y = point.vector.y;
-    colour_t colour = image_pixel_get(image_p, x, y);
-    uint32_t buffer = *(uint32_t*) colour.array;
-
-    buffer ^= *(uint32_t*) &point.colour;
-
-    memcpy(&colour, &buffer, sizeof(colour));
-
-    image_pixel_set(image_p, x, y, colour);
-}
-
-void
-image_average_point(image_t* image_p, point_t point)
-{
-    int x = point.vector.x;
-    int y = point.vector.y;
-    image_pixel_set(image_p, x, y, colour_average(image_pixel_get(image_p, x, y), point.colour));
+    int x = point_p->vector.x;
+    int y = point_p->vector.y;
+    image_pixel_set(image_p, x, y, colour_average(image_pixel_get(image_p, x, y), point_p->colour));
 }
 
 int
@@ -117,11 +141,11 @@ point_is_in_image(const point_t* point_p, const image_t* image_p)
             && (point_p->vector.y < image_height(image_p));
 }
 
-void
-camera_render_point(const camera_t* camera_p,
-                    image_t* image_p,
-                    point_t point)
+void point_render(const void* this_p,
+                  image_t* image_p,
+                  const camera_t* camera_p)
 {
+    point_t point = *(const point_t*) this_p;
     vector_t image_point = camera_render_point_position(camera_p, image_p, point.vector);
     if(image_point.z < 0)
     {
@@ -140,23 +164,39 @@ camera_render_point(const camera_t* camera_p,
         camera_cache_allocate(&camera_cache, image_p);
     }
 
-    point_t render_point = point_init(x_image, y_image, image_point.z, point.colour);
-    if(point_is_in_image(&render_point, image_p))
+    point_t* render_point_p = point_init(x_image, y_image, image_point.z, point.colour);
+    if(point_is_in_image(render_point_p, image_p))
     {
         if(image_point.z < camera_cache_u_index_get(&camera_cache, x_image, y_image))
         {
             camera_cache_u_index_set(&camera_cache, x_image, y_image, image_point.z);
 
-            (*public_point_renderer)(image_p, render_point);
+            (*public_point_renderer)(render_point_p, image_p);
         }
     }
+    point_free(render_point_p);
+}
 
+renderable_i*
+point_renderable(point_t* point_p)
+{
+    return &point_p->renderable;
+}
 
+vector_t*
+point_vector(point_t* point_p)
+{
+    return &point_p->vector;
+}
 
+colour_t*
+point_colour(point_t* point_p)
+{
+    return &point_p->colour;
 }
 
 void
-camera_cache_clear()
+renderable_cache_clear()
 {
     if(camera_cache_is_allocated(&camera_cache))
     {
@@ -235,89 +275,6 @@ camera_cache_u_index_set(camera_cache_t* camera_cache_p, uint32_t x, uint32_t y,
     camera_cache_p->pixel_u_row[y][x] = u_index;
 }
 
-static camera_t local_camera;
-
-static struct camera_context_t
-{
-    float angle;
-    vector_t o;
-    vector_t f;
-    vector_t of;
-    float norme_of;
-    vector_t u;
-    vector_t v;
-    vector_t w;
-} camera_context;
-
-vector_t
-camera_render_point_position(const camera_t* camera_p, image_t* image_p, vector_t point)
-{
-    if(memcmp(camera_p, &local_camera, sizeof(local_camera)) != 0)
-    {
-        camera_context_update(camera_p);
-        local_camera = *camera_p;
-    }
-
-    //I P /1
-    vector_t p = point;
-
-    //II PO /1
-    vector_t op = vector_subtract(p, camera_context.o);
-
-    //III PO /2
-    float op_u_scalaire = vector_scalar(op, camera_context.u);
-    float op_v_scalaire = vector_scalar(op, camera_context.v);
-    float op_w_scalaire = vector_scalar(op, camera_context.w);
-
-    //IV u>0
-    if(op_u_scalaire <= 0)
-    {
-        return vector_init(0, 0, -1);
-    }
-
-    //V
-    float scale = (float) image_width(image_p) / (2 * op_u_scalaire * tan(camera_context.angle/2));
-
-    float x_image_scale = -scale * op_v_scalaire;
-    float y_image_scale =  scale * op_w_scalaire;
-
-    x_image_scale += (float) image_width(image_p)  / 2;
-    y_image_scale += (float) image_height(image_p) / 2;
-
-    return vector_init(x_image_scale, y_image_scale, op_u_scalaire);
-}
-
-static void
-camera_context_update(const camera_t* camera_p)
-{
-    float angle = camera_p->angle;
-    vector_t o = camera_p->origin;
-    vector_t f = camera_p->direction;
-    vector_t of = vector_subtract(f, o);
-
-    float norme_of = vector_norm(of);
-    vector_t u = vector_scale(of, 1/norme_of);
-
-    vector_t v;
-    v.x = -u.y / sqrt(pow(u.x, 2) + pow(u.y, 2));
-    v.y =  u.x / sqrt(pow(u.x, 2) + pow(u.y, 2));
-    v.z = 0;
-
-    vector_t w = vector_product(u, v);
-
-    struct camera_context_t context =
-    {
-            angle,
-            o,
-            f,
-            of,
-            norme_of,
-            u,
-            v,
-            w
-    };
-    camera_context = context;
-}
 
 
 
