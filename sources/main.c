@@ -158,7 +158,7 @@ main(int argc, char* argv[])
 
         performance_try_start(&render_performance);
         renderable_cache_clear();
-        figure_render(figure_bis_p, image_p, &camera);
+        //figure_render(figure_bis_p, image_p, &camera);
         for(uint32_t edge=0; edge<sizeof(edge_array)/sizeof(edge_array[0]); ++edge)
         {
             edge_render(edge_array[edge], image_p, &camera);
