@@ -49,7 +49,7 @@ point_free(point_t* point_p)
 void
 point_print(const point_t* point_p)
 {
-    printf("(x y z) = (%4f %4f %4f | (R G B) = (%02X %02X %02X))\n",
+     printf("xyz: %4f %4f %4f #%02X%02X%02X\n",
             point_p->vector.x, point_p->vector.y, point_p->vector.z,
             point_p->colour.red, point_p->colour.green, point_p->colour.blue);
 }
@@ -111,8 +111,8 @@ int
 point_is_in_image(const point_t* point_p, const image_t* image_p)
 {
     return image_is_in(image_p,
-                       point_vector(point_p)->x,
-                       point_vector(point_p)->y);
+                       point_vector((point_t*) point_p)->x,  //const OK
+                       point_vector((point_t*) point_p)->y); //const OK
 }
 
 void point_render(const void* this_p,

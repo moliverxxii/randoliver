@@ -45,10 +45,11 @@ main(int argc, char* argv[])
     int width = 1280;
     int height = 720;
 
+    float scale = 7.0f;
     image_file_t* image_file_p;
 
     //Initialisation de l'image.
-    image_t* image_p  = image_init(width, height);
+    image_t* image_p  = image_init(scale*width, scale* height);
     image_set(image_p);
     //Initialisation des particules
     srand(time(NULL));
@@ -175,7 +176,14 @@ main(int argc, char* argv[])
 
         char* file_name_p = num_extension(file_name_prefix_p, frame);
 
+        image_scale(image_p, 1/scale, SCALE_ALGORITHM_LINEAR);
         image_file_p = image_file_init(file_name_p, image_p);
+        image_file_free(image_file_p);
+        image_file_p = NULL;
+
+        image_scale(image_p, scale, SCALE_ALGORITHM_LINEAR);
+        free(file_name_p);
+        image_set(image_p);
 
         //OPERATION
         performance_try_start(&process_performance);
@@ -190,10 +198,6 @@ main(int argc, char* argv[])
         }
         performance_try_add(&process_performance);
 
-        free(file_name_p);
-        image_file_free(image_file_p);
-        image_file_p = NULL;
-        image_set(image_p);
         performance_try_add(&frame_performance);
     }
     figure_free(figure_bis_p);

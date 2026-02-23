@@ -28,6 +28,10 @@ const image_t SYSTEM_SCREEN =
 
 typedef void (*scale_function_t)(image_t* new_image_p, const image_t* image_p, uint32_t new_x, uint32_t new_y, float scale);
 
+static int  image_data_is_allocated(image_t* image_p);
+static void image_data_allocate(image_t* image_p);
+static void image_data_deallocate(image_t* image_p);
+
 static void scale_pixel_dumb(image_t* new_image_p, const image_t* image_p, uint32_t new_x, uint32_t new_y, float scale);
 static void scale_pixel_linear(image_t* new_image_p, const image_t* image_p, uint32_t new_x, uint32_t new_y, float scale);
 
@@ -41,19 +45,23 @@ image_t*
 image_init(uint32_t width, uint32_t height)
 {
 
-    colour_t* image_data_p = malloc(height * width * sizeof(colour_t));
 
-    image_t* image_p = malloc(sizeof(image_t));
-    image_p->width   = width;
-    image_p->height  = height;
-    image_p->image   = malloc(height * sizeof(row_t));
-
-    uint32_t y;
-	row_t row_p = image_data_p;
-    for(y = 0; y < height; ++y)
+    image_t image =
     {
-        image_p->image[y] = row_p;
-        row_p += width;
+        width,
+        height,
+        NULL
+    };
+    image_data_allocate(&image);
+
+    image_t* image_p = NULL;
+    if(image_data_is_allocated(&image))
+    {
+        image_p = malloc(sizeof(image_t));
+        if(image_p != NULL)
+        {
+            *image_p = image;
+        }
     }
     return image_p;
 }
@@ -61,8 +69,7 @@ image_init(uint32_t width, uint32_t height)
 void
 image_free(image_t* image_p)
 {
-    free(*(image_p->image));
-    free(image_p->image);
+    image_data_deallocate(image_p);
     free(image_p);
 }
 
@@ -111,31 +118,40 @@ image_pixel_set(image_t* image_p, uint32_t x, uint32_t y, colour_t colour)
     image_p->image[y][x] = colour;
 }
 void
-image_scale(image_t** image_pp, float scale, image_scale_algorithm_t algorithm)
+image_scale(image_t* image_p, float scale, image_scale_algorithm_t algorithm)
 {
     if(algorithm>SCALE_ALGORITHM_COUNT && algorithm < 0)
     {
         return;
     }
 
-    uint32_t new_width  = (*image_pp)->width * scale;
-    uint32_t new_height = (*image_pp)->height * scale;
-    image_t* new_image_p = image_init(new_width, new_height);
+
+    uint32_t new_width  = image_p->width * scale;
+    uint32_t new_height = image_p->height * scale;
+
+    image_t new_image =
+    {
+        new_width,
+        new_height,
+        NULL
+    };
+    image_data_allocate(&new_image);
     for(uint32_t y=0; y<new_height; ++y)
     {
         for(uint32_t x=0; x<new_width; ++x)
         {
-            (*SCALE_FUNCTION_TABLE[algorithm])(new_image_p, *image_pp, x, y, scale);
+            (*SCALE_FUNCTION_TABLE[algorithm])(&new_image, image_p, x, y, scale);
         }
     }
-    image_free(*image_pp);
-    *image_pp = new_image_p;
+
+    image_data_deallocate(image_p);
+    *image_p = new_image;
 }
 
 int image_is_in(const image_t* image_p, int x, int y)
 {
-    return 0 <= x && x < image_width(image_p)
-        && 0 <= y && y < image_height(image_p);
+    return (uint32_t) x < image_width(image_p)
+        && (uint32_t) y < image_height(image_p);
 
 }
 
@@ -143,10 +159,9 @@ int image_is_in(const image_t* image_p, int x, int y)
 void
 image_random(image_t* image_p)
 {
-    uint32_t x,y;
-    for(x=0; x<image_p->width; ++x)
+    for(uint32_t x=0; x<image_p->width; ++x)
     {
-        for(y=0; y<image_p->height; ++y)
+        for(uint32_t y=0; y<image_p->height; ++y)
         {
             image_p->image[y][x] = colour_get_random();
         }
@@ -159,10 +174,9 @@ image_get_sum_colour(const image_t* image_p)
     int sum = 0;
     for(int colour = 0; colour<COLOUR_COUNT; colour++)
     {
-        uint32_t x,y;
-        for(x=0; x<image_p->width; ++x)
+        for(uint32_t x=0; x<image_p->width; ++x)
         {
-            for(y=0; y<image_p->height; ++y)
+            for(uint32_t y=0; y<image_p->height; ++y)
             {
                 sum += image_p->image[y][x].array[colour];
             }
@@ -175,10 +189,9 @@ image_get_sum_colour(const image_t* image_p)
 void
 image_process_1(colour_unary_operator operator, image_t* image_p, void* parameters_p)
 {
-    uint32_t x,y;
-    for(x=0; x<image_p->width; ++x)
+    for(uint32_t x=0; x<image_p->width; ++x)
     {
-        for(y=0; y<image_p->height; ++y)
+        for(uint32_t y=0; y<image_p->height; ++y)
         {
             image_p->image[y][x] =  (*operator)(image_p->image[y][x], parameters_p);
         }
@@ -191,10 +204,9 @@ image_process_2(colour_binary_operator operator,
         const image_t* image_2_p,
         void* parameters_p)
 {
-    uint32_t x,y;
-    for(x=0; x<image_1_p->width; ++x)
+    for(uint32_t x=0; x<image_1_p->width; ++x)
     {
-        for(y=0; y<image_1_p->height; ++y)
+        for(uint32_t y=0; y<image_1_p->height; ++y)
         {
             image_1_p->image[y][x] =
                     (*operator)(image_1_p->image[y][x],
@@ -211,10 +223,9 @@ image_process_3(colour_ternary_operator operator,
         const image_t* image_3_p,
         void* parameters_p)
 {
-    uint32_t x,y;
-    for(x=0; x<image_1_p->width; ++x)
+    for(uint32_t x=0; x<image_1_p->width; ++x)
     {
-        for(y=0; y<image_1_p->height; ++y)
+        for(uint32_t y=0; y<image_1_p->height; ++y)
         {
             image_1_p->image[y][x] =
                     (*operator)(image_1_p->image[y][x],
@@ -234,15 +245,15 @@ image_add(image_t* image_1_p, const image_t* image_2_p)
 void
 image_print(const image_t* image)
 {
-    uint32_t x;
-    uint32_t y;
-    for(x = 0; x < image->width; ++x)
+    for(uint32_t x = 0; x < image->width; ++x)
     {
-        for(y = 0; y < image->height; ++y)
+        for(uint32_t y = 0; y < image->height; ++y)
         {
-            printf("Point[%5d,%5d] = (%x,%x,%x)\n", x + 1, y + 1,
-                    image->image[y][x].blue, image->image[y][x].green,
-                    image->image[y][x].red);
+            printf("[%5d,%5d] = #%02X%02X%02X\n",
+                   x, y,
+                   image->image[y][x].blue,
+                   image->image[y][x].green,
+                   image->image[y][x].red);
         }
     }
 }
@@ -258,6 +269,48 @@ image_draw_rect(colour_t color, uint32_t botLeftX, uint32_t botLeftY, uint32_t t
             image->image[y][x] = color;
         }
     }
+}
+
+static int
+image_data_is_allocated(image_t* image_p)
+{
+    return image_p->image != NULL && *image_p->image != NULL;
+}
+
+static void
+image_data_allocate(image_t* image_p)
+{
+    colour_t* image_data_p = malloc(image_width(image_p)
+                                  * image_height(image_p)
+                                  * sizeof(colour_t));
+
+    if(image_data_p != NULL)
+    {
+        image_p->image = malloc(image_height(image_p) * sizeof(row_t));
+        if(image_p->image != NULL)
+        {
+            row_t row_p = image_data_p;
+            for(uint32_t y = 0; y < image_height(image_p); ++y)
+            {
+                image_p->image[y] = row_p;
+                row_p += image_width(image_p);
+            }
+        }
+        else
+        {
+            free(image_data_p);
+        }
+    }
+
+}
+
+static void
+image_data_deallocate(image_t* image_p)
+{
+    free(image_data(image_p));
+    free(image_p->image);
+    image_p->height = 0;
+    image_p->width  = 0;
 }
 
 
