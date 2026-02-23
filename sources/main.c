@@ -122,7 +122,7 @@ main(int argc, char* argv[])
             edge_init(point_vector(figure_point(figure_bis_p, 5)), point_vector(figure_point(figure_bis_p, 1)), GREEN),
         };
 
-        triangle_t solid[] =
+        triangle_t* solid[] =
         {
             triangle_init(point_vector(figure_point(figure_bis_p, 0)),
                           point_vector(figure_point(figure_bis_p, 1)),
@@ -165,7 +165,7 @@ main(int argc, char* argv[])
         }
         for(uint32_t triangle=0; triangle<sizeof(solid)/sizeof(solid[0]); ++triangle)
         {
-            triangle_render(&camera, image_p, solid[triangle]);
+            triangle_render(solid[triangle], image_p, &camera);
         }
         figure_free(figure_bis_p);
         figure_bis_p = NULL;

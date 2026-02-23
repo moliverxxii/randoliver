@@ -6,18 +6,14 @@
 
 #include "renderable.h"
 
-typedef struct
-{
-    vector_t* array[3];
-    colour_t colour;
-} triangle_t;
+typedef struct triangle_t triangle_t;
 
-triangle_t triangle_init(vector_t* a_p, vector_t* b_p, vector_t* c_p,
+triangle_t* triangle_init(vector_t* a_p, vector_t* b_p, vector_t* c_p,
                          colour_t colour);
 
-void triangle_render(const camera_t* camera_p,
+void triangle_render(const triangle_t* triangle,
                      image_t* image_p,
-                     triangle_t triangle);
+                     const camera_t* camera_p);
 
 
 #endif //TRIANGLE_H_
