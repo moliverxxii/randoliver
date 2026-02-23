@@ -28,7 +28,7 @@ static camera_cache_t camera_cache =
     NULL
 };
 
-const float CAMERA_SUBDIVISION = 0.2;
+const float CAMERA_SUBDIVISION = 0.9;
 
 static void camera_context_update(const camera_t* camera_p);
 

@@ -101,7 +101,7 @@ figure_get_average_point(const figure_t* figure_p)
             average.array[axis] += vector.array[axis];
         }
     }
-    for(int axis=0; axis<3; ++axis)
+    for(int axis=0; axis<VECTOR_AXIS_COUNT; ++axis)
     {
         average.array[axis] /= figure_p->length;
     }
