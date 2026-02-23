@@ -50,6 +50,7 @@ colour_t image_pixel_get(const image_t* image_p, uint32_t x, uint32_t y);
 void     image_pixel_set(image_t* image_p, uint32_t x, uint32_t y, colour_t colour);
 
 void image_scale(image_t** image_pp, float scale, image_scale_algorithm_t algorithm);
+int image_is_in(const image_t* image_p, int x, int y);
 
 //Colore aléatorement l'image.
 void image_random(image_t* image);

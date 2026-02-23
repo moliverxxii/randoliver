@@ -10,7 +10,7 @@ typedef struct triangle_t triangle_t;
 
 triangle_t* triangle_init(vector_t* a_p, vector_t* b_p, vector_t* c_p,
                          colour_t colour);
-
+void        triangle_free(triangle_t* triangle_p);
 void triangle_render(const triangle_t* triangle,
                      image_t* image_p,
                      const camera_t* camera_p);

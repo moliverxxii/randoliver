@@ -30,7 +30,12 @@ triangle_init(vector_t* a_p, vector_t* b_p, vector_t* c_p,
     return triangle_p;
 }
 
-static uint32_t CAMERA_SUBDIVISION = 3;
+void
+triangle_free(triangle_t* triangle_p)
+{
+    free(triangle_p);
+}
+
 
 void
 triangle_render(const triangle_t* triangle,

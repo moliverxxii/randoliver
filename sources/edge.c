@@ -5,7 +5,6 @@
  *      Author: moliver
  */
 #include "edge.h"
-#include "figure.h"
 
 typedef struct edge_t
 {
@@ -47,8 +46,6 @@ edge_get_vector(const edge_t* edge_p, float fraction)
     return  vector_add(average_0, average_1);
 }
 
-const uint32_t CAMERA_SUBDIVISION = 3;
-
 void
 edge_render(const edge_t* edge_p,
             image_t* image_p,
@@ -68,9 +65,7 @@ edge_render(const edge_t* edge_p,
         float fraction = (float) point/(point_count - 1);
 
         vector_t average = edge_get_vector(edge_p, fraction);
-        point_t* edge_point_p = point_init(average.x, average.y, average.z, edge_p->colour);
-        renderable_render(point_renderable(edge_point_p), image_p, camera_p);
-        point_free(edge_point_p);
+        render_vector(average, edge_p->colour, image_p, camera_p);
     }
 }
 

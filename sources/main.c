@@ -79,7 +79,7 @@ main(int argc, char* argv[])
 #endif //OLI_TEST_PATTERN
 
 //Animation
-    int frame_count = 20;
+    int frame_count = 360;
     figure_t* figure_p = figure_init(point_count);
     #ifdef OLI_3D
     //3
@@ -162,10 +162,12 @@ main(int argc, char* argv[])
         for(uint32_t edge=0; edge<sizeof(edge_array)/sizeof(edge_array[0]); ++edge)
         {
             edge_render(edge_array[edge], image_p, &camera);
+            edge_free(edge_array[edge]);
         }
         for(uint32_t triangle=0; triangle<sizeof(solid)/sizeof(solid[0]); ++triangle)
         {
             triangle_render(solid[triangle], image_p, &camera);
+            triangle_free(solid[triangle]);
         }
         figure_free(figure_bis_p);
         figure_bis_p = NULL;

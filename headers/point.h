@@ -41,6 +41,4 @@ void point_average(const point_t* point_p, image_t* image_p);
 
 int point_is_in_image(const point_t* point_p, const image_t* image_p);
 
-void renderable_cache_clear();
-
 #endif /* HEADERS_POINT_H_ */

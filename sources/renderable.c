@@ -8,13 +8,82 @@
 #include <string.h>
 
 #include "renderable.h"
+#include "utility.h"
+
+typedef struct camera_cache_t
+{
+    uint32_t width;
+    uint32_t height;
+    const image_t* current_image_p;
+    vector_axis_t* pixel_u_index;
+    vector_axis_t** pixel_u_row;
+} camera_cache_t;
+
+static camera_cache_t camera_cache =
+{
+    0,
+    0,
+    NULL,
+    NULL,
+    NULL
+};
+
+const float CAMERA_SUBDIVISION = 0.2;
 
 static void camera_context_update(const camera_t* camera_p);
+
+static int  camera_cache_is_same_image(const camera_cache_t* camera_cache_p, const image_t* image_p);
+static void camera_cache_allocate(camera_cache_t* camera_cache_p, const image_t* image_p);
+static void camera_cache_deallocate(camera_cache_t* camera_cache_p);
+static int  camera_cache_is_allocated(const camera_cache_t* camera_cache_p);
+static vector_axis_t camera_cache_u_index_get(const camera_cache_t* camera_cache_p, uint32_t x, uint32_t y);
+static void camera_cache_u_index_set(camera_cache_t* camera_cache_p, uint32_t x, uint32_t y, vector_axis_t u_index);
+
+
 
 renderable_i renderable_init(renderable_render_f render_function, void* this_p)
 {
     renderable_i renderable = {render_function, this_p};
     return renderable;
+}
+
+//#define DITHER
+
+void
+render_vector(vector_t vector, colour_t colour, image_t* image_p, const camera_t* camera_p)
+{
+    vector_t image_point = camera_render_point_position(camera_p, image_p, vector);
+    if(image_point.z < 0)
+    {
+        return;
+    }
+    //VI
+#ifdef DITHER
+    int x_image = dither(image_point.x);
+    int y_image = dither(image_point.y);
+#else //DITHER
+    int x_image = image_point.x;
+    int y_image = image_point.y;
+#endif //DITHER
+
+    if(!camera_cache_is_same_image(&camera_cache, image_p))
+    {
+        if(camera_cache_is_allocated(&camera_cache))
+        {
+            camera_cache_deallocate(&camera_cache);
+        }
+        camera_cache_allocate(&camera_cache, image_p);
+    }
+
+    if(image_is_in(image_p, x_image, y_image))
+    {
+        if(image_point.z < camera_cache_u_index_get(&camera_cache, x_image, y_image))
+        {
+            camera_cache_u_index_set(&camera_cache, x_image, y_image, image_point.z);
+            image_pixel_set(image_p, x_image, y_image, colour);
+        }
+    }
+
 }
 
 static struct camera_context_t
@@ -105,3 +174,85 @@ void renderable_render(const renderable_i* this_p, image_t* image_p, const camer
 {
     (*this_p->render)(this_p->this_p, image_p, camera_p);
 }
+
+void
+renderable_cache_clear()
+{
+    if(camera_cache_is_allocated(&camera_cache))
+    {
+        camera_cache_deallocate(&camera_cache);
+    }
+}
+
+
+static int
+camera_cache_is_same_image(const camera_cache_t* camera_cache_p, const image_t* image_p)
+{
+    return camera_cache_p->current_image_p == image_p;
+}
+
+static void
+camera_cache_allocate(camera_cache_t* camera_cache_p, const image_t* image_p)
+{
+    camera_cache_t cache =
+    {
+            image_width(image_p),
+            image_height(image_p),
+            image_p,
+            NULL,
+            NULL
+    };
+    cache.pixel_u_index = malloc(image_width(image_p) * image_height(image_p) * sizeof(vector_axis_t));
+    if(cache.pixel_u_index != NULL)
+    {
+        for(uint32_t pixel=0; pixel<cache.width * cache.height; ++pixel)
+        {
+            cache.pixel_u_index[pixel] = INFINITY;
+        }
+        cache.pixel_u_row = malloc(image_height(image_p) * sizeof(vector_axis_t*));
+        if(cache.pixel_u_row != NULL)
+        {
+            vector_axis_t* row_p = cache.pixel_u_index;
+            for(uint32_t row=0; row<cache.height; ++row)
+            {
+                cache.pixel_u_row[row] = row_p;
+                row_p += cache.width;
+            }
+        }
+    }
+    *camera_cache_p = cache;
+}
+
+static void
+camera_cache_deallocate(camera_cache_t* camera_cache_p)
+{
+    free(camera_cache_p->pixel_u_row);
+    free(camera_cache_p->pixel_u_index);
+    *camera_cache_p = (camera_cache_t)
+    {
+        0, 0,
+        NULL, NULL, NULL
+    };
+}
+
+static int
+camera_cache_is_allocated(const camera_cache_t* camera_cache_p)
+{
+    return camera_cache_p->current_image_p != NULL
+        && camera_cache_p->pixel_u_index   != NULL
+        && camera_cache_p->pixel_u_row     != NULL;
+}
+
+static vector_axis_t
+camera_cache_u_index_get(const camera_cache_t* camera_cache_p, uint32_t x, uint32_t y)
+{
+    return camera_cache_p->pixel_u_row[y][x];
+}
+
+
+static void
+camera_cache_u_index_set(camera_cache_t* camera_cache_p, uint32_t x, uint32_t y, vector_axis_t u_index)
+{
+    camera_cache_p->pixel_u_row[y][x] = u_index;
+}
+

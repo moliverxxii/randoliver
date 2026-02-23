@@ -58,8 +58,7 @@ figure_free(figure_t* figure_p)
         point_free(figure_p->array[point]);
     }
     free(figure_p->array);
-    figure_p->length = 0;
-    figure_p-> array = NULL;
+    free(figure_p);
 }
 
 figure_t*

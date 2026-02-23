@@ -132,6 +132,14 @@ image_scale(image_t** image_pp, float scale, image_scale_algorithm_t algorithm)
     *image_pp = new_image_p;
 }
 
+int image_is_in(const image_t* image_p, int x, int y)
+{
+    return 0 <= x && x < image_width(image_p)
+        && 0 <= y && y < image_height(image_p);
+
+}
+
+
 void
 image_random(image_t* image_p)
 {
