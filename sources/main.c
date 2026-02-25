@@ -99,10 +99,12 @@ main(int argc, char* argv[])
         *point_colour(figure_point(figure_p, point)) = WHITE;
     }
 
-    vector_t centre_grave = figure_get_average_point(figure_p);
-    vector_print(centre_grave);
+    vector_t figure_average = figure_get_average_point(figure_p);
+    vector_print(figure_average);
 
-    camera_t camera = camera_init(centre_grave.x, -10, 1, centre_grave.x, centre_grave.y, centre_grave.z, M_PI_2/2);
+    camera_t camera = camera_init(figure_average.x, -10, 1,
+                                  figure_average.x, figure_average.y, figure_average.z,
+                                  M_PI_2/3);
 
     figure_t* figure_bis_p = figure_copy(figure_p);
     for(int frame=0; frame<frame_count; ++frame)
@@ -191,10 +193,11 @@ main(int argc, char* argv[])
         const vector_t rotation_axis = vector_add(VECTOR_X, VECTOR_Z);
         for(uint32_t point = 0; point < figure_length(figure_bis_p); point++)
         {
-             vector_rotate_axial(point_vector(figure_point(figure_bis_p, point)),
-                                 VECTOR_0,
-                                 rotation_axis,
-                                 (float) frame * 2.*M_PI/frame_count);
+            float angle = (float) frame * 2.*M_PI/frame_count;
+            vector_rotate_axial(point_vector(figure_point(figure_bis_p, point)),
+                                VECTOR_0,
+                                rotation_axis,
+                                angle);
         }
         performance_try_add(&process_performance);
 
