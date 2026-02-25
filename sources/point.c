@@ -119,7 +119,7 @@ void point_render(const void* this_p,
                   image_t* image_p,
                   const camera_t* camera_p)
 {
-    point_t* point_p = (point_t*) this_p;
+    point_t* point_p = (point_t*) this_p; //const OK
     render_vector(*point_vector(point_p),
                   *point_colour(point_p),
                   image_p,

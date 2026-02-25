@@ -19,8 +19,10 @@ void    edge_free(edge_t* edge_p);
 
 vector_t edge_get_vector(const edge_t* edge_p, float fraction);
 
-void edge_render(const edge_t* edge,
+void edge_render(const void* this_p,
                  image_t* image_p,
                  const camera_t* camera_p);
+
+renderable_i* edge_renderable(edge_t* edge_p);
 
 #endif /* HEADERS_EDGE_H_ */

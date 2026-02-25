@@ -8,6 +8,7 @@
 
 typedef struct edge_t
 {
+    renderable_i renderable;
     vector_t* array[2];
     colour_t colour;
 } edge_t;
@@ -16,14 +17,15 @@ typedef struct edge_t
 edge_t*
 edge_init(vector_t* a_p, vector_t* b_p, colour_t colour)
 {
-    edge_t edge =
-    {
-        {a_p, b_p},
-        colour
-    };
-    edge_t* edge_p = malloc(sizeof(edge));
+    edge_t* edge_p = malloc(sizeof(edge_t));
     if(edge_p != NULL)
     {
+        edge_t edge =
+        {
+            renderable_init(&edge_render, edge_p),
+            {a_p, b_p},
+            colour
+        };
         *edge_p = edge;
     }
     return edge_p;
@@ -47,10 +49,12 @@ edge_get_vector(const edge_t* edge_p, float fraction)
 }
 
 void
-edge_render(const edge_t* edge_p,
+edge_render(const void* this_p,
             image_t* image_p,
             const camera_t* camera_p)
 {
+
+    const edge_t* edge_p = this_p;
 
     vector_t image_points[]=
     {
@@ -69,3 +73,8 @@ edge_render(const edge_t* edge_p,
     }
 }
 
+renderable_i*
+edge_renderable(edge_t* edge_p)
+{
+    return &edge_p->renderable;
+}
