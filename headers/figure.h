@@ -30,9 +30,11 @@ uint32_t  figure_length(const figure_t* figure_p);
 point_t*  figure_point(const figure_t* figure_p, uint32_t index);
 vector_t  figure_get_average_point(const figure_t* figure_p);
 
-void figure_render(const figure_t* figure_p,
+void figure_render(const void* this_p,
                    image_t* image_p,
                    const camera_t* camera_p);
+
+renderable_i* figure_renderable(figure_t* figure_p);
 
 // Draws a sequence of points into an image.
 void figure_draw(const figure_t* figure, image_t* image_p);

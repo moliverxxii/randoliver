@@ -14,6 +14,7 @@
 
 typedef struct figure_t
 {
+    renderable_i renderable;
     uint32_t length;
     point_t** array;
 } figure_t;
@@ -21,21 +22,33 @@ typedef struct figure_t
 figure_t*
 figure_init(uint32_t point_count)
 {
-    figure_t figure;
-
-    figure.length = point_count;
-    figure.array = (point_t**) malloc(point_count * sizeof(point_t*));
-
-    for(uint32_t point = 0; point < point_count; ++point)
-    {
-        figure.array[point] = point_init(0, 0, 0, BLACK);
-    }
-
     figure_t* figure_p = malloc(sizeof(figure_t));
+
     if(figure_p != NULL)
     {
-        *figure_p = figure;
+        figure_t figure =
+        {
+                renderable_init(&figure_render, figure_p),
+                point_count,
+                malloc(point_count * sizeof(point_t*))
+        };
+
+        if(figure.array != NULL)
+        {
+            for(uint32_t point = 0; point < point_count; ++point)
+            {
+                figure.array[point] = point_init(0, 0, 0, BLACK);
+            }
+            *figure_p = figure;
+        }
+        else
+        {
+            free(figure_p);
+            figure_p = 0;
+
+        }
     }
+
     return figure_p;
 }
 
@@ -110,14 +123,22 @@ figure_get_average_point(const figure_t* figure_p)
 }
 
 void
-figure_render(const figure_t* figure_p,
+figure_render(const void* this_p,
               image_t* image_p,
               const camera_t* camera_p)
 {
+    const figure_t* figure_p = this_p;
+
     for(uint32_t point = 0; point < figure_length(figure_p); ++point)
     {
         renderable_render(point_renderable(figure_point(figure_p, point)), image_p, camera_p);
     }
+}
+
+renderable_i*
+figure_renderable(figure_t* figure_p)
+{
+    return &figure_p->renderable;
 }
 
 void
