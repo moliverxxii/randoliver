@@ -11,8 +11,9 @@ DIRS = $(OBJECT_DIR) $(DEPENDENCY_DIR)
 #SYSTEM := -D__BSD_VISIBLE
 SYSTEM = -D_POSIX_C_SOURCE=200112L
 
+OPTIMISE = 3
 #CC_FLAGS = -std=c99 -Wall -Wextra -pedantic -D$(SYSTEM) -g -I$(HEADER_DIR)
-CC_FLAGS = -Wall -Wextra -pedantic -O1 $(SYSTEM) -g -I$(HEADER_DIR) $(SANITIZE)
+CC_FLAGS = -Wall -Wextra -pedantic -O$(OPTIMISE) -Wno-strict-prototypes $(SYSTEM) -g -I$(HEADER_DIR) $(SANITIZE)
 DEPENDENCY_FLAGS = -MMD
 CC = clang
 PROJECT = randoliver
@@ -36,6 +37,7 @@ clean:
 rebuild: clean all
 
 debug: SANITIZE = -fsanitize=address
+debug: OPTIMISE = g
 debug: CC = $(shell /usr/local/bin/brew --prefix llvm)/bin/clang
 debug: rebuild
 
