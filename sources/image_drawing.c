@@ -55,14 +55,13 @@ barres1(image_t* image, int spread)
     uint32_t y;
     uint32_t x;
     uint32_t x_prime;
-    int bool = 1;
+    int is_in_image = 1;
 
     for(y = 0; y < image_height(image); ++y)
     {
         x = 2;
         x_prime = x;
-        bool = 1;
-        while(bool)
+        do
         {
 
             for(i = 0; i < 3; ++i)
@@ -71,8 +70,8 @@ barres1(image_t* image, int spread)
             }
             x += spread;
             x_prime = x + (rand() % 5 - 2);
-            bool = x_prime < image_width(image);
-        }
+            is_in_image = x_prime < image_width(image);
+        } while(is_in_image);
     }
     printf("Processus terminé\n");
 
@@ -87,15 +86,14 @@ barres2(image_t* image, int spread)
     uint32_t y;
     uint32_t x;
     uint32_t x_prime[3];
-    int bool;
+    int is_in_image;
 
     for(y = 0; y < image_height(image); ++y)
     {
         x = 2;
         for(i = 0; i < 3; ++i)
             x_prime[i] = x;
-        bool = 1;
-        while(bool)
+        do
         {
 
             for(i = 0; i < 3; ++i)
@@ -105,9 +103,9 @@ barres2(image_t* image, int spread)
             x += spread;
             for(i = 0; i < 3; ++i)
                 x_prime[i] = x + (rand() % 5 - 2);
-            bool = (x_prime[0] < image_width(image)) && (x_prime[1] < image_width(image))
-                 && (x_prime[2] < image_width(image));
-        }
+            is_in_image = (x_prime[0] < image_width(image)) && (x_prime[1] < image_width(image))
+                       && (x_prime[2] < image_width(image));
+        } while(is_in_image);
     }
     printf("Processus terminé\n");
 }
