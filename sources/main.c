@@ -17,10 +17,9 @@
 #include "camera.h"
 #include "utility.h"
 #include "performance.h"
-#include "edge.h"
 #include "figure.h"
 #include "triangle.h"
-
+#include "solid.h"
 //#define OLI_BROWN
 //#define OLI_TEST_PATTERN
 
@@ -80,78 +79,21 @@ main(int argc, char* argv[])
 #endif //OLI_TEST_PATTERN
 
 //Animation
-    int frame_count = 360;
-    figure_t* figure_p = figure_init(point_count);
+    int frame_count = 1;
     #ifdef OLI_3D
     //3
     performance_t render_performance = performance_init("rendu");
     performance_t process_performance = performance_init("processus");
     performance_t frame_performance = performance_init("image");
-    *point_vector(figure_point(figure_p, 0)) = vector_init( 1,  0,  0);
-    *point_vector(figure_point(figure_p, 1)) = vector_init( 0,  1,  0);
-    *point_vector(figure_point(figure_p, 2)) = vector_init(-1,  0,  0);
-    *point_vector(figure_point(figure_p, 3)) = vector_init( 0, -1,  0);
-    *point_vector(figure_point(figure_p, 4)) = vector_init( 0,  0,  1);
-    *point_vector(figure_point(figure_p, 5)) = vector_init( 0,  0, -1);
 
-    for(uint32_t point = 0; point < point_count; ++point)
-    {
-        *point_colour(figure_point(figure_p, point)) = WHITE;
-    }
+    solid_init_const();
 
-    vector_t figure_average = figure_get_average_point(figure_p);
-    vector_print(figure_average);
-
-    camera_t camera = camera_init(figure_average.x, -10, 1,
-                                  figure_average.x, figure_average.y, figure_average.z,
+    camera_t camera = camera_init(0, -10, 1,
+                                  0, 0, 0,
                                   M_PI_2/3);
 
-    figure_t* figure_bis_p = figure_copy(figure_p);
     for(int frame=0; frame<frame_count; ++frame)
     {
-        edge_t* edge_array[] =
-        {
-            edge_init(point_vector(figure_point(figure_bis_p, 0)), point_vector(figure_point(figure_bis_p, 1)), RED),
-            edge_init(point_vector(figure_point(figure_bis_p, 1)), point_vector(figure_point(figure_bis_p, 2)), RED),
-            edge_init(point_vector(figure_point(figure_bis_p, 2)), point_vector(figure_point(figure_bis_p, 3)), RED),
-            edge_init(point_vector(figure_point(figure_bis_p, 3)), point_vector(figure_point(figure_bis_p, 0)), RED),
-            edge_init(point_vector(figure_point(figure_bis_p, 0)), point_vector(figure_point(figure_bis_p, 4)), BLUE),
-            edge_init(point_vector(figure_point(figure_bis_p, 4)), point_vector(figure_point(figure_bis_p, 2)), BLUE),
-            edge_init(point_vector(figure_point(figure_bis_p, 2)), point_vector(figure_point(figure_bis_p, 5)), BLUE),
-            edge_init(point_vector(figure_point(figure_bis_p, 5)), point_vector(figure_point(figure_bis_p, 0)), BLUE),
-            edge_init(point_vector(figure_point(figure_bis_p, 1)), point_vector(figure_point(figure_bis_p, 4)), GREEN),
-            edge_init(point_vector(figure_point(figure_bis_p, 4)), point_vector(figure_point(figure_bis_p, 3)), GREEN),
-            edge_init(point_vector(figure_point(figure_bis_p, 3)), point_vector(figure_point(figure_bis_p, 5)), GREEN),
-            edge_init(point_vector(figure_point(figure_bis_p, 5)), point_vector(figure_point(figure_bis_p, 1)), GREEN),
-        };
-
-        triangle_t* solid[] =
-        {
-            triangle_init(point_vector(figure_point(figure_bis_p, 0)),
-                          point_vector(figure_point(figure_bis_p, 1)),
-                          point_vector(figure_point(figure_bis_p, 4)), GREEN),
-            triangle_init(point_vector(figure_point(figure_bis_p, 2)),
-                          point_vector(figure_point(figure_bis_p, 1)),
-                          point_vector(figure_point(figure_bis_p, 4)), MAGENTA),
-            triangle_init(point_vector(figure_point(figure_bis_p, 2)),
-                          point_vector(figure_point(figure_bis_p, 3)),
-                          point_vector(figure_point(figure_bis_p, 4)), BLUE),
-            triangle_init(point_vector(figure_point(figure_bis_p, 0)),
-                          point_vector(figure_point(figure_bis_p, 3)),
-                          point_vector(figure_point(figure_bis_p, 4)), RED),
-            triangle_init(point_vector(figure_point(figure_bis_p, 0)),
-                          point_vector(figure_point(figure_bis_p, 1)),
-                          point_vector(figure_point(figure_bis_p, 5)), BLUE),
-            triangle_init(point_vector(figure_point(figure_bis_p, 2)),
-                          point_vector(figure_point(figure_bis_p, 1)),
-                          point_vector(figure_point(figure_bis_p, 5)), RED),
-            triangle_init(point_vector(figure_point(figure_bis_p, 2)),
-                          point_vector(figure_point(figure_bis_p, 3)),
-                          point_vector(figure_point(figure_bis_p, 5)), GREEN),
-            triangle_init(point_vector(figure_point(figure_bis_p, 0)),
-                          point_vector(figure_point(figure_bis_p, 3)),
-                          point_vector(figure_point(figure_bis_p, 5)), MAGENTA),
-        };
         performance_try_start(&frame_performance);
         interface_state_restore();
         printf("Image %u\n", frame);
@@ -161,24 +103,13 @@ main(int argc, char* argv[])
 
         performance_try_start(&render_performance);
         renderable_cache_clear();
-        //figure_render(figure_bis_p, image_p, &camera);
-        for(uint32_t edge=0; edge<sizeof(edge_array)/sizeof(edge_array[0]); ++edge)
-        {
-            edge_render(edge_array[edge], image_p, &camera);
-            edge_free(edge_array[edge]);
-        }
-        for(uint32_t triangle=0; triangle<sizeof(solid)/sizeof(solid[0]); ++triangle)
-        {
-            triangle_render(solid[triangle], image_p, &camera);
-            triangle_free(solid[triangle]);
-        }
-        figure_free(figure_bis_p);
-        figure_bis_p = NULL;
+
+        solid_render(OCTAHEDRON_P, image_p, &camera);
         performance_try_add(&render_performance);
 
-        char* file_name_p = num_extension(file_name_prefix_p, frame);
-
         image_scale(image_p, 1/scale, SCALE_ALGORITHM_LINEAR);
+
+        char* file_name_p = num_extension(file_name_prefix_p, frame);
         image_file_p = image_file_init(file_name_p, image_p);
         image_file_free(image_file_p);
         image_file_p = NULL;
@@ -189,21 +120,19 @@ main(int argc, char* argv[])
 
         //OPERATION
         performance_try_start(&process_performance);
-        figure_bis_p = figure_copy(figure_p);
         const vector_t rotation_axis = vector_add(VECTOR_X, VECTOR_Z);
-        for(uint32_t point = 0; point < figure_length(figure_bis_p); point++)
-        {
-            float angle = (float) frame * 2.*M_PI/frame_count;
-            vector_rotate_axial(point_vector(figure_point(figure_bis_p, point)),
-                                VECTOR_0,
-                                rotation_axis,
-                                angle);
-        }
+//        for(uint32_t point = 0; point < solid_length(figure_bis_p); point++)
+//        {
+//            float angle = (float) frame * 2.*M_PI/frame_count;
+//            vector_rotate_axial(point_vector(figure_point(figure_bis_p, point)),
+//                                VECTOR_0,
+//                                rotation_axis,
+//                                angle);
+//        }
         performance_try_add(&process_performance);
 
         performance_try_add(&frame_performance);
     }
-    figure_free(figure_bis_p);
     performance_free(&render_performance);
     performance_free(&process_performance);
     performance_free(&frame_performance);
@@ -239,7 +168,6 @@ main(int argc, char* argv[])
         image_set(image_p);
     }
 #endif
-    figure_free(figure_p);
 
 #ifdef OLI_FIG_2
     test_pattern_squares(image_p, 1);
