@@ -158,8 +158,10 @@ interface_state_save()
 {
     set_cursor_escape(DEVICE_STATUS_REPORT);
     fflush(stdout); //On s'assure que les donnees sortent.
+#ifndef NDEBUG
     const char* p_text = get_terminal_response();
     sscanf(p_text, "\033[%d;%dR", &interface.row, &interface.column);
+#endif //NDEBUG
 }
 
 

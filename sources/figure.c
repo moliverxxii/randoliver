@@ -148,7 +148,12 @@ figure_draw(const figure_t* figure, image_t* image_p)
     {
         if(point_is_in_image(figure->array[point], image_p))
         {
-            (*public_point_renderer)(figure->array[point], image_p);
+            point_t* point_p = figure_point(figure, point);
+
+            image_pixel_set(image_p,
+                            point_vector(point_p)->x,
+                            point_vector(point_p)->y,
+                            *point_colour(point_p));
         }
     }
 }

@@ -34,11 +34,6 @@ typedef void (*point_renderer_f)(const point_t*, image_t*);
 
 extern point_renderer_f public_point_renderer;
 
-void point_draw(const point_t* point_p, image_t* image_p);
-void point_or(const point_t* point_p, image_t* image_p);
-void point_xor(const point_t* point_p, image_t* image_p);
-void point_average(const point_t* point_p, image_t* image_p);
-
 int point_is_in_image(const point_t* point_p, const image_t* image_p);
 
 #endif /* HEADERS_POINT_H_ */

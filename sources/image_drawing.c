@@ -124,9 +124,7 @@ test_pattern_squares(image_t* image_p, uint32_t period)
     {
         for(uint32_t x=0; x < image_width(image_p); ++x)
         {
-            point_t* point_p = point_init(x, y, 0, square_colours_p[x/period + (y/period)*x_squares]);
-            point_draw(point_p, image_p);
-            point_free(point_p);
+            image_pixel_set(image_p, x, y, square_colours_p[x/period + (y/period)*x_squares]);
         }
 
     }
