@@ -29,6 +29,7 @@ typedef struct solid_t
 static uint32_t solid_count_vertex(uint32_t face_count, triangle_t* faces_p);
 
 static vector_t VERTEX[6];
+static edge_t* EDGES[12];
 static triangle_t* FACES[8];
 
 
@@ -51,7 +52,6 @@ solid_init_const()
     };
     memcpy(VERTEX, vertices, sizeof(VERTEX));
 
-
     edge_t* edge_array[] =
     {
         edge_init(&VERTEX[0], &VERTEX[1], RED),
@@ -67,33 +67,18 @@ solid_init_const()
         edge_init(&VERTEX[3], &VERTEX[5], GREEN),
         edge_init(&VERTEX[5], &VERTEX[1], GREEN)
     };
+    memcpy(EDGES, edge_array, sizeof(EDGES));
 
     triangle_t* faces[] =
     {
-        triangle_init(&VERTEX[0],
-                      &VERTEX[1],
-                      &VERTEX[4], GREEN),
-        triangle_init(&VERTEX[2],
-                      &VERTEX[1],
-                      &VERTEX[4], MAGENTA),
-        triangle_init(&VERTEX[2],
-                      &VERTEX[3],
-                      &VERTEX[4], BLUE),
-        triangle_init(&VERTEX[0],
-                      &VERTEX[3],
-                      &VERTEX[4], RED),
-        triangle_init(&VERTEX[0],
-                      &VERTEX[1],
-                      &VERTEX[5], BLUE),
-        triangle_init(&VERTEX[2],
-                      &VERTEX[1],
-                      &VERTEX[5], RED),
-        triangle_init(&VERTEX[2],
-                      &VERTEX[3],
-                      &VERTEX[5], GREEN),
-        triangle_init(&VERTEX[0],
-                      &VERTEX[3],
-                      &VERTEX[5], MAGENTA),
+        triangle_init_list(VERTEX, 0, 1, 4, GREEN),
+        triangle_init_list(VERTEX, 2, 1, 4, MAGENTA),
+        triangle_init_list(VERTEX, 2, 3, 4, BLUE),
+        triangle_init_list(VERTEX, 0, 3, 4, RED),
+        triangle_init_list(VERTEX, 0, 1, 5, BLUE),
+        triangle_init_list(VERTEX, 2, 1, 5, RED),
+        triangle_init_list(VERTEX, 2, 3, 5, GREEN),
+        triangle_init_list(VERTEX, 0, 3, 5, MAGENTA),
     };
     memcpy(FACES, faces, sizeof(FACES));
 
