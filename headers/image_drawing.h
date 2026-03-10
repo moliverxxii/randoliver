@@ -30,5 +30,6 @@ void barres1(image_t* image, int spread);
 void barres2(image_t* image, int spread);
 
 void test_pattern_squares(image_t* image_p, uint32_t period);
+void test_pattern_scan(image_t* image_p);
 
 #endif /* HEADERS_IMAGE_DRAWING_H_ */

@@ -131,4 +131,20 @@ test_pattern_squares(image_t* image_p, uint32_t period)
     free(square_colours_p);
 }
 
+void
+test_pattern_scan(image_t* image_p)
+{
+    for(uint32_t y = 0; y < image_height(image_p); ++y)
+    {
+        for(uint32_t x = 0; x < image_width(image_p); ++x)
+        {
+            colour_t colour = colour_init(x%(COLOUR_MAX + 1),
+                                          y%(COLOUR_MAX + 1),
+                                          ((x*y)/image_width(image_p))%(COLOUR_MAX + 1));
+            image_pixel_set(image_p, x, y, colour);
+
+        }
+    }
+}
+
 

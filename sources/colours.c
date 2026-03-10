@@ -20,6 +20,14 @@ const colour_t MAGENTA = {{0xFF, 0x00, 0xFF}};
 const colour_t YELLOW  = {{0x00, 0xFF, 0xFF}};
 
 colour_t
+colour_init(colour_value_t red,
+            colour_value_t green,
+            colour_value_t blue)
+{
+    return (colour_t) {{blue, green, red}};
+}
+
+colour_t
 colour_get_random()
 {
     uint32_t colour_raw = rand();

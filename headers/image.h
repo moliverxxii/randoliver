@@ -17,6 +17,15 @@ typedef colour_t* row_t;
 
 /** Conteneur avec les donnees de bases d'une image.
  *  Doit être utilisé pour tous les traitements d'images.
+ *
+ *  image NxM
+ *  c(0,0)   - c(1,0)   - ... - c(N-1,0)
+ *  |                         |
+ *  c(0,1)   - c(1,1)   - ... - c(N-1,1)
+ *  |                         |
+ *  :                         :
+ *  |                         |
+ *  c(0,M-1) - c(1,M-1) - ... - c(N-1,M-1)
  */
 typedef struct image_t image_t;
 

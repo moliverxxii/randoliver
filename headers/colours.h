@@ -51,6 +51,9 @@ typedef colour_t (*colour_unary_operator)(colour_t, void*);
 typedef colour_t (*colour_binary_operator)(colour_t, colour_t, void*);
 typedef colour_t (*colour_ternary_operator)(colour_t, colour_t, colour_t, void*);
 
+colour_t colour_init(colour_value_t red,
+                     colour_value_t green,
+                     colour_value_t blue);
 
 colour_t colour_get_random();
 

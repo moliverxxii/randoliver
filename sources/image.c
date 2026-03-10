@@ -44,8 +44,6 @@ const scale_function_t SCALE_FUNCTION_TABLE[SCALE_ALGORITHM_COUNT] =
 image_t*
 image_init(uint32_t width, uint32_t height)
 {
-
-
     image_t image =
     {
         width,

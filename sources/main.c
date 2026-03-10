@@ -20,10 +20,12 @@
 #include "figure.h"
 #include "triangle.h"
 #include "solid.h"
+
 //#define OLI_BROWN
 //#define OLI_TEST_PATTERN
+#define OLI_TEST_PATTERN_SCAN
 
-#define OLI_3D
+//#define OLI_3D
 //#define OLI_FIG
 //#define OLI_FIG_2
 
@@ -45,10 +47,8 @@ main(int argc, char* argv[])
     int height = 720;
 
     float scale = 7.0f;
-    image_file_t* image_file_p;
-
     //Initialisation de l'image.
-    image_t* image_p  = image_init(scale*width, scale* height);
+    image_t* image_p  = image_init(width, height);
     image_set(image_p);
     //Initialisation des particules
     srand(time(NULL));
@@ -60,25 +60,25 @@ main(int argc, char* argv[])
 
 #ifdef OLI_BROWN
     brownien1(image_p, point_count, 1, width/2, height/2);
-    image_file_p = image_file_init(file_name_prefix_p, image_p);
-
-    image_file_write(image_file_p, image_p);
-    image_file_free(image_file_p);
-    image_set(image_p);
+    image_file_write(file_name_prefix_p, image_p);
 #endif /* OLI_BROWN */
 
 
 #ifdef OLI_TEST_PATTERN
-    image_scale(&image_p, 1.0f/height, SCALE_ALGORITHM_LINEAR);
+    image_scale(image_p, 1.0f/height, SCALE_ALGORITHM_LINEAR);
     test_pattern_squares(image_p, 1);
-    image_scale(&image_p, 960, SCALE_ALGORITHM_LINEAR);
-    image_scale(&image_p, 10.0f/960, SCALE_ALGORITHM_LINEAR);
-    image_scale(&image_p, 96, SCALE_ALGORITHM_LINEAR);
-    image_file_p = image_file_init(file_name_prefix_p, image_p);
-    image_file_free(image_file_p);
+    image_scale(image_p, 960, SCALE_ALGORITHM_LINEAR);
+    image_scale(image_p, 10.0f/960, SCALE_ALGORITHM_LINEAR);
+    image_scale(image_p, 96, SCALE_ALGORITHM_LINEAR);
+    image_file_write(file_name_prefix_p, image_p);
 #endif //OLI_TEST_PATTERN
 
-//Animation
+#ifdef OLI_TEST_PATTERN_SCAN
+    test_pattern_scan(image_p);
+    image_file_write(file_name_prefix_p, image_p);
+#endif //OLI_TEST_PATTERN_SCAN
+
+    //Animation
     int frame_count = 1;
     #ifdef OLI_3D
     //3
@@ -110,9 +110,7 @@ main(int argc, char* argv[])
         image_scale(image_p, 1/scale, SCALE_ALGORITHM_LINEAR);
 
         char* file_name_p = num_extension(file_name_prefix_p, frame);
-        image_file_p = image_file_init(file_name_p, image_p);
-        image_file_free(image_file_p);
-        image_file_p = NULL;
+        image_file_write(file_name_p, image_p);
 
         image_scale(image_p, scale, SCALE_ALGORITHM_LINEAR);
         free(file_name_p);
@@ -139,32 +137,31 @@ main(int argc, char* argv[])
 #endif /* OLI_3D */
 
 #ifdef OLI_FIG
-    for(uint32_t point_n=0; point_n<figure_p.amount; ++point_n)
+    figure_t* figure_p = figure_init(point_count);
+    for(uint32_t point = 0; point < figure_length(figure_p); ++point)
     {
-        *point_vector(figure_p.array[point_n]) = vector_init(image_width(image_p)/2, image_height(image_p)/2, 0);
-        *point_colour(figure_p.array[point_n]) = colour_get_random();
+        *point_vector(figure_point(figure_p, point)) = vector_init(image_width(image_p)/2, image_height(image_p)/2, 0);
+        *point_colour(figure_point(figure_p, point)) = colour_get_random();
     }
     
 
-    for(int frame=0; frame<frame_count; ++frame)
+    for(int frame = 0; frame < frame_count; ++frame)
     {
         interface_state_restore();
         printf("Image %u\n", frame);
-        for(uint32_t point_n=0; point_n<figure_p.amount;++point_n)
+        for(uint32_t point = 0; point < figure_length(figure_p); ++point)
         {
-           vector_random_delta(point_vector(figure_p.array[point_n]),
-                             point_n,
+           vector_random_delta(point_vector(figure_point(figure_p, point)),
+                             point,
                              image_width(image_p),
                              image_height(image_p));
         }
+        figure_draw(figure_p, image_p);
+
         char* file_name_p = num_extension(file_name_prefix_p, frame);
-
-        image_file_p = image_file_init(file_name_p, image_p);
-
-        figure_draw(&figure_p, image_p);
-        image_file_write(image_file_p, image_p);
+        image_file_write(file_name_p, image_p);
         free(file_name_p);
-        image_file_free(image_file_p);
+
         image_set(image_p);
     }
 #endif
@@ -177,24 +174,23 @@ main(int argc, char* argv[])
         interface_state_restore();
         printf("Image %u\n", frame);
         
-        figure_t figure_p = figure_from_image(image_p);
-        for(uint32_t point=0; point<figure_p.amount;++point)
+        figure_t* figure_p = figure_from_image(image_p);
+        for(uint32_t point = 0; point<figure_length(figure_p); ++point)
         {
-           vector_random_delta(point_vector(figure_p.array[point]),
+           vector_random_delta(point_vector(figure_point(figure_p, point)),
                              8,
                              image_width(image_p),
                              image_height(image_p));
         }
 
-        figure_draw(&figure_p, image_p);
-        figure_free(&figure_p);
-        image_scale(&image_p, 1.0f/8, SCALE_ALGORITHM_DUMB);
-        image_scale(&image_p, 8, SCALE_ALGORITHM_DUMB);
+        figure_draw(figure_p, image_p);
+        figure_free(figure_p);
+        image_scale(image_p, 1.0f/8, SCALE_ALGORITHM_DUMB);
+        image_scale(image_p, 8, SCALE_ALGORITHM_DUMB);
 
         char* file_name_p = num_extension(file_name_prefix_p, frame);
-        image_file_p = image_file_init(file_name_p, image_p);
+        image_file_write(file_name_p, image_p);
         free(file_name_p);
-        image_file_free(image_file_p);
     }
 #endif
 
