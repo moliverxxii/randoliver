@@ -186,7 +186,7 @@ renderable_vector_position(vector_t point, image_t* image_p,
                 / (2 * op_u_scalaire * tan(camera_context.angle/2));
 
     float x_image_scale = -scale * op_v_scalaire;
-    float y_image_scale =  scale * op_w_scalaire;
+    float y_image_scale = -scale * op_w_scalaire;
 
     x_image_scale += (float) image_width(image_p)  / 2;
     y_image_scale += (float) image_height(image_p) / 2;

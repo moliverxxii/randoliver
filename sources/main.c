@@ -140,8 +140,11 @@ main(int argc, char* argv[])
     figure_t* figure_p = figure_init(point_count);
     for(uint32_t point = 0; point < figure_length(figure_p); ++point)
     {
-        *point_vector(figure_point(figure_p, point)) = vector_init(image_width(image_p)/2, image_height(image_p)/2, 0);
-        *point_colour(figure_point(figure_p, point)) = colour_get_random();
+        *point_vector(figure_point(figure_p, point))
+                = vector_init(image_width(image_p)/2,
+                              image_height(image_p)/2, 0);
+        *point_colour(figure_point(figure_p, point))
+                = colour_get_random();
     }
     
 
@@ -152,9 +155,9 @@ main(int argc, char* argv[])
         for(uint32_t point = 0; point < figure_length(figure_p); ++point)
         {
            vector_random_delta(point_vector(figure_point(figure_p, point)),
-                             point,
-                             image_width(image_p),
-                             image_height(image_p));
+                               point,
+                               image_width(image_p),
+                               image_height(image_p));
         }
         figure_draw(figure_p, image_p);
 
