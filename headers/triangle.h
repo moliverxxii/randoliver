@@ -8,6 +8,14 @@
 
 typedef struct triangle_t triangle_t;
 
+typedef enum
+{
+    TRIANGLE_POINT_A = 0,
+    TRIANGLE_POINT_B,
+    TRIANGLE_POINT_C,
+    TRIANGLE_POINT_COUNT
+} triangle_point_e;
+
 triangle_t* triangle_init(vector_t* a_p, vector_t* b_p, vector_t* c_p,
                          colour_t colour);
 triangle_t* triangle_init_list(vector_t* list_p,

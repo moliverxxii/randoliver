@@ -51,6 +51,7 @@ triangle_init(vector_t* a_p, vector_t* b_p, vector_t* c_p,
     return triangle_p;
 }
 
+
 triangle_t*
 triangle_init_list(vector_t* list_p, uint32_t a, uint32_t b, uint32_t c,
               colour_t colour)
@@ -91,13 +92,30 @@ static void triangle_render_crystal(const triangle_t* triangle_p,
                                     image_t* image_p,
                                     const camera_t* camera_p);
 
+typedef void (* triangle_render_f) (const triangle_t* triangle_p,
+                                    image_t* image_p,
+                                    const camera_t* camera_p);
+
+enum triangle_render_method
+{
+    TRIANGLE_RENDER_METHOD_TENT = 0,
+    TRIANGLE_RENDER_METHOD_CRYSTAL,
+    TRIANGLE_RENDER_METHOD_COUNT,
+};
+
+static triangle_render_f const TRIANGLE_RENDER_TABLE[TRIANGLE_RENDER_METHOD_COUNT] =
+{
+    &triangle_render_tent,
+    &triangle_render_crystal
+};
+
 void
 triangle_render(const void* this_p,
                 image_t* image_p,
                 const camera_t* camera_p)
 {
     const triangle_t* triangle_p = this_p;
-    triangle_render_crystal(triangle_p, image_p, camera_p);
+    (*TRIANGLE_RENDER_TABLE[TRIANGLE_RENDER_METHOD_CRYSTAL])(triangle_p, image_p, camera_p);
 }
 
 renderable_i*
@@ -179,7 +197,7 @@ static vector_t*
 triangle_vector(triangle_t* triangle_p, uint32_t index)
 {
     vector_t* vector_p = NULL;
-    if(index < 3)
+    if(index < TRIANGLE_POINT_COUNT)
     {
         switch(triangle_p->type)
         {

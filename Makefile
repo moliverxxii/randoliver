@@ -8,23 +8,20 @@ HEADERS = $(SOURCES:$(SOURCE_DIR)/%.c=$(HEADER_DIR)/%.h)
 OBJECTS = $(SOURCES:$(SOURCE_DIR)/%.c=$(OBJECT_DIR)/%.o)
 DEPENDENCIES = $(SOURCES:$(SOURCE_DIR)/%.c=$(DEPENDENCY_DIR)/%.d)
 DIRS = $(OBJECT_DIR) $(DEPENDENCY_DIR)
-#SYSTEM := -D__BSD_VISIBLE
-SYSTEM = -D_POSIX_C_SOURCE=200112L
 
 OPTIMISE = 3
-#CC_FLAGS = -std=c99 -Wall -Wextra -pedantic -D$(SYSTEM) -g -I$(HEADER_DIR)
-CC_FLAGS = -Wall -Wextra -pedantic -O$(OPTIMISE) -Wno-strict-prototypes $(SYSTEM) -g -I$(HEADER_DIR) $(SANITIZE)
+CC_FLAGS = -c -g -pedantic -Wall -Wextra -Wno-strict-prototypes -O$(OPTIMISE) $(SYSTEM) -I$(HEADER_DIR) $(SANITIZE)
 DEPENDENCY_FLAGS = -MMD
-CC = clang
+CC = gcc
 PROJECT = randoliver
 
 all: $(PROJECT)
 
 $(PROJECT): $(OBJECTS)
 	$(CC) -o $@ $^ $(SANITIZE) -lm
-	
+
 $(OBJECTS): $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c | $(OBJECT_DIR) $(DEPENDENCY_DIR)
-	$(CC) $(CC_FLAGS) $(DEPENDENCY_FLAGS) -MF $(patsubst $(@D)%.o,$(DEPENDENCY_DIR)%.d, $@) -c -o $@ $< 
+	$(CC) $(CC_FLAGS) $(DEPENDENCY_FLAGS) -MF $(patsubst $(@D)%.o,$(DEPENDENCY_DIR)%.d,$@) -o $@ $< 
 
 -include $(DEPENDENCIES)
 
@@ -37,12 +34,13 @@ clean:
 rebuild: clean all
 
 debug: SANITIZE = -fsanitize=address
-debug: OPTIMISE = g
-debug: CC = $(shell /usr/local/bin/brew --prefix llvm)/bin/clang
+debug: OPTIMISE = 0
+#debug: CC = $(shell /usr/local/bin/brew --prefix llvm)/bin/clang
 debug: rebuild
+debug: CC_FLAGS += -DNDEBUG
 
-ANALYZER = $(shell /usr/local/bin/brew --prefix llvm)/bin/scan-build
-#ANALYZER = scan-build
+#ANALYZER = $(shell /usr/local/bin/brew --prefix llvm)/bin/scan-build
+ANALYZER = scan-build
 
 analysis: clean
 	$(ANALYZER) -o $(PROJECT)-analysis make $(PROJECT)

@@ -7,3 +7,6 @@ open your shell.
 once in the directory build with "make all".
 then run with "./randoliver".
 
+randoliver -i input.txt output
+- input.txt: parametres sous formes d'un fichier texte.
+- output: nom du rendu.

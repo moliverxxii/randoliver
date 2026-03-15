@@ -7,6 +7,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "solid.h"
 #include "edge.h"
@@ -23,10 +24,6 @@ typedef struct solid_t
     float rotation2;
     float rotation3;
 } solid_t;
-
-
-
-static uint32_t solid_count_vertex(uint32_t face_count, triangle_t* faces_p);
 
 static vector_t VERTEX[6];
 static edge_t* EDGES[12];
@@ -97,14 +94,49 @@ solid_init_const()
 }
 
 solid_t*
-solid_init(uint32_t face_count, triangle_t* faces_p)
+solid_init(uint32_t vertex_count, const vector_t* vertices_p,
+           uint32_t face_count, const uint32_t **faces_p)
 {
-    return NULL;
+    solid_t* solid_p = malloc(sizeof(solid_t));
+    if(solid_p != NULL)
+    {
+        solid_t solid =
+        {
+            renderable_init(solid_render, solid_p),
+            vertex_count,
+            malloc(vertex_count * sizeof(vector_t)),
+            face_count,
+            malloc(face_count * sizeof(triangle_t*)),
+            VECTOR_0,
+            0, 0, 0
+        };
+
+        memcpy(solid.vertex_array_p, vertices_p, vertex_count * sizeof(vector_t));
+
+        for(uint32_t face = 0; face < solid.face_count; ++face)
+        {
+            printf("solid_init face: %u\n", face);
+            solid.faces_array_p[face] = triangle_init_list(solid.vertex_array_p,
+                   faces_p[face][0],
+                   faces_p[face][1],
+                   faces_p[face][2], colour_get_random());
+        }
+
+        *solid_p = solid;
+    }
+    return solid_p;
 }
 
 void
 solid_free(solid_t* solid_p)
 {
+    for(uint32_t face=0; face < solid_p->face_count; ++face)
+    {
+        triangle_free(solid_p->faces_array_p[face]);
+    }
+    free(solid_p->faces_array_p);
+    free(solid_p->vertex_array_p);
+    free(solid_p);
 }
 
 void

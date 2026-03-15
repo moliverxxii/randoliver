@@ -4,28 +4,30 @@
  *  Created on: 13 févr. 2019
  *      Author: moliver
  */
+#include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include <math.h>
 
-#include "interface.h"
-#include "image.h"
-#include "image_file.h"
-#include "image_drawing.h"
 #include "camera.h"
-#include "utility.h"
-#include "performance.h"
+#include "engine.h"
 #include "figure.h"
-#include "triangle.h"
+#include "image.h"
+#include "image_drawing.h"
+#include "image_file.h"
+#include "interface.h"
+#include "performance.h"
 #include "solid.h"
+#include "solid_file.h"
+#include "triangle.h"
+#include "utility.h"
 
 //#define OLI_BROWN
 //#define OLI_TEST_PATTERN
-#define OLI_TEST_PATTERN_SCAN
+//#define OLI_TEST_PATTERN_SCAN
 
-//#define OLI_3D
+#define OLI_3D
 //#define OLI_FIG
 //#define OLI_FIG_2
 
@@ -46,7 +48,7 @@ main(int argc, char* argv[])
     int width = 1280;
     int height = 720;
 
-    float scale = 7.0f;
+    float scale = 1.0f;
     //Initialisation de l'image.
     image_t* image_p  = image_init(width, height);
     image_set(image_p);
@@ -87,8 +89,10 @@ main(int argc, char* argv[])
     performance_t frame_performance = performance_init("image");
 
     solid_init_const();
+    solid_t* solid_p = solid_file_open("scene.txt");
 
-    camera_t camera = camera_init(0, -10, 1,
+
+    camera_t camera = camera_init(-5, -10, 2,
                                   0, 0, 0,
                                   M_PI_2/3);
 
@@ -104,12 +108,12 @@ main(int argc, char* argv[])
         performance_try_start(&render_performance);
         renderable_cache_clear();
 
-        solid_render(OCTAHEDRON_P, image_p, &camera);
+        solid_render(solid_p, image_p, &camera);
         performance_try_add(&render_performance);
 
         image_scale(image_p, 1/scale, SCALE_ALGORITHM_LINEAR);
 
-        char* file_name_p = num_extension(file_name_prefix_p, frame);
+        char* file_name_p = file_name_extension_number(file_name_prefix_p, frame);
         image_file_write(file_name_p, image_p);
 
         image_scale(image_p, scale, SCALE_ALGORITHM_LINEAR);

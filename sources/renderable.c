@@ -28,7 +28,7 @@ static camera_cache_t camera_cache =
     NULL
 };
 
-const float CAMERA_SUBDIVISION = 0.7;
+const float CAMERA_SUBDIVISION = 2.5;
 
 static void camera_context_update(const camera_t* camera_p);
 
@@ -67,7 +67,7 @@ renderable_cache_clear()
     }
 }
 
-#define DITHER
+//#define DITHER
 
 void
 render_vector(vector_t vector, colour_t colour, image_t* image_p, const camera_t* camera_p)
