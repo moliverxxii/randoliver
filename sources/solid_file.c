@@ -77,12 +77,13 @@ solid_file_open(const char* file_name_p)
             }
             else
             {
-                line_type = solid_file_parse_line_type(line);
+                enum solid_file_line_e new_line_type = solid_file_parse_line_type(line);
 
-                int is_new_step_found = solid_file_parse_step_title(line_type, &solid_struct);
+                int is_new_step_found = solid_file_parse_step_title(new_line_type, &solid_struct);
 
                 if(is_new_step_found)
                 {
+                    line_type = new_line_type;
                     continue;
                 }
 
