@@ -135,6 +135,8 @@ main(int argc, char* argv[])
 
         performance_try_add(&frame_performance);
     }
+    image_free(image_p);
+    solid_free(solid_p);
     performance_free(&render_performance);
     performance_free(&process_performance);
     performance_free(&frame_performance);
