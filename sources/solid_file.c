@@ -64,8 +64,7 @@ solid_file_open(const char* file_name_p)
     if(file_p != NULL)
     {
         char line[SOLID_LINE_LENGTH + 1] = {0};
-
-        int      is_ok        = 1;
+        int is_ok = 1;
         enum solid_file_line_e line_type = SOLID_FILE_LINE_NONE;
 
         do
@@ -100,8 +99,10 @@ solid_file_open(const char* file_name_p)
             list_free(solid_struct.list_p);
         }
 
-        solid_p = solid_init(solid_struct.vertex_count, solid_struct.vertices_p,
-                             solid_struct.face_count, (const uint32_t**) solid_struct.vertex_index_p);
+        solid_p = solid_init(solid_struct.vertex_count,
+                             solid_struct.vertices_p,
+                             solid_struct.face_count,
+                             (const uint32_t**) solid_struct.vertex_index_p);
 
         for(uint32_t face = 0; face < solid_struct.face_count; ++face)
         {
@@ -140,7 +141,8 @@ solid_file_parse_line_type(const char* line_p)
 }
 
 static int
-solid_file_parse_step_title(enum solid_file_line_e line_type, struct solid_constructor_t* solid_struct_p)
+solid_file_parse_step_title(enum solid_file_line_e line_type,
+                            struct solid_constructor_t* solid_struct_p)
 {
     int is_new_step_found = 0;
     switch(line_type)
@@ -178,7 +180,9 @@ solid_file_parse_step_title(enum solid_file_line_e line_type, struct solid_const
     return is_new_step_found;
 }
 static void
-solid_file_parse_step_content(enum solid_file_line_e line_type, const char* line_p, struct solid_constructor_t* solid_struct_p)
+solid_file_parse_step_content(enum solid_file_line_e line_type,
+                              const char* line_p,
+                              struct solid_constructor_t* solid_struct_p)
 {
 
     switch(line_type)
