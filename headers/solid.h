@@ -17,7 +17,7 @@ typedef struct solid_t solid_t;
 void solid_init_const();
 
 solid_t* solid_init(uint32_t vertex_count, const vector_t* vertices_p,
-                    uint32_t face_count, const uint32_t **faces_pp);
+                    uint32_t face_count, const uint32_t **faces_pp, const colour_t* colours_p);
 void     solid_free(solid_t* solid_p);
 
 void solid_render(const void* this_p,

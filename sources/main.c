@@ -52,10 +52,11 @@ main(int argc, char* argv[])
     //Initialisation de l'image.
     image_t* image_p  = image_init(width, height);
     image_set(image_p);
+    image_scale(image_p, scale, SCALE_ALGORITHM_LINEAR);
     //Initialisation des particules
     srand(time(NULL));
 
-    interface_state_save();
+    //interface_state_save();
 
 
     uint32_t point_count = 6;
@@ -92,14 +93,14 @@ main(int argc, char* argv[])
     solid_t* solid_p = solid_file_open("scene.txt");
 
 
-    camera_t camera = camera_init(-5, -10, 2,
+    camera_t camera = camera_init(-5, -1.5, -1,
                                   0, 0, 0,
-                                  M_PI_2/3);
+                                  45);
 
     for(int frame=0; frame<frame_count; ++frame)
     {
         performance_try_start(&frame_performance);
-        interface_state_restore();
+        //interface_state_restore();
         printf("Image %u\n", frame);
         performance_print(&render_performance);
         performance_print(&process_performance);

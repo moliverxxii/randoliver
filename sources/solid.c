@@ -95,7 +95,7 @@ solid_init_const()
 
 solid_t*
 solid_init(uint32_t vertex_count, const vector_t* vertices_p,
-           uint32_t face_count, const uint32_t **faces_p)
+           uint32_t face_count, const uint32_t **faces_p, const colour_t* colours_p)
 {
     solid_t* solid_p = malloc(sizeof(solid_t));
     if(solid_p != NULL)
@@ -115,11 +115,11 @@ solid_init(uint32_t vertex_count, const vector_t* vertices_p,
 
         for(uint32_t face = 0; face < solid.face_count; ++face)
         {
-            printf("solid_init face: %u\n", face);
+            colour_t colour = colours_p != NULL ? colours_p[face] : colour_get_random();
             solid.faces_array_p[face] = triangle_init_list(solid.vertex_array_p,
                    faces_p[face][0],
                    faces_p[face][1],
-                   faces_p[face][2], colour_get_random());
+                   faces_p[face][2], colour);
         }
 
         *solid_p = solid;

@@ -67,7 +67,7 @@ renderable_cache_clear()
     }
 }
 
-//#define DITHER
+#define DITHER
 
 void
 render_vector(vector_t vector, colour_t colour, image_t* image_p, const camera_t* camera_p)
@@ -183,9 +183,9 @@ renderable_vector_position(vector_t point, image_t* image_p,
 
     //V
     float scale = (float) image_width(image_p)
-                / (2 * op_u_scalaire * tan(camera_context.angle/2));
+                / (2 * op_u_scalaire * tan(M_PI*camera_context.angle/360));
 
-    float x_image_scale = -scale * op_v_scalaire;
+    float x_image_scale =  scale * op_v_scalaire;
     float y_image_scale = -scale * op_w_scalaire;
 
     x_image_scale += (float) image_width(image_p)  / 2;

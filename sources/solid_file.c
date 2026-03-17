@@ -32,9 +32,18 @@ struct solid_constructor_t
     vector_t* vertices_p;
     uint32_t vertex_count;
     uint32_t** vertex_index_p;
+    colour_t* colours_p;
     uint32_t face_count;
     list_t* list_p;
+    list_t* colour_list_p;
 };
+
+//struct face_color_index
+//{
+//};
+
+typedef int (*solid_file_content_parser_f) (const char* line_p,
+                                            struct solid_constructor_t* solid_struct_p);
 
 static int solid_file_is_key(const char* line_p, const char* key_p);
 static enum solid_file_line_e solid_file_parse_line_type(const char* line_p);
@@ -42,6 +51,10 @@ static int solid_file_parse_step_title(enum solid_file_line_e line_type,
                                        struct solid_constructor_t* solid_struct_p);
 static void solid_file_parse_step_content(enum solid_file_line_e line_type,
                                           const char* line_p,
+                                          struct solid_constructor_t* solid_struct_p);
+static int solid_file_content_parser_vertex(const char* line_p,
+                                            struct solid_constructor_t* solid_struct_p);
+static int solid_file_content_parser_face(const char* line_p,
                                           struct solid_constructor_t* solid_struct_p);
 
 
@@ -57,7 +70,9 @@ solid_file_open(const char* file_name_p)
         NULL,
         0,
         NULL,
+        NULL,
         0,
+        NULL,
         NULL,
     };
 
@@ -79,7 +94,8 @@ solid_file_open(const char* file_name_p)
             {
                 enum solid_file_line_e new_line_type = solid_file_parse_line_type(line);
 
-                int is_new_step_found = solid_file_parse_step_title(new_line_type, &solid_struct);
+                int is_new_step_found = solid_file_parse_step_title(new_line_type,
+                                                                    &solid_struct);
 
                 if(is_new_step_found)
                 {
@@ -98,12 +114,15 @@ solid_file_open(const char* file_name_p)
 
             solid_struct.vertex_index_p = list_array(solid_struct.list_p);
             list_free(solid_struct.list_p);
+            solid_struct.colours_p = list_array(solid_struct.colour_list_p);
+            list_free(solid_struct.colour_list_p);
         }
 
         solid_p = solid_init(solid_struct.vertex_count,
                              solid_struct.vertices_p,
                              solid_struct.face_count,
-                             (const uint32_t**) solid_struct.vertex_index_p);
+                             (const uint32_t**) solid_struct.vertex_index_p,
+                             solid_struct.colours_p);
 
         for(uint32_t face = 0; face < solid_struct.face_count; ++face)
         {
@@ -180,52 +199,78 @@ solid_file_parse_step_title(enum solid_file_line_e line_type,
 
     return is_new_step_found;
 }
+
+static const solid_file_content_parser_f CONTENT_PARSER_TABLE[SOLID_FILE_LINE_COUNT] =
+{
+        &solid_file_content_parser_vertex,
+        &solid_file_content_parser_face
+};
+
 static void
 solid_file_parse_step_content(enum solid_file_line_e line_type,
                               const char* line_p,
                               struct solid_constructor_t* solid_struct_p)
 {
-
-    switch(line_type)
+    if(0 <= line_type && line_type < SOLID_FILE_LINE_COUNT)
     {
-    case SOLID_FILE_LINE_VERTEX:
-        //lecture points
-        {
-            vector_t vector = VECTOR_0;
-            int conversion_count = sscanf(line_p,
-                                          "%f %f %f",
-                                          &vector.x,
-                                          &vector.y,
-                                          &vector.z);
-            if(conversion_count == VECTOR_AXIS_COUNT)
-            {
-                list_append(&solid_struct_p->list_p, &vector, sizeof(vector));
-                solid_struct_p->vertex_count++;
-            }
-        }
-        break;
-    case SOLID_FILE_LINE_FACE:
-        //fabrication des triangles
-        {
-            uint32_t faces[TRIANGLE_POINT_COUNT] = {0, 0, 0};
-            int conversion_count = sscanf(line_p,
-                                          "%u %u %u",
-                                          &faces[0],
-                                          &faces[1],
-                                          &faces[2]);
-
-            if(conversion_count == TRIANGLE_POINT_COUNT)
-            {
-                uint32_t* element_p = malloc(sizeof(faces));
-                memcpy(element_p, faces, sizeof(faces));
-                list_append(&solid_struct_p->list_p, &element_p, sizeof(element_p));
-                solid_struct_p->face_count++;
-            }
-        }
-        break;
-    default:
-        break;
+        (*CONTENT_PARSER_TABLE[line_type])(line_p, solid_struct_p);
     }
 }
 
+static int solid_file_content_parser_vertex(const char* line_p,
+                                            struct solid_constructor_t* solid_struct_p)
+{
+    vector_t vector = VECTOR_0;
+    int conversion_count = sscanf(line_p,
+                                  "%f %f %f",
+                                  &vector.x,
+                                  &vector.y,
+                                  &vector.z);
+    if(conversion_count == VECTOR_AXIS_COUNT)
+    {
+        list_append(&solid_struct_p->list_p, &vector, sizeof(vector));
+        solid_struct_p->vertex_count++;
+    }
+    return 0;
+}
+
+static int solid_file_content_parser_face(const char* line_p,
+                                          struct solid_constructor_t* solid_struct_p)
+{
+    colour_t colour = BLACK;
+    int conversion_count = sscanf(line_p,
+                                  "#%2hhx%2hhx%2hhx",
+                                  &colour.red,
+                                  &colour.green,
+                                  &colour.blue);
+
+    static colour_t current_colour = {{COLOUR_MAX, COLOUR_MAX, COLOUR_MAX}};
+    if(conversion_count > 0)
+    {
+        if(conversion_count == 3)
+        {
+            current_colour = colour;
+        }
+    }
+    else
+    {
+        uint32_t faces[TRIANGLE_POINT_COUNT] = {0, 0, 0};
+        conversion_count = sscanf(line_p,
+                                  "%u %u %u",
+                                  &faces[0],
+                                  &faces[1],
+                                  &faces[2]);
+
+        if(conversion_count == TRIANGLE_POINT_COUNT)
+        {
+            uint32_t* element_p = malloc(sizeof(faces));
+            memcpy(element_p, faces, sizeof(faces));
+            list_append(&solid_struct_p->list_p, &element_p, sizeof(element_p));
+            solid_struct_p->face_count++;
+            list_append(&solid_struct_p->colour_list_p, &current_colour, sizeof(current_colour));
+        }
+    }
+
+    return 0;
+}
 
