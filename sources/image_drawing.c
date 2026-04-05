@@ -5,6 +5,7 @@
  *      Author: moliver
  */
 #include <stdio.h>
+#include <math.h>
 
 #include "image_drawing.h"
 #include "utility.h"
@@ -147,4 +148,80 @@ test_pattern_scan(image_t* image_p)
     }
 }
 
+void
+image_draw_triangle(image_t* image_p, vector_t a, vector_t b, vector_t c, colour_t colour, const camera_t* camera_p)
+{
+    const vector_t* top_p    = NULL;
+    const vector_t* bottom_p = NULL;
+    const vector_t* middle_p = NULL;
+
+    //points des triangles ordonnes de haut en bas.
+    if(a.y < b.y)
+    {
+        top_p    = &a;
+        middle_p = &b;
+    }
+    else
+    {
+        top_p    = &b;
+        middle_p = &a;
+    }
+
+    if(middle_p->y < c.y)
+    {
+        bottom_p = &c;
+    }
+    else
+    {
+        bottom_p = middle_p;
+        if(top_p->y < c.y)
+        {
+            middle_p = &c;
+        }
+        else
+        {
+            middle_p = top_p;
+            top_p = &c;
+        }
+    }
+
+    int top_y = (int) ceilf(top_p->y);
+    int bottom_y = (int) ceilf(bottom_p->y);
+
+    vector_t top_bottom_v = vector_subtract(*bottom_p, *top_p);
+    for(int image_y = top_y; image_y < bottom_y; ++image_y)
+    {
+        //segment 1
+        float coefficient = ((float) image_y - top_p->y)
+                          / (bottom_p->y     - top_p->y);
+        vector_t p = vector_add(*top_p, vector_scale(top_bottom_v, coefficient));
+
+        //segment 2
+        const vector_t* d_p = ((vector_axis_t) image_y < middle_p->y)
+                            ? top_p
+                            : bottom_p;
+
+        coefficient = ((float) image_y - middle_p->y)
+                             / (d_p->y - middle_p->y);
+
+        vector_t middle_d_v = vector_subtract(*d_p, *middle_p);
+        vector_t q = vector_add(*middle_p, vector_scale(middle_d_v, coefficient));
+
+        float left  = p.x;
+        float right = q.x;
+        if(q.x < p.x)
+        {
+            left  = q.x;
+            right = p.x;
+        }
+
+        for(int image_x = ceilf(left); image_x < ceilf(right); ++image_x)
+        {
+            vector_axis_t z = p.z + (q.z - p.z) * (left - p.x) / (q.x - p.x);
+            vector_t vector = vector_init(image_x, image_y, z);
+            render_vector_camera_space(vector, colour, image_p, camera_p);
+        }
+    }
+
+}
 

@@ -4,8 +4,9 @@
  *  Created on: 16 févr. 2026
  *      Author: moliver
  */
-#include "triangle.h"
 #include "edge.h"
+#include "image_drawing.h"
+#include "triangle.h"
 
 enum triangle_reference_e
 {
@@ -84,6 +85,10 @@ triangle_free(triangle_t* triangle_p)
     free(triangle_p);
 }
 
+typedef void (* triangle_render_f) (const triangle_t* triangle_p,
+                                    image_t* image_p,
+                                    const camera_t* camera_p);
+
 static void triangle_render_tent(const triangle_t* triangle_p,
                                  image_t* image_p,
                                  const camera_t* camera_p);
@@ -92,21 +97,23 @@ static void triangle_render_crystal(const triangle_t* triangle_p,
                                     image_t* image_p,
                                     const camera_t* camera_p);
 
-typedef void (* triangle_render_f) (const triangle_t* triangle_p,
-                                    image_t* image_p,
-                                    const camera_t* camera_p);
+static void triangle_render_2d(const triangle_t* triangle_p,
+                               image_t* image_p,
+                               const camera_t* camera_p);
 
 enum triangle_render_method
 {
     TRIANGLE_RENDER_METHOD_TENT = 0,
     TRIANGLE_RENDER_METHOD_CRYSTAL,
+    TRIANGLE_RENDER_METHOD_2D,
     TRIANGLE_RENDER_METHOD_COUNT,
 };
 
 static triangle_render_f const TRIANGLE_RENDER_TABLE[TRIANGLE_RENDER_METHOD_COUNT] =
 {
     &triangle_render_tent,
-    &triangle_render_crystal
+    &triangle_render_crystal,
+    &triangle_render_2d
 };
 
 void
@@ -115,7 +122,7 @@ triangle_render(const void* this_p,
                 const camera_t* camera_p)
 {
     const triangle_t* triangle_p = this_p;
-    (*TRIANGLE_RENDER_TABLE[TRIANGLE_RENDER_METHOD_CRYSTAL])(triangle_p, image_p, camera_p);
+    (*TRIANGLE_RENDER_TABLE[TRIANGLE_RENDER_METHOD_2D])(triangle_p, image_p, camera_p);
 }
 
 renderable_i*
@@ -191,6 +198,17 @@ triangle_render_crystal(const triangle_t* triangle_p,
     edge_free(slide_edge_1_p);
     edge_free(slide_edge_2_p);
 
+}
+
+static void triangle_render_2d(const triangle_t* triangle_p,
+                               image_t* image_p,
+                               const camera_t* camera_p)
+{
+    vector_t a = renderable_vector_position(*triangle_vector((triangle_t*) triangle_p, 0), image_p, camera_p);
+    vector_t b = renderable_vector_position(*triangle_vector((triangle_t*) triangle_p, 1), image_p, camera_p);
+    vector_t c = renderable_vector_position(*triangle_vector((triangle_t*) triangle_p, 2), image_p, camera_p);
+
+    image_draw_triangle(image_p, a, b, c, triangle_p->colour, camera_p);
 }
 
 static vector_t*

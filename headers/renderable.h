@@ -32,6 +32,9 @@ void         renderable_render(const renderable_i* renderable_p,
                                const camera_t* camera_p);
 void         renderable_cache_clear();
 
+void render_vector_camera_space(vector_t vector,
+                  colour_t colour,
+                  image_t* image_p, const camera_t* camera_p);
 void render_vector(vector_t vector, colour_t colour,
                    image_t* image_p,
                    const camera_t* camera_p);
