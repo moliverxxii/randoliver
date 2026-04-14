@@ -34,4 +34,6 @@ void test_pattern_scan(image_t* image_p);
 
 void image_draw_triangle(image_t* image_p, vector_t a, vector_t b, vector_t c, colour_t colour, const camera_t* camera_p);
 
+void image_reduce_bit_depth(image_t* image_p, uint8_t bits_per_colour, int dither);
+
 #endif /* HEADERS_IMAGE_DRAWING_H_ */

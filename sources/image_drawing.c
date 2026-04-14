@@ -225,3 +225,37 @@ image_draw_triangle(image_t* image_p, vector_t a, vector_t b, vector_t c, colour
 
 }
 
+#define DITHER_MATRIX_ORDER 4
+
+//PlayStation 1 matrice de dithering.
+static const uint16_t dither_matrix[DITHER_MATRIX_ORDER][DITHER_MATRIX_ORDER] =
+{
+    { 0,  4,  1,  5},
+    { 6,  2,  7,  3},
+    { 1,  5,  0,  4},
+    { 7,  3,  6,  2}
+};
+
+void image_reduce_bit_depth(image_t* image_p, uint8_t bits_per_colour, int dither)
+{
+    for(uint32_t y = 0; y < image_height(image_p); ++y)
+    {
+        for(uint32_t x = 0; x < image_width(image_p); ++x)
+        {
+            colour_t pixel = image_pixel_get(image_p, x, y);
+            colour_t new_pixel = BLACK;
+            for(int colour = 0; colour < COLOUR_COUNT; ++colour)
+            {
+                uint16_t dither_value = dither ? dither_matrix[y%DITHER_MATRIX_ORDER][x%DITHER_MATRIX_ORDER] : 0;
+                uint16_t value = ((uint16_t)pixel.array[colour] + dither_value);
+                value = saturator(value, COLOUR_MIN, COLOUR_MAX);
+                value = value >> (8 - bits_per_colour);
+                new_pixel.array[colour] = value << (8 - bits_per_colour);
+            }
+            image_pixel_set(image_p, x, y, new_pixel);
+
+        }
+    }
+}
+
+

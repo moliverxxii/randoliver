@@ -25,9 +25,9 @@
 
 //#define OLI_BROWN
 //#define OLI_TEST_PATTERN
-//#define OLI_TEST_PATTERN_SCAN
+#define OLI_TEST_PATTERN_SCAN
 
-#define OLI_3D
+//#define OLI_3D
 //#define OLI_FIG
 //#define OLI_FIG_2
 
@@ -45,8 +45,8 @@ main(int argc, char* argv[])
     {
         strcpy(file_name_prefix_p, "sans titre");
     }
-    int width = 1280;
-    int height = 720;
+    int width = 320;
+    int height = 240;
 
     float scale = 1.0f;
     //Initialisation de l'image.
@@ -78,7 +78,12 @@ main(int argc, char* argv[])
 
 #ifdef OLI_TEST_PATTERN_SCAN
     test_pattern_scan(image_p);
-    image_file_write(file_name_prefix_p, image_p);
+    image_reduce_bit_depth(image_p, 5, 1);
+    image_file_write("oli test pattern scan", image_p);
+
+    test_pattern_scan(image_p);
+    image_reduce_bit_depth(image_p, 5, 0);
+    image_file_write("oli test pattern scan2", image_p);
 #endif //OLI_TEST_PATTERN_SCAN
 
     //Animation
@@ -113,6 +118,7 @@ main(int argc, char* argv[])
         performance_try_add(&render_performance);
 
         image_scale(image_p, 1/scale, SCALE_ALGORITHM_LINEAR);
+        image_reduce_bit_depth(image_p, 5, 1);
 
         char* file_name_p = file_name_extension_number(file_name_prefix_p, frame);
         image_file_write(file_name_p, image_p);

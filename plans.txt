@@ -5,14 +5,17 @@ OK interface de base
 OK mesure des performances de rendu de base
 OK operations matricielles
 OK rendu de triangles 3D
+OK rendu des triangles par pixels de l'image et non par points
 
+operations vectorielles affines avec matrices 4x4.
+    deplacement des objets
+algoritmes de rendu de la lumiere
+
+moteur de rendu iteratifs et d'animations
 interpreteurs d'entree
 rendus avec transparence multicouche
-rendu des triangles par pixels de l'image et non par points
 moteur de rendu par scene avec objets
-operations vectorielles affines avec matrices 4x4.
-moteur de rendu iteratifs et d'animations
-algoritmes de rendu de la lumiere
 scripts de tests et systemes de fichiers
 differents modeles de couleurs et conversions
 moteur de refraction
+documentation
