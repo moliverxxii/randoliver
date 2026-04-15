@@ -208,7 +208,7 @@ static void triangle_render_2d(const triangle_t* triangle_p,
     vector_t b = renderable_vector_position(*triangle_vector((triangle_t*) triangle_p, 1), image_p, camera_p);
     vector_t c = renderable_vector_position(*triangle_vector((triangle_t*) triangle_p, 2), image_p, camera_p);
 
-    image_draw_triangle(image_p, a, b, c, triangle_p->colour, camera_p);
+    render_triangle(image_p, a, b, c, triangle_p->colour, camera_p);
 }
 
 static vector_t*

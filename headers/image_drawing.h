@@ -9,7 +9,6 @@
 #define HEADERS_IMAGE_DRAWING_H_
 
 #include "image.h"
-#include "camera.h"
 /* Processus */
 /**Ajoute un mouvement brownien à l'image de longueur "iterations" et de
  *point
@@ -31,8 +30,6 @@ void barres2(image_t* image, int spread);
 
 void test_pattern_squares(image_t* image_p, uint32_t period);
 void test_pattern_scan(image_t* image_p);
-
-void image_draw_triangle(image_t* image_p, vector_t a, vector_t b, vector_t c, colour_t colour, const camera_t* camera_p);
 
 void image_reduce_bit_depth(image_t* image_p, uint8_t bits_per_colour, int dither);
 

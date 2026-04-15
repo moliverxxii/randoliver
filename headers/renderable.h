@@ -42,7 +42,7 @@ vector_t renderable_vector_position(vector_t point,
                                     image_t* image_p,
                                     const camera_t* camera_p);
 
-
+void render_triangle(image_t* image_p, vector_t a, vector_t b, vector_t c, colour_t colour, const camera_t* camera_p);
 
 
 #endif /* HEADERS_RENDERABLE_H_ */
