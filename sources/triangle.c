@@ -5,7 +5,6 @@
  *      Author: moliver
  */
 #include "edge.h"
-#include "image_drawing.h"
 #include "triangle.h"
 
 enum triangle_reference_e
@@ -208,7 +207,7 @@ static void triangle_render_2d(const triangle_t* triangle_p,
     vector_t b = renderable_vector_position(*triangle_vector((triangle_t*) triangle_p, 1), image_p, camera_p);
     vector_t c = renderable_vector_position(*triangle_vector((triangle_t*) triangle_p, 2), image_p, camera_p);
 
-    render_triangle(image_p, a, b, c, triangle_p->colour, camera_p);
+    render_triangle(image_p, a, b, c, triangle_p->colour);
 }
 
 static vector_t*

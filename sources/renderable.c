@@ -74,20 +74,11 @@ renderable_cache_clear()
     }
 }
 
-//#define DITHER
-
 void
-render_vector_camera_space(vector_t vector, colour_t colour, image_t* image_p, const camera_t* camera_p)
+render_vector_camera_space(vector_t vector, colour_t colour, image_t* image_p)
 {
-#ifdef DITHER
-    int x_image = dither(vector.x);
-    int y_image = dither(vector.y);
-#else //DITHER
     int x_image = vector.x;
     int y_image = vector.y;
-#endif //DITHER
-
-
 
     if(!render_cache_is_same_image(&camera_cache, image_p))
     {
@@ -119,7 +110,7 @@ render_vector(vector_t vector, colour_t colour, image_t* image_p, const camera_t
         return;
     }
 
-    render_vector_camera_space(image_point, colour, image_p, camera_p);
+    render_vector_camera_space(image_point, colour, image_p);
 }
 
 static struct camera_context_t
@@ -209,7 +200,7 @@ renderable_vector_position(vector_t point, image_t* image_p,
 }
 
 void
-render_triangle(image_t* image_p, vector_t a, vector_t b, vector_t c, colour_t colour, const camera_t* camera_p)
+render_triangle(image_t* image_p, vector_t a, vector_t b, vector_t c, colour_t colour)
 {
     const vector_t* top_p    = NULL;
     const vector_t* bottom_p = NULL;
@@ -279,7 +270,7 @@ render_triangle(image_t* image_p, vector_t a, vector_t b, vector_t c, colour_t c
         {
             vector_axis_t z = p.z + (q.z - p.z) * (left - p.x) / (q.x - p.x);
             vector_t vector = vector_init(image_x, image_y, z);
-            render_vector_camera_space(vector, colour, image_p, camera_p);
+            render_vector_camera_space(vector, colour, image_p);
         }
     }
 
