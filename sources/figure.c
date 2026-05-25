@@ -131,7 +131,7 @@ figure_render(const void* this_p,
 
     for(uint32_t point = 0; point < figure_length(figure_p); ++point)
     {
-        renderable_render(point_renderable(figure_point(figure_p, point)), image_p, camera_p);
+        point_render(figure_point(figure_p, point), image_p, camera_p);
     }
 }
 

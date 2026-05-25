@@ -25,11 +25,12 @@
 
 //#define OLI_BROWN
 //#define OLI_TEST_PATTERN
-#define OLI_TEST_PATTERN_SCAN
+//#define OLI_TEST_PATTERN_SCAN
 
 //#define OLI_3D
 //#define OLI_FIG
 //#define OLI_FIG_2
+#define OLI_SPHERE
 
 int
 main(int argc, char* argv[])
@@ -50,6 +51,8 @@ main(int argc, char* argv[])
 
     float scale = 1.0f;
     //Initialisation de l'image.
+    performance_t performance_total = performance_init("total");
+    performance_try_start(&performance_total);
     image_t* image_p  = image_init(width, height);
     image_set(image_p);
     image_scale(image_p, scale, SCALE_ALGORITHM_LINEAR);
@@ -59,7 +62,7 @@ main(int argc, char* argv[])
     //interface_state_save();
 
 
-    uint32_t point_count = 6;
+    uint32_t point_count = 1000000;
 
 #ifdef OLI_BROWN
     brownien1(image_p, point_count, 1, width/2, height/2);
@@ -210,7 +213,39 @@ main(int argc, char* argv[])
     }
 #endif
 
+
+#ifdef OLI_SPHERE
+    srand(time(NULL));
+    figure_t* sphere_points_p = figure_init(point_count);
+    const vector_t START = VECTOR_Z;
+    for(uint32_t point = 0; point<point_count; ++point)
+    {
+        point_t* point_p = figure_point(sphere_points_p, point);
+        vector_t* vector_p = point_vector(point_p);
+        *vector_p = START;
+
+        float rand_vertical   = (float) rand()/RAND_MAX;
+        float rand_horizontal = (float) rand()/RAND_MAX;
+
+        *vector_p = vector_rotate(*vector_p, VECTOR_X,     M_PI * rand_vertical);
+        *vector_p = vector_rotate(*vector_p, VECTOR_Z, 2 * M_PI * rand_horizontal);
+        *point_colour(point_p) = colour_init(COLOUR_MAX * rand_vertical,
+                                             COLOUR_MAX * rand_horizontal,
+                                             COLOUR_MAX * rand_vertical);
+    }
+
+    camera_t camera = camera_init(10, -40, 30, 0, 0, 0, 4.5);
+
+    image_set(image_p);
+    figure_render(sphere_points_p, image_p, &camera);
+    image_reduce_bit_depth(image_p, 5, 1);
+    image_file_write("sphere", image_p);
+
+#endif //OLI_SPHERE
+
     free(file_name_prefix_p);
+    performance_try_add(&performance_total);
+    performance_print(&performance_total);
     interface_deinit();
 
     return EXIT_SUCCESS;
