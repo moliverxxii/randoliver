@@ -53,7 +53,7 @@ performance_try_add(performance_t* performance_p)
 void
 performance_print(const performance_t* performance_p)
 {
-    printf("%s: %8.2f ms/operation\n",
+    printf("%20s: %8.2f ms/operation\n",
            performance_p->name_p,
            (float) performance_p->total_time/performance_p->total_operations);
 }

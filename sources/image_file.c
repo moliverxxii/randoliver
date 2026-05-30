@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "image_file.h"
+#include "utility.h"
 
 static const uint8_t BMP_PLANE_COUNT = 1;
 static const uint8_t BITS_PER_BYTE = 8;
@@ -115,8 +116,11 @@ image_file_free(image_file_t* image_file_p)
 
 
 void
-image_file_write(const char* name_p, const image_t* image_p)
+image_file_write(const char* name_p, const image_t* image_p,
+                 const image_file_parameters_t* parameters_p)
 {
+    OLI_UNUSED(parameters_p);
+
     image_file_t* image_file_p = image_file_init(name_p);
     fseek(image_file_p->file_p, HEADER_SIZE, SEEK_SET);
     image_file_init_header(image_file_p->file_p, image_width(image_p), image_height(image_p));

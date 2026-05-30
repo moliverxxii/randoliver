@@ -21,7 +21,6 @@ brownien1(image_t* image, int iterations, int spread, int x0, int y0)
     int i;
     iterations = 1000000;
     //Début du procesus.
-    printf("Début du processus\n");
     for(i = 0; i < iterations; ++i)
     {
         image_pixel_set(image, x, y, pixel);
@@ -44,14 +43,11 @@ brownien1(image_t* image, int iterations, int spread, int x0, int y0)
         x += delta;
         x = modulo(x, image_width(image));
     }
-    printf("Processus terminé\n");
 }
 
 void
 barres1(image_t* image, int spread)
 {
-    printf("Début du processus\n");
-
     int i = 0;
     uint32_t y;
     uint32_t x;
@@ -108,7 +104,6 @@ barres2(image_t* image, int spread)
                        && (x_prime[2] < image_width(image));
         } while(is_in_image);
     }
-    printf("Processus terminé\n");
 }
 
 void
