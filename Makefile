@@ -37,7 +37,7 @@ debug: rebuild
 #debug: CC = $(shell /usr/local/bin/brew --prefix llvm)/bin/clang
 debug: CC_FLAGS += -DNDEBUG
 debug: OPTIMISE = 0
-debug: SANITIZE = -mlinker-version=450 -fsanitize=address
+debug: SANITIZE = -fsanitize=address -fsanitize=leak
 
 check: rebuild
 #check: CC = $(shell /usr/local/bin/brew --prefix llvm)/bin/clang

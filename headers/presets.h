@@ -14,7 +14,7 @@ typedef struct preset_t preset_t;
 
 uint32_t preset_get_total_count();
 
-const char* preset_get_name();
+const char* preset_get_name(uint32_t preset_index);
 void        preset_run(uint32_t preset_index);
 
 #endif /* HEADERS_PRESETS_H_ */
