@@ -17,7 +17,7 @@
 int
 main(int argc, char* argv[])
 {
-    interface_init();
+    interface_init("OAM IMAGE SYNTHESIZER (2019-2025)");
     //Paramètres de base.
     char* file_name_prefix_p = malloc(sizeof(char) * 40);
     if(1 < argc)

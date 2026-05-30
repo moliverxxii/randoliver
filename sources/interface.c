@@ -126,12 +126,12 @@ struct interface_state
 struct termios original_terminal;
 
 void
-interface_init()
+interface_init(const char* title_p)
 {
 
     struct termios interface_terminal;
-    set_cursor_escape(ERASE_IN_DISPLAY,2);    
-    set_cursor_escape(HORIZONTAL_VERTICAL_POSITION,1,1);    
+//    set_cursor_escape(ERASE_IN_DISPLAY,2);
+//    set_cursor_escape(HORIZONTAL_VERTICAL_POSITION,1,1);
     fflush(stdout); //On s'assure que les donnees sortent.
     tcgetattr(STDIN_FILENO, &interface_terminal);
     original_terminal = interface_terminal;
@@ -140,7 +140,7 @@ interface_init()
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &interface_terminal);
 
     set_colour_escape(FOREGROUND_GREEN);
-    printf("OAM IMAGE SYNTHESIZER (2019-2025)\n");
+    printf("%s\n", title_p);
     set_colour_escape(RESET);
     set_colour_escape(DEFAULT_BACKGROUND_COLOUR);
 

@@ -25,6 +25,8 @@ typedef struct preset_t
     void (*action)();
 } preset_t;
 
+static void oli_test_3d_middle_point();
+static void oli_test_2d_corners();
 static void oli_brown();
 static void oli_test_pattern();
 static void oli_test_pattern_scan();
@@ -35,6 +37,8 @@ static void oli_sphere();
 
 static const preset_t PRESET_LIST[] =
 {
+    {"test 3D point milieu", &oli_test_3d_middle_point},
+    {"test 2D coins", &oli_test_2d_corners},
     {"brownien 1", &oli_brown},
     {"test pattern", &oli_test_pattern},
     {"test pattern scan", &oli_test_pattern_scan},
@@ -77,6 +81,42 @@ preset_run(uint32_t preset_index)
     }
 }
 
+static void
+oli_test_3d_middle_point()
+{
+    int width = 4;
+    int height = 4;
+    image_t* image_p  = image_init(width, height);
+    image_set(image_p);
+
+    point_t* p_p = point_init(0, 0, 0, WHITE);
+    camera_t camera = camera_init(-1,
+                                  0,
+                                  0,
+                                  point_vector(p_p)->x,
+                                  point_vector(p_p)->y,
+                                  point_vector(p_p)->z,
+                                  45.0f);
+    point_render(p_p, image_p, &camera);
+    image_file_write("test 3D point milieu", image_p, NULL);
+}
+
+static void
+oli_test_2d_corners()
+{
+    int width = 4;
+    int height = 4;
+    image_t* image_p  = image_init(width, height);
+    image_set(image_p);
+
+    image_pixel_set(image_p,         0,         0,   BLUE);
+    image_pixel_set(image_p, width - 1,         0,    RED);
+    image_pixel_set(image_p, width - 1, height -1, YELLOW);
+    image_pixel_set(image_p,         0, height -1,  GREEN);
+
+    image_file_write("test 2d coins", image_p, NULL);
+    image_free(image_p);
+}
 
 static void
 oli_brown()
