@@ -130,6 +130,7 @@ solid_file_open(const char* file_name_p)
         }
         free(solid_struct.vertex_index_p);
         free(solid_struct.vertices_p);
+        free(solid_struct.colours_p);
 
 
         fclose(file_p);

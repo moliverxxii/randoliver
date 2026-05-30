@@ -33,11 +33,16 @@ clean:
 	
 rebuild: clean all
 
-debug: SANITIZE = -fsanitize=address
-debug: OPTIMISE = 0
-#debug: CC = $(shell /usr/local/bin/brew --prefix llvm)/bin/clang
 debug: rebuild
+#debug: CC = $(shell /usr/local/bin/brew --prefix llvm)/bin/clang
 debug: CC_FLAGS += -DNDEBUG
+debug: OPTIMISE = 0
+debug: SANITIZE = -mlinker-version=450 -fsanitize=address
+
+check: rebuild
+#check: CC = $(shell /usr/local/bin/brew --prefix llvm)/bin/clang
+check: OPTIMISE = g
+check: SANITIZE = -fsanitize=address -fsanitize=leak
 
 #ANALYZER = $(shell /usr/local/bin/brew --prefix llvm)/bin/scan-build
 ANALYZER = scan-build

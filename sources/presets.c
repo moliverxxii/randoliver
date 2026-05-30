@@ -219,6 +219,7 @@ oli_figure()
                                image_height(image_p));
         }
         figure_draw(figure_p, image_p);
+        figure_free(figure_p);
 
         char* file_name_p = file_name_extension_number("oli figure", frame);
         image_file_write(file_name_p, image_p, NULL);
@@ -226,6 +227,7 @@ oli_figure()
 
         image_set(image_p);
     }
+    image_free(image_p);
 }
 
 
@@ -237,7 +239,7 @@ oli_sphere()
     int height = 240;
     image_t* image_p  = image_init(width, height);
 
-    uint32_t point_count = 1000000;
+    uint32_t point_count = 1000;
     figure_t* sphere_points_p = figure_init(point_count);
     const vector_t START = VECTOR_Z;
     for(uint32_t point = 0; point<point_count; ++point)
@@ -260,6 +262,7 @@ oli_sphere()
 
     image_set(image_p);
     figure_render(sphere_points_p, image_p, &camera);
+    figure_free(sphere_points_p);
     image_reduce_bit_depth(image_p, 5, 1);
     image_file_write("sphere", image_p, NULL);
 }
