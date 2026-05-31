@@ -10,9 +10,11 @@
 
 #include "presets.h"
 
+#include "edge.h"
 #include "figure.h"
 #include "image_file.h"
 #include "image_drawing.h"
+#include "list.h"
 #include "performance.h"
 #include "solid.h"
 #include "solid_file.h"
@@ -34,6 +36,7 @@ static void oli_test_pattern_squares();
 static void oli_solid();
 static void oli_figure();
 static void oli_sphere();
+static void oli_sphere_2();
 
 static const preset_t PRESET_LIST[] =
 {
@@ -45,7 +48,8 @@ static const preset_t PRESET_LIST[] =
     {"test pattern squares", &oli_test_pattern_squares},
     {"solid file", &oli_solid},
     {"figure", &oli_figure},
-    {"sphere", &oli_sphere}
+    {"sphere 1", &oli_sphere},
+    {"sphere 2", &oli_sphere_2}
 };
 
 
@@ -307,4 +311,86 @@ oli_sphere()
     image_reduce_bit_depth(image_p, 5, 1);
     image_file_write("sphere", image_p, NULL);
     image_free(image_p);
+}
+
+static void
+oli_sphere_2()
+{
+    int width = 320;
+    int height = 240;
+    image_t* image_p  = image_init(width, height);
+
+    uint32_t point_count = 100;
+    figure_t* sphere_points_p = figure_init(point_count);
+    const vector_t START = VECTOR_Z;
+    for(uint32_t point = 0; point<point_count; ++point)
+    {
+        point_t* point_p = figure_point(sphere_points_p, point);
+        vector_t* vector_p = point_vector(point_p);
+        *vector_p = START;
+
+        float rand_vertical   = (double) rand()/RAND_MAX;
+        float rand_horizontal = (double) rand()/RAND_MAX;
+
+        *vector_p = vector_rotate(*vector_p, VECTOR_X,     M_PI * rand_vertical);
+        *vector_p = vector_rotate(*vector_p, VECTOR_Z, 2 * M_PI * rand_horizontal);
+        *point_colour(point_p) = colour_init(COLOUR_MAX * rand_vertical,
+                                             COLOUR_MAX * rand_horizontal,
+                                             COLOUR_MAX * rand_vertical);
+    }
+
+
+    list_t* list_head_vector_p = list_init(point_vector(figure_point(sphere_points_p, 0)), sizeof(vector_t));
+
+    //tri des vecteurs de la liste.
+    for(uint32_t point = 1; point<point_count; ++point)
+    {
+
+        vector_t* current_p = point_vector(figure_point(sphere_points_p, point));
+
+        //Tant que l'element a ajoute est superieur a l'element compare
+        list_t** compared_element_pp = &list_head_vector_p;
+        while(*compared_element_pp != NULL)
+        {
+            vector_t* compared_vector_p = list_value(*compared_element_pp);
+
+            if(current_p->z <= compared_vector_p->z)
+            {
+                break;
+            }
+            else
+            {
+                compared_element_pp = list_next(*compared_element_pp);
+            }
+        }
+
+        //si il est inferieur a l'element comparee ou on est en bout de chaine on le remplace
+
+        list_insert(compared_element_pp, current_p, sizeof(vector_t));
+    }
+    figure_free(sphere_points_p);
+
+    vector_t* vector_array_p = list_array(list_head_vector_p);
+    list_free(list_head_vector_p);
+
+    uint32_t edge_count = point_count - 1;
+
+    camera_t camera = camera_init(10, -40, 0, 0, 0, 0, 4.5);
+
+    image_set(image_p);
+    for(uint32_t edge = 0; edge < edge_count; edge++)
+    {
+        edge_t* edge_p = edge_init(vector_array_p + edge,
+                                   vector_array_p + edge + 1,
+                                   colour_init(COLOUR_MAX * (1 + vector_array_p[edge].x) / 2,
+                                               COLOUR_MAX * (1 + vector_array_p[edge].y) / 2,
+                                               COLOUR_MAX * (1 - vector_array_p[edge].z) / 2));
+        edge_render(edge_p, image_p, &camera);
+        edge_free(edge_p);
+    }
+
+    free(vector_array_p);
+
+    image_reduce_bit_depth(image_p, 5, 1);
+    image_file_write("sphere 2", image_p, NULL);
 }
