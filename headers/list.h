@@ -16,13 +16,14 @@ typedef struct list_t list_t;
 list_t*  list_init(const void* element_p, size_t size);
 void     list_free(list_t* list_p);
 uint32_t list_length(const list_t* list_p);
+void*    list_value(list_t* list_p);
 void*    list_array(const list_t* list_p);
 
 //    new
 //    vvv
-// n, n+1, n+2
+// n, n+1 (*element_pp), n+2
 //
-// n, new, n+1, n+2
+// n, new (*element_pp), n+1, n+2
 list_t*  list_insert(list_t** element_pp, const void* next_p, size_t size);
 //              new
 //              vvv
@@ -30,6 +31,8 @@ list_t*  list_insert(list_t** element_pp, const void* next_p, size_t size);
 //
 // n, n+1, n+2, new
 list_t*  list_append(list_t** element_pp, const void* next_p, size_t size);
+list_t** list_next(list_t* list_p);
+list_t*  list_fetch(list_t* list_p, uint32_t index);
 list_t*  list_fetch_last(list_t* list_p);
 
 

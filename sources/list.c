@@ -64,6 +64,12 @@ list_length(const list_t* list_p)
 }
 
 void*
+list_value(list_t* list_p)
+{
+    return list_p->element_p;
+}
+
+void*
 list_array(const list_t* list_p)
 {
     size_t size = list_p->size * list_length(list_p);
@@ -81,14 +87,13 @@ list_array(const list_t* list_p)
     return array_p;
 }
 
-
 list_t*
 list_insert(list_t** element_pp, const void* new_p, size_t size)
 {
     list_t* element_new_p = list_init(new_p, size);
-    list_t* element_present_p = *element_pp;
+    list_t* element_current_p = *element_pp;
     *element_pp = element_new_p;
-    element_new_p->next_p = element_present_p;
+    element_new_p->next_p = element_current_p;
     return element_new_p;
 }
 
@@ -109,6 +114,31 @@ list_append(list_t** element_pp, const void* new_p, size_t size)
     return list_insert(write_element_pp, new_p, size);
 }
 
+list_t**
+list_next(list_t* list_p)
+{
+    list_t** next_pp = NULL;
+    if(list_p != NULL)
+    {
+        next_pp = &list_p->next_p;
+    }
+    return next_pp;
+}
+
+list_t*
+list_fetch(list_t* list_p, uint32_t index)
+{
+    list_t* position_p = list_p;
+    for(uint32_t position = 0; position < index; ++position)
+    {
+        position_p = position_p->next_p;
+        if(position_p == NULL)
+        {
+            break;
+        }
+    }
+    return position_p;
+}
 
 list_t*
 list_fetch_last(list_t* list_p)
@@ -122,5 +152,4 @@ list_fetch_last(list_t* list_p)
     }
 
     return previous_p;
-
 }
