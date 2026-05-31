@@ -153,3 +153,44 @@ list_fetch_last(list_t* list_p)
 
     return previous_p;
 }
+
+void
+list_sort(list_t** head_pp,
+        sort_value_access_f sort_value, enum list_sort_order_e order)
+{
+
+}
+
+void
+list_sort_array(list_t** head_pp,
+                const void* array_p, size_t element_size, uint32_t element_count,
+                sort_value_access_f sort_value, enum list_sort_order_e order)
+{
+    list_t* list_head_vector_p = list_init(array_p, element_size);
+    //tri des vecteurs de la liste.
+    for(uint32_t point = 1; point < element_count; ++point)
+    {
+        const void* current_p = (const char*) array_p + element_size * point;
+        float current_compare_value = sort_value(current_p);
+        //tant que l'element a ajoute est superieur a l'element compare
+        list_t** compared_element_pp = &list_head_vector_p;
+        while(*compared_element_pp != NULL)
+        {
+            float compared = sort_value(list_value(*compared_element_pp));
+            if(current_compare_value <= compared)
+            {
+                break;
+            }
+            else
+            {
+                compared_element_pp = list_next(*compared_element_pp);
+            }
+        }
+
+        //si il est inferieur a l'element comparee ou on est en bout de chaine on le remplace
+
+        list_insert(compared_element_pp, current_p, element_size);
+    }
+
+    *head_pp = list_head_vector_p;
+}

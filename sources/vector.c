@@ -38,10 +38,39 @@ vector_init_array(const vector_axis_t* array)
     return vector;
 }
 
+vector_t vector_init_planetary(planetary_t coordinates)
+{
+    return vector_scale(vector_init(cos(coordinates.latitude)*cos(coordinates.longitude),
+                                    cos(coordinates.latitude)*sin(coordinates.longitude),
+                                    sin(coordinates.latitude)),
+                        coordinates.altitude);
+}
+
+planetary_t planetary_init_vector(vector_t coordinates)
+{
+    planetary_t planetary = {0, 0, vector_norm(coordinates)};
+    planetary.latitude    = asin(coordinates.z / planetary.altitude);
+    planetary.longitude   = (coordinates.y > 0 ? -1 : 1) * acos(coordinates.x/vector_norm(vector_init(coordinates.x, coordinates.y, 0)));
+    return planetary;
+}
+
+
 void
 vector_print(vector_t vector)
 {
-    printf(" (% 10.3f, % 10.3f, % 10.3f)\n",vector.x, vector.y, vector.z);
+    printf(" (% 10.3f, % 10.3f, % 10.3f)\n",
+           vector.x,
+           vector.y,
+           vector.z);
+}
+
+void
+planetary_print(planetary_t planetary)
+{
+    printf(" (% 10.3f, % 10.3f, % 10.3f)\n",
+           planetary.longitude,
+           planetary.latitude,
+           planetary.altitude);
 }
 
 int

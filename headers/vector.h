@@ -36,6 +36,13 @@ typedef union
     vector_axis_t array[VECTOR_AXIS_COUNT];
 } vector_t;
 
+typedef struct
+{
+    float latitude;
+    float longitude;
+    float altitude;
+} planetary_t;
+
 #define VECTOR_AXIS_MASK(AXIS) VECTOR_AXIS_MASK_##AXIS = 1 << VECTOR_AXIS_##AXIS
 
 typedef enum
@@ -52,9 +59,15 @@ extern const vector_t VECTOR_Z;
 extern const vector_t VECTOR_0;
 
 vector_t vector_init(vector_axis_t x, vector_axis_t y, vector_axis_t z);
+
+vector_t vector_init_planetary(planetary_t coordinates);
+planetary_t planetary_init_vector(vector_t coordinates);
+
 vector_t vector_init_array(const vector_axis_t* array);
 
+
 void vector_print(vector_t vector);
+void planetary_print(planetary_t planetary);
 
 int vector_is_equal(vector_t a, vector_t b);
 

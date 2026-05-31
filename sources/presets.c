@@ -7,6 +7,7 @@
 
 #include <math.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "presets.h"
 
@@ -313,6 +314,18 @@ oli_sphere()
     image_free(image_p);
 }
 
+static float vector_z_access(const void* list_element_p)
+{
+    const vector_t* vector_p = list_element_p;
+    return (float) vector_p->z;
+}
+
+static float vector_longitude_access(const void* list_element_p)
+{
+    const vector_t* vector_p = list_element_p;
+    return planetary_init_vector(*vector_p).longitude;
+}
+
 static void
 oli_sphere_2()
 {
@@ -320,7 +333,9 @@ oli_sphere_2()
     int height = 240;
     image_t* image_p  = image_init(width, height);
 
-    uint32_t point_count = 100;
+    uint32_t point_count = 10000;
+    uint32_t class_count = 200;
+
     figure_t* sphere_points_p = figure_init(point_count);
     const vector_t START = VECTOR_Z;
     for(uint32_t point = 0; point<point_count; ++point)
@@ -338,53 +353,49 @@ oli_sphere_2()
                                              COLOUR_MAX * rand_horizontal,
                                              COLOUR_MAX * rand_vertical);
     }
-
-
-    list_t* list_head_vector_p = list_init(point_vector(figure_point(sphere_points_p, 0)), sizeof(vector_t));
-
-    //tri des vecteurs de la liste.
-    for(uint32_t point = 1; point<point_count; ++point)
+    vector_t* vector_array_p = malloc(point_count * sizeof(vector_t));
+    for(uint32_t point=0; point < point_count; ++point)
     {
-
-        vector_t* current_p = point_vector(figure_point(sphere_points_p, point));
-
-        //Tant que l'element a ajoute est superieur a l'element compare
-        list_t** compared_element_pp = &list_head_vector_p;
-        while(*compared_element_pp != NULL)
-        {
-            vector_t* compared_vector_p = list_value(*compared_element_pp);
-
-            if(current_p->z <= compared_vector_p->z)
-            {
-                break;
-            }
-            else
-            {
-                compared_element_pp = list_next(*compared_element_pp);
-            }
-        }
-
-        //si il est inferieur a l'element comparee ou on est en bout de chaine on le remplace
-
-        list_insert(compared_element_pp, current_p, sizeof(vector_t));
+        vector_array_p[point] = *point_vector(figure_point(sphere_points_p, point));
     }
+    list_t* list_head_vector_p = NULL;
+    list_sort_array(&list_head_vector_p,
+                    vector_array_p, sizeof(vector_t), point_count,
+                    &vector_z_access, SORT_ORDER_ASCENDING);
+
     figure_free(sphere_points_p);
 
-    vector_t* vector_array_p = list_array(list_head_vector_p);
+    free(vector_array_p);
+    vector_array_p = list_array(list_head_vector_p);
     list_free(list_head_vector_p);
+
+    for(uint32_t point = 0; point < point_count; point += class_count)
+    {
+        uint32_t element_count = ((point_count - point) > class_count)
+                               ? class_count
+                               : (point_count - point);
+        list_sort_array(&list_head_vector_p,
+                        &vector_array_p[point], sizeof(vector_t), element_count,
+                        &vector_longitude_access, SORT_ORDER_ASCENDING);
+        vector_t* vector_slice_p = list_array(list_head_vector_p);
+        list_free(list_head_vector_p);
+
+        memcpy(vector_array_p + point, vector_slice_p, element_count * sizeof(vector_t));
+        free(vector_slice_p);
+    }
 
     uint32_t edge_count = point_count - 1;
 
-    camera_t camera = camera_init(10, -40, 0, 0, 0, 0, 4.5);
+    camera_t camera = camera_init(1, 1, 30, 0, 0, 0, 4.5);
 
     image_set(image_p);
     for(uint32_t edge = 0; edge < edge_count; edge++)
     {
         edge_t* edge_p = edge_init(vector_array_p + edge,
                                    vector_array_p + edge + 1,
-                                   colour_init(COLOUR_MAX * (1 + vector_array_p[edge].x) / 2,
+                                   colour_init(COLOUR_MAX * (1 - vector_array_p[edge].x) / 2,
                                                COLOUR_MAX * (1 + vector_array_p[edge].y) / 2,
-                                               COLOUR_MAX * (1 - vector_array_p[edge].z) / 2));
+                                               COLOUR_MAX * (1 + vector_array_p[edge].z) / 2));
         edge_render(edge_p, image_p, &camera);
         edge_free(edge_p);
     }

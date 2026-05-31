@@ -13,6 +13,15 @@
 
 typedef struct list_t list_t;
 
+enum list_sort_order_e
+{
+  SORT_ORDER_ASCENDING = 0,
+  SORT_ORDER_DESCENDING
+};
+
+
+typedef float (*sort_value_access_f)(const void* value_p);
+
 list_t*  list_init(const void* element_p, size_t size);
 void     list_free(list_t* list_p);
 uint32_t list_length(const list_t* list_p);
@@ -35,5 +44,10 @@ list_t** list_next(list_t* list_p);
 list_t*  list_fetch(list_t* list_p, uint32_t index);
 list_t*  list_fetch_last(list_t* list_p);
 
+void list_sort(list_t** head_pp, sort_value_access_f sort_value, enum list_sort_order_e order);
+
+void list_sort_array(list_t** head_pp,
+                     const void* array, size_t element_size, uint32_t element_count,
+                     sort_value_access_f sort_value, enum list_sort_order_e order);
 
 #endif /* HEADERS_LIST_H_ */
