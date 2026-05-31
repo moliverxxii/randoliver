@@ -63,6 +63,12 @@ list_length(const list_t* list_p)
     return length;
 }
 
+size_t
+list_element_size(const list_t* element_p)
+{
+    return element_p->size;
+}
+
 void*
 list_value(list_t* list_p)
 {
@@ -156,9 +162,20 @@ list_fetch_last(list_t* list_p)
 
 void
 list_sort(list_t** head_pp,
-        sort_value_access_f sort_value, enum list_sort_order_e order)
+          sort_value_access_f sort_value, enum list_sort_order_e order)
 {
+    uint32_t elment_count = list_length(*head_pp);
+    void* array_p = list_array(*head_pp);
+    size_t element_size = list_element_size(*head_pp);
 
+    list_t* new_list_p;
+
+    list_sort_array(&new_list_p,
+                    array_p, element_size, elment_count,
+                    sort_value, order);
+    free(array_p);
+    list_free(*head_pp);
+    *head_pp = new_list_p;
 }
 
 void
@@ -172,12 +189,14 @@ list_sort_array(list_t** head_pp,
     {
         const void* current_p = (const char*) array_p + element_size * point;
         float current_compare_value = sort_value(current_p);
-        //tant que l'element a ajoute est superieur a l'element compare
+
         list_t** compared_element_pp = &list_head_vector_p;
         while(*compared_element_pp != NULL)
         {
             float compared = sort_value(list_value(*compared_element_pp));
-            if(current_compare_value <= compared)
+            int sort_b = current_compare_value <= compared;
+            sort_b = (order == SORT_ORDER_ASCENDING) ? sort_b : !sort_b;
+            if(sort_b)
             {
                 break;
             }
@@ -186,8 +205,6 @@ list_sort_array(list_t** head_pp,
                 compared_element_pp = list_next(*compared_element_pp);
             }
         }
-
-        //si il est inferieur a l'element comparee ou on est en bout de chaine on le remplace
 
         list_insert(compared_element_pp, current_p, element_size);
     }

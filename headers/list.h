@@ -25,9 +25,9 @@ typedef float (*sort_value_access_f)(const void* value_p);
 list_t*  list_init(const void* element_p, size_t size);
 void     list_free(list_t* list_p);
 uint32_t list_length(const list_t* list_p);
+size_t   list_element_size(const list_t* element_p);
 void*    list_value(list_t* list_p);
 void*    list_array(const list_t* list_p);
-
 //    new
 //    vvv
 // n, n+1 (*element_pp), n+2
