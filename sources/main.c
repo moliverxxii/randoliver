@@ -13,23 +13,16 @@
 #include "interface.h"
 #include "performance.h"
 #include "presets.h"
+#include "utility.h"
 
 int
 main(int argc, char* argv[])
 {
-    interface_init("OAM IMAGE SYNTHESIZER (2019-2025)");
-    //Paramètres de base.
-    char* file_name_prefix_p = malloc(sizeof(char) * 40);
-    if(1 < argc)
-    {
-        strcpy(file_name_prefix_p, argv[1]);
-    }
-    else
-    {
-        strcpy(file_name_prefix_p, "sans titre");
-    }
+    OLI_UNUSED(argc);
+    OLI_UNUSED(argv);
 
-    //Initialisation de l'image.
+    interface_init("OAM IMAGE SYNTHESIZER (2019-2026)");
+
     performance_t performance_total = performance_init("total");
     performance_try_start(&performance_total);
 
@@ -50,7 +43,6 @@ main(int argc, char* argv[])
         performance_free(&performance_preset);
     }
 
-    free(file_name_prefix_p);
     performance_try_add(&performance_total);
     performance_print(&performance_total);
     interface_deinit();
