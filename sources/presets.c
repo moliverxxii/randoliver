@@ -52,7 +52,7 @@ static const preset_t PRESET_LIST[] =
 uint32_t
 preset_get_total_count()
 {
-    return sizeof(PRESET_LIST)/ sizeof(preset_t);
+    return sizeof(PRESET_LIST) / sizeof(preset_t);
 }
 
 const char*
@@ -98,7 +98,9 @@ oli_test_3d_middle_point()
                                   point_vector(p_p)->z,
                                   45.0f);
     point_render(p_p, image_p, &camera);
+    point_free(p_p);
     image_file_write("test 3D point milieu", image_p, NULL);
+    image_free(image_p);
 }
 
 static void
@@ -235,6 +237,7 @@ oli_figure()
     int width = 320;
     int height = 240;
     image_t* image_p  = image_init(width, height);
+    image_set(image_p);
     int frame_count = 1;
 
     uint32_t point_count = 1000000;
@@ -270,8 +273,6 @@ oli_figure()
     image_free(image_p);
 }
 
-
-
 static void
 oli_sphere()
 {
@@ -305,4 +306,5 @@ oli_sphere()
     figure_free(sphere_points_p);
     image_reduce_bit_depth(image_p, 5, 1);
     image_file_write("sphere", image_p, NULL);
+    image_free(image_p);
 }
