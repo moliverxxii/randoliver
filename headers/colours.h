@@ -57,6 +57,8 @@ colour_t colour_init(colour_value_t red,
 
 colour_t colour_get_random();
 
+void colour_print(colour_t colour);
+
 colour_t colour_random_delta(colour_t colour, void* parameters_p);
 
 colour_t colour_add_2(colour_t a, colour_t b, void* parameters_p);

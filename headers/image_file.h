@@ -11,35 +11,14 @@
 #include <stdint.h>
 #include <stdio.h>
 
+#include "colour_palette.h"
 #include "image.h"
-
-typedef enum
-{
-    PIXEL_BIT_DEPTH_1b  =  1,
-    PIXEL_BIT_DEPTH_4b  =  4,
-    PIXEL_BIT_DEPTH_8b  =  8,
-    PIXEL_BIT_DEPTH_16b = 16,
-    PIXEL_BIT_DEPTH_24b = 24,
-    PIXEL_BIT_DEPTH_32b = 32,
-} image_file_bit_depth_e;
-
-union palette_element_u
-{
-    colour_t colour;
-    uint32_t unused;
-};
-
-typedef struct
-{
-    uint32_t count;
-    union palette_element_u* palette_p;
-} colour_palette_t;
 
 typedef struct image_file_parameters_t image_file_parameters_t;
 
 image_file_parameters_t* image_file_parameters_init(
-            image_file_bit_depth_e bitdepth,
-            const colour_palette_t* palette_p);
+            palette_bit_depth_e bit_depth,
+            const palette_t* palette_p);
 
 //Writes an image into a windows BITMAP stream.
 void image_file_write(const char* name_p, const image_t* image_p,

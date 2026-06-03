@@ -11,6 +11,7 @@
 
 #include "presets.h"
 
+#include "colour_palette.h"
 #include "edge.h"
 #include "figure.h"
 #include "image_file.h"
@@ -33,6 +34,7 @@ static void oli_test_2d_corners();
 static void oli_brown();
 static void oli_test_pattern();
 static void oli_test_pattern_scan();
+static void oli_test_palette();
 static void oli_test_pattern_squares();
 static void oli_solid();
 static void oli_figure();
@@ -46,6 +48,7 @@ static const preset_t PRESET_LIST[] =
     {"brownien 1", &oli_brown},
     {"test pattern", &oli_test_pattern},
     {"test pattern scan", &oli_test_pattern_scan},
+    {"test palette", &oli_test_palette},
     {"test pattern squares", &oli_test_pattern_squares},
     {"solid file", &oli_solid},
     {"figure", &oli_figure},
@@ -170,6 +173,37 @@ oli_test_pattern_scan()
     image_reduce_bit_depth(image_p, 5, 0);
     image_file_write("oli test pattern scan2", image_p, NULL);
     image_free(image_p);
+}
+
+static void
+oli_test_palette()
+{
+    palette_t* palette_p = palette_init(PIXEL_BIT_DEPTH_8b, 0);
+    int width = 320;
+    int height = 240;
+    image_t* image_p  = image_init(width, height);
+    test_pattern_scan(image_p);
+    for(uint32_t x = 0; x < image_width(image_p); ++x)
+    {
+        for(uint32_t y = 0; y < image_height(image_p); ++y)
+        {
+            colour_t new_colour = *palette_colour_get(palette_p,
+                                      palette_index_get(palette_p,
+                                      image_pixel_get(image_p, x, y)));
+            image_pixel_set(image_p, x, y, new_colour);
+        }
+    }
+    image_file_write("oli test pattern palette", image_p, NULL);
+    image_free(image_p);
+    image_p = image_init(16, 16);
+    for(palette_index_t colour = 0; colour < palette_count(palette_p); ++colour)
+    {
+        image_pixel_set(image_p,
+                        colour%image_width(image_p),
+                        colour/image_width(image_p),
+                        *palette_colour_get(palette_p, colour));
+    }
+    image_file_write("palette", image_p, NULL);
 }
 
 static void

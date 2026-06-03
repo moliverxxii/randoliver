@@ -46,6 +46,11 @@ typedef struct __attribute__((packed))
     uint32_t important_colours;
 } bitmap_info_header;
 
+union palette_element_u
+{
+    colour_t colour;
+    uint32_t unused;
+};
 
 typedef struct __attribute__((packed))
 {
@@ -198,3 +203,4 @@ image_file_init_header(FILE* file, uint32_t width, uint32_t height)
     };
     fwrite(&header, sizeof(header), 1, file);
 }
+

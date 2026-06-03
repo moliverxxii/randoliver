@@ -4,8 +4,10 @@
  *  Created on: 19 nov. 2023
  *      Author: moliver
  */
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "colours.h"
 #include "utility.h"
 
@@ -34,6 +36,14 @@ colour_get_random()
     colour_t colour;
     memcpy(&colour, &colour_raw, sizeof(colour));
     return colour;
+}
+
+void
+colour_print(colour_t colour)
+{
+    printf("#%02X%02X%02X\n",
+           colour.red, colour.green, colour.blue);
+
 }
 
 colour_t
