@@ -124,7 +124,7 @@ typedef enum
     CURSOR_ESCAPE_COUNT
 } cursor_escape_t;
 
-void interface_init();
+void interface_init(const char* message_p);
 void interface_deinit();
 void interface_state_save();
 void interface_state_restore();
