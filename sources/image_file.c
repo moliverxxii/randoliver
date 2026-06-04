@@ -177,7 +177,7 @@ image_file_init_header(FILE* file, uint32_t width, uint32_t height)
     bmp_file_header_t header =
     {
         {'B', 'M'},
-        HEADER_SIZE + COLOUR_COUNT * width * height,
+        HEADER_SIZE + COLOUR_INDEX_COUNT * width * height,
         *(uint32_t*) BMP_GENERATOR_SIGNATURE,
         HEADER_SIZE,
 
@@ -190,7 +190,7 @@ image_file_init_header(FILE* file, uint32_t width, uint32_t height)
             width,
             height,
             BMP_PLANE_COUNT,
-            COLOUR_COUNT*BITS_PER_BYTE,
+            COLOUR_INDEX_COUNT*BITS_PER_BYTE,
 #ifdef BITMAP_INFO_HEADER
             0,
             0,

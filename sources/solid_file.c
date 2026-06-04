@@ -238,14 +238,14 @@ static int solid_file_content_parser_vertex(const char* line_p,
 static int solid_file_content_parser_face(const char* line_p,
                                           struct solid_constructor_t* solid_struct_p)
 {
-    colour_t colour = BLACK;
+    colour_t colour = COLOUR_BLACK;
     int conversion_count = sscanf(line_p,
                                   "#%2hhx%2hhx%2hhx",
                                   &colour.red,
                                   &colour.green,
                                   &colour.blue);
 
-    static colour_t current_colour = {{COLOUR_MAX, COLOUR_MAX, COLOUR_MAX}};
+    static colour_t current_colour = {{COLOUR_VALUE_MAX, COLOUR_VALUE_MAX, COLOUR_VALUE_MAX}};
     if(conversion_count > 0)
     {
         if(conversion_count == 3)

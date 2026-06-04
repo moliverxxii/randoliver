@@ -5,8 +5,8 @@
  *      Author: moliver
  */
 
-#ifndef HEADERS_COLOUR_PALETTE_H_
-#define HEADERS_COLOUR_PALETTE_H_
+#ifndef HEADERS_PALETTE_H_
+#define HEADERS_PALETTE_H_
 
 #include <stdint.h>
 
@@ -24,11 +24,10 @@ typedef enum
 
 typedef enum
 {
-    PALETTE_INDEX_METHOD_VALUE = 0,
-    PALETTE_INDEX_METHOD_BLUE,
-    PALETTE_INDEX_METHOD_RED,
-    PALETTE_INDEX_METHOD_GREEN,
+    PALETTE_INDEX_METHOD_RGB = 0,
     PALETTE_INDEX_METHOD_DISTANCE,
+    PALETTE_INDEX_METHOD_DITHER,
+    PALETTE_INDEX_METHOD_COUNT
 } palette_index_method_e;
 
 typedef struct palette_t palette_t;
@@ -41,11 +40,11 @@ palette_index_t palette_count(const palette_t* palette_p);
 palette_t* palette_init(palette_bit_depth_e bitdepth,
                                       palette_index_t colour_count);
 
-palette_index_t palette_index_get(const palette_t* palette_p,
-                                                colour_t colour);
+palette_index_t palette_index_get(const palette_t* palette_p, colour_t colour,
+                                  palette_index_method_e method);
 
 const colour_t* palette_colour_get(const palette_t* palette_p,
                                    palette_index_t index);
 
 void palette_print(const palette_t* palette_p);
-#endif /* HEADERS_COLOUR_PALETTE_H_ */
+#endif /* HEADERS_PALETTE_H_ */

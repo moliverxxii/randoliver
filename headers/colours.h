@@ -12,18 +12,18 @@
 
 typedef enum
 {
-	COLOUR_BLUE = 0,
-	COLOUR_GREEN,
-	COLOUR_RED,
-	COLOUR_COUNT
-} pixel_colour_t;
+	COLOUR_INDEX_BLUE = 0,
+	COLOUR_INDEX_GREEN,
+	COLOUR_INDEX_RED,
+	COLOUR_INDEX_COUNT
+} colour_index_t;
 
 typedef uint8_t colour_value_t;
 
 typedef enum
 {
-    COLOUR_MIN = 0,
-    COLOUR_MAX = UINT8_MAX,
+    COLOUR_VALUE_MIN = 0,
+    COLOUR_VALUE_MAX = UINT8_MAX,
 } colour_boundaries_t;
 
 typedef union
@@ -34,18 +34,18 @@ typedef union
         colour_value_t green;
         colour_value_t red;
     };
-    colour_value_t array[COLOUR_COUNT];
+    colour_value_t array[COLOUR_INDEX_COUNT];
 } colour_t;
 
-extern const colour_t BLACK;
-extern const colour_t WHITE;
-extern const colour_t GREY;
-extern const colour_t RED;
-extern const colour_t GREEN;
-extern const colour_t BLUE;
-extern const colour_t CYAN;
-extern const colour_t MAGENTA;
-extern const colour_t YELLOW;
+extern const colour_t COLOUR_BLACK;
+extern const colour_t COLOUR_WHITE;
+extern const colour_t COLOUR_GREY;
+extern const colour_t COLOUR_RED;
+extern const colour_t COLOUR_GREEN;
+extern const colour_t COLOUR_BLUE;
+extern const colour_t COLOUR_CYAN;
+extern const colour_t COLOUR_MAGENTA;
+extern const colour_t COLOUR_YELLOW;
 
 typedef colour_t (*colour_unary_operator)(colour_t, void*);
 typedef colour_t (*colour_binary_operator)(colour_t, colour_t, void*);
@@ -58,6 +58,7 @@ colour_t colour_init(colour_value_t red,
 colour_t colour_get_random();
 
 void colour_print(colour_t colour);
+uint32_t colour_distance(colour_t a, colour_t b);
 
 colour_t colour_random_delta(colour_t colour, void* parameters_p);
 

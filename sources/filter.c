@@ -66,7 +66,7 @@ get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius)
         return image_pixel_get(image_p, pixel_x, pixel_y);
     }
     colour_t return_colour = {{0, 0, 0}};
-    for (int colour = 0; colour < COLOUR_COUNT; colour++)
+    for (int colour = 0; colour < COLOUR_INDEX_COUNT; colour++)
     {
         float sum = 0;
         int count = 0;
@@ -74,7 +74,7 @@ get_blurred_pixel(const image_t* image_p, int pixel_x, int pixel_y, int radius)
         {
             for (int j = -radius; j <= radius; ++j)
             {
-                point_t* point_p = point_init(pixel_x + i, pixel_y + j, 0, BLACK);
+                point_t* point_p = point_init(pixel_x + i, pixel_y + j, 0, COLOUR_BLACK);
                 int is_in_image = point_is_in_image(point_p, image_p);
                 point_free(point_p);
                 if(!is_in_image)

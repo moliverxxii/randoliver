@@ -37,7 +37,7 @@ figure_init(uint32_t point_count)
         {
             for(uint32_t point = 0; point < point_count; ++point)
             {
-                figure.array[point] = point_init(0, 0, 0, BLACK);
+                figure.array[point] = point_init(0, 0, 0, COLOUR_BLACK);
             }
             *figure_p = figure;
         }

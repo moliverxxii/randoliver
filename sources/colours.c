@@ -11,15 +11,15 @@
 #include "colours.h"
 #include "utility.h"
 
-const colour_t BLACK   = {{0x00, 0x00, 0x00}};
-const colour_t WHITE   = {{0xFF, 0xFF, 0xFF}};
-const colour_t GREY    = {{0x80, 0x80, 0x80}};
-const colour_t RED     = {{0x00, 0x00, 0xFF}};
-const colour_t GREEN   = {{0x00, 0xFF, 0x00}};
-const colour_t BLUE    = {{0xFF, 0x00, 0x00}};
-const colour_t CYAN    = {{0xFF, 0xFF, 0x00}};
-const colour_t MAGENTA = {{0xFF, 0x00, 0xFF}};
-const colour_t YELLOW  = {{0x00, 0xFF, 0xFF}};
+const colour_t COLOUR_BLACK   = {{0x00, 0x00, 0x00}};
+const colour_t COLOUR_WHITE   = {{0xFF, 0xFF, 0xFF}};
+const colour_t COLOUR_GREY    = {{0x80, 0x80, 0x80}};
+const colour_t COLOUR_RED     = {{0x00, 0x00, 0xFF}};
+const colour_t COLOUR_GREEN   = {{0x00, 0xFF, 0x00}};
+const colour_t COLOUR_BLUE    = {{0xFF, 0x00, 0x00}};
+const colour_t COLOUR_CYAN    = {{0xFF, 0xFF, 0x00}};
+const colour_t COLOUR_MAGENTA = {{0xFF, 0x00, 0xFF}};
+const colour_t COLOUR_YELLOW  = {{0x00, 0xFF, 0xFF}};
 
 colour_t
 colour_init(colour_value_t red,
@@ -46,16 +46,29 @@ colour_print(colour_t colour)
 
 }
 
+uint32_t
+colour_distance(colour_t a, colour_t b)
+{
+    uint32_t total_distance = 0;
+    for(uint8_t colour = 0; colour<COLOUR_INDEX_COUNT; ++colour)
+    {
+        int16_t colour_distance = (int16_t) a.array[colour] - (int16_t) b.array[colour];
+        colour_distance *= colour_distance;
+        total_distance += colour_distance;
+    }
+    return total_distance;
+}
+
 colour_t
 colour_random_delta(colour_t colour, void* parameters_p)
 {
     float range = *(int*) parameters_p;
     int colour_index;
-    int8_t delta[COLOUR_COUNT];
+    int8_t delta[COLOUR_INDEX_COUNT];
     uint32_t rand_colour = rand();
 
     memcpy(delta, &rand_colour, sizeof(delta));
-    for(colour_index = 0; colour_index < COLOUR_COUNT; ++colour_index)
+    for(colour_index = 0; colour_index < COLOUR_INDEX_COUNT; ++colour_index)
     {
         uint8_t* colour_p = (uint8_t*) &colour + colour_index;
         *colour_p += (int8_t) (2*range * ((float) delta[colour_index] + 0.5f)/INT8_MAX);
@@ -71,19 +84,19 @@ colour_add_2(colour_t colour_1, colour_t colour_2, void* parameters_p)
 
     int colour;
     colour_t return_colour;
-    for(colour = 0; colour<COLOUR_COUNT; ++colour)
+    for(colour = 0; colour<COLOUR_INDEX_COUNT; ++colour)
     {
         uint16_t tmp_colour = (uint16_t) colour_1.array[colour] + (uint16_t) colour_2.array[colour];
-        return_colour.array[colour] = saturator(tmp_colour, COLOUR_MIN, COLOUR_MAX);
+        return_colour.array[colour] = saturator(tmp_colour, COLOUR_VALUE_MIN, COLOUR_VALUE_MAX);
     }
     return return_colour;
 }
 
 colour_t colour_average(colour_t a, colour_t b)
 {
-    colour_t new_colour = BLACK;
+    colour_t new_colour = COLOUR_BLACK;
 
-    for(int colour = 0; colour < COLOUR_COUNT; colour++)
+    for(int colour = 0; colour < COLOUR_INDEX_COUNT; colour++)
     {
         float new_value = (float) a.array[colour] + (float) b.array[colour];
         new_colour.array[colour] = dither(new_value/2);

@@ -170,7 +170,7 @@ int
 image_get_sum_colour(const image_t* image_p)
 {
     int sum = 0;
-    for(int colour = 0; colour<COLOUR_COUNT; colour++)
+    for(int colour = 0; colour<COLOUR_INDEX_COUNT; colour++)
     {
         for(uint32_t x=0; x<image_p->width; ++x)
         {
@@ -325,7 +325,7 @@ scale_pixel_linear(image_t* new_image_p, const image_t* image_p, uint32_t new_x,
 {
     float x_n = new_x/scale;
     float y_n = new_y/scale;
-    float colour_new[COLOUR_COUNT] = {0, 0, 0};
+    float colour_new[COLOUR_INDEX_COUNT] = {0, 0, 0};
 
     if(scale>1.0f)
     {
@@ -364,7 +364,7 @@ scale_pixel_linear(image_t* new_image_p, const image_t* image_p, uint32_t new_x,
 
                 float colour_factor = colour_factor_y[n_y_offset] * colour_factor_x[n_x_offset];
                 for(uint8_t colour_index = 0;
-                    colour_index < COLOUR_COUNT;
+                    colour_index < COLOUR_INDEX_COUNT;
                     ++colour_index)
                 {
                     colour_new[colour_index] +=
@@ -376,7 +376,7 @@ scale_pixel_linear(image_t* new_image_p, const image_t* image_p, uint32_t new_x,
         }
 
 
-        for(uint8_t colour_index = 0; colour_index < COLOUR_COUNT;
+        for(uint8_t colour_index = 0; colour_index < COLOUR_INDEX_COUNT;
                 ++colour_index)
         {
             colour_new[colour_index] /= colour_factor_sum;
@@ -435,7 +435,7 @@ scale_pixel_linear(image_t* new_image_p, const image_t* image_p, uint32_t new_x,
                 }
 
 
-                for(uint8_t colour_index = 0; colour_index < COLOUR_COUNT;
+                for(uint8_t colour_index = 0; colour_index < COLOUR_INDEX_COUNT;
                         ++colour_index)
                 {
                     colour_new[colour_index] +=
@@ -443,7 +443,7 @@ scale_pixel_linear(image_t* new_image_p, const image_t* image_p, uint32_t new_x,
                 }
             }
         }
-        for(uint8_t colour_index = 0; colour_index<COLOUR_COUNT; ++colour_index)
+        for(uint8_t colour_index = 0; colour_index<COLOUR_INDEX_COUNT; ++colour_index)
         {
             colour_new[colour_index] *= scale*scale;
         }

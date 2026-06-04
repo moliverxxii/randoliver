@@ -6,12 +6,12 @@
  */
 
 #include <math.h>
+#include <palette.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "presets.h"
 
-#include "colour_palette.h"
 #include "edge.h"
 #include "figure.h"
 #include "image_file.h"
@@ -97,7 +97,7 @@ oli_test_3d_middle_point()
     image_t* image_p  = image_init(width, height);
     image_set(image_p);
 
-    point_t* p_p = point_init(0, 0, 0, WHITE);
+    point_t* p_p = point_init(0, 0, 0, COLOUR_WHITE);
     camera_t camera = camera_init(-1,
                                   0,
                                   0,
@@ -119,10 +119,10 @@ oli_test_2d_corners()
     image_t* image_p  = image_init(width, height);
     image_set(image_p);
 
-    image_pixel_set(image_p,         0,         0,   BLUE);
-    image_pixel_set(image_p, width - 1,         0,    RED);
-    image_pixel_set(image_p, width - 1, height -1, YELLOW);
-    image_pixel_set(image_p,         0, height -1,  GREEN);
+    image_pixel_set(image_p,         0,         0,   COLOUR_BLUE);
+    image_pixel_set(image_p, width - 1,         0,    COLOUR_RED);
+    image_pixel_set(image_p, width - 1, height -1, COLOUR_YELLOW);
+    image_pixel_set(image_p,         0, height -1,  COLOUR_GREEN);
 
     image_file_write("test 2d coins", image_p, NULL);
     image_free(image_p);
@@ -189,7 +189,8 @@ oli_test_palette()
         {
             colour_t new_colour = *palette_colour_get(palette_p,
                                       palette_index_get(palette_p,
-                                      image_pixel_get(image_p, x, y)));
+                                                        image_pixel_get(image_p, x, y),
+                                                        PALETTE_INDEX_METHOD_DITHER));
             image_pixel_set(image_p, x, y, new_colour);
         }
     }
@@ -333,9 +334,9 @@ oli_sphere()
 
         *vector_p = vector_rotate(*vector_p, VECTOR_X,     M_PI * rand_vertical);
         *vector_p = vector_rotate(*vector_p, VECTOR_Z, 2 * M_PI * rand_horizontal);
-        *point_colour(point_p) = colour_init(COLOUR_MAX * rand_vertical,
-                                             COLOUR_MAX * rand_horizontal,
-                                             COLOUR_MAX * rand_vertical);
+        *point_colour(point_p) = colour_init(COLOUR_VALUE_MAX * rand_vertical,
+                                             COLOUR_VALUE_MAX * rand_horizontal,
+                                             COLOUR_VALUE_MAX * rand_vertical);
     }
 
     camera_t camera = camera_init(10, -40, 30, 0, 0, 0, 4.5);
@@ -383,9 +384,9 @@ oli_sphere_2()
 
         *vector_p = vector_rotate(*vector_p, VECTOR_X,     M_PI * rand_vertical);
         *vector_p = vector_rotate(*vector_p, VECTOR_Z, 2 * M_PI * rand_horizontal);
-        *point_colour(point_p) = colour_init(COLOUR_MAX * rand_vertical,
-                                             COLOUR_MAX * rand_horizontal,
-                                             COLOUR_MAX * rand_vertical);
+        *point_colour(point_p) = colour_init(COLOUR_VALUE_MAX * rand_vertical,
+                                             COLOUR_VALUE_MAX * rand_horizontal,
+                                             COLOUR_VALUE_MAX * rand_vertical);
     }
     vector_t* vector_array_p = malloc(point_count * sizeof(vector_t));
     for(uint32_t point=0; point < point_count; ++point)
@@ -427,9 +428,9 @@ oli_sphere_2()
     {
         edge_t* edge_p = edge_init(vector_array_p + edge,
                                    vector_array_p + edge + 1,
-                                   colour_init(COLOUR_MAX * (1 - vector_array_p[edge].x) / 2,
-                                               COLOUR_MAX * (1 + vector_array_p[edge].y) / 2,
-                                               COLOUR_MAX * (1 + vector_array_p[edge].z) / 2));
+                                   colour_init(COLOUR_VALUE_MAX * (1 - vector_array_p[edge].x) / 2,
+                                               COLOUR_VALUE_MAX * (1 + vector_array_p[edge].y) / 2,
+                                               COLOUR_VALUE_MAX * (1 + vector_array_p[edge].z) / 2));
         edge_render(edge_p, image_p, &camera);
         edge_free(edge_p);
     }

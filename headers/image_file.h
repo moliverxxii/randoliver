@@ -11,8 +11,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "colour_palette.h"
 #include "image.h"
+#include "palette.h"
 
 typedef struct image_file_parameters_t image_file_parameters_t;
 

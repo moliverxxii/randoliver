@@ -31,8 +31,8 @@ brownien1(image_t* image, int iterations, int spread, int x0, int y0)
             {
                 delta = rand() % 3 - 1;
                 pixel.array[colour] = saturator(pixel.array[colour] + delta,
-                COLOUR_MIN,
-                COLOUR_MAX);
+                COLOUR_VALUE_MIN,
+                COLOUR_VALUE_MAX);
             }
         }
         delta = rand() % (2 * spread + 1) - spread;
@@ -63,7 +63,7 @@ barres1(image_t* image, int spread)
 
             for(i = 0; i < 3; ++i)
             {
-                image_pixel_set(image, x_prime, y, WHITE);
+                image_pixel_set(image, x_prime, y, COLOUR_WHITE);
             }
             x += spread;
             x_prime = x + (rand() % 5 - 2);
@@ -95,7 +95,7 @@ barres2(image_t* image, int spread)
 
             for(i = 0; i < 3; ++i)
             {
-                image_pixel_set(image, x_prime[i], y, WHITE);
+                image_pixel_set(image, x_prime[i], y, COLOUR_WHITE);
             }
             x += spread;
             for(i = 0; i < 3; ++i)
@@ -134,9 +134,9 @@ test_pattern_scan(image_t* image_p)
     {
         for(uint32_t x = 0; x < image_width(image_p); ++x)
         {
-            colour_t colour = colour_init(x%(COLOUR_MAX + 1),
-                                          y%(COLOUR_MAX + 1),
-                                          ((x*y)/image_width(image_p))%(COLOUR_MAX + 1));
+            colour_t colour = colour_init(x%(COLOUR_VALUE_MAX + 1),
+                                          y%(COLOUR_VALUE_MAX + 1),
+                                          ((x*y)/image_width(image_p))%(COLOUR_VALUE_MAX + 1));
             image_pixel_set(image_p, x, y, colour);
 
         }
@@ -161,12 +161,12 @@ void image_reduce_bit_depth(image_t* image_p, uint8_t bits_per_colour, int dithe
         for(uint32_t x = 0; x < image_width(image_p); ++x)
         {
             colour_t pixel = image_pixel_get(image_p, x, y);
-            colour_t new_pixel = BLACK;
-            for(int colour = 0; colour < COLOUR_COUNT; ++colour)
+            colour_t new_pixel = COLOUR_BLACK;
+            for(int colour = 0; colour < COLOUR_INDEX_COUNT; ++colour)
             {
                 uint16_t dither_value = dither ? dither_matrix[y%DITHER_MATRIX_ORDER][x%DITHER_MATRIX_ORDER] : 0;
                 uint16_t value = ((uint16_t)pixel.array[colour] + dither_value);
-                value = saturator(value, COLOUR_MIN, COLOUR_MAX);
+                value = saturator(value, COLOUR_VALUE_MIN, COLOUR_VALUE_MAX);
                 value = value >> (8 - bits_per_colour);
                 new_pixel.array[colour] = value << (8 - bits_per_colour);
             }

@@ -51,31 +51,31 @@ solid_init_const()
 
     edge_t* edge_array[] =
     {
-        edge_init(&VERTEX[0], &VERTEX[1], RED),
-        edge_init(&VERTEX[1], &VERTEX[2], RED),
-        edge_init(&VERTEX[2], &VERTEX[3], RED),
-        edge_init(&VERTEX[3], &VERTEX[0], RED),
-        edge_init(&VERTEX[0], &VERTEX[4], BLUE),
-        edge_init(&VERTEX[4], &VERTEX[2], BLUE),
-        edge_init(&VERTEX[2], &VERTEX[5], BLUE),
-        edge_init(&VERTEX[5], &VERTEX[0], BLUE),
-        edge_init(&VERTEX[1], &VERTEX[4], GREEN),
-        edge_init(&VERTEX[4], &VERTEX[3], GREEN),
-        edge_init(&VERTEX[3], &VERTEX[5], GREEN),
-        edge_init(&VERTEX[5], &VERTEX[1], GREEN)
+        edge_init(&VERTEX[0], &VERTEX[1], COLOUR_RED),
+        edge_init(&VERTEX[1], &VERTEX[2], COLOUR_RED),
+        edge_init(&VERTEX[2], &VERTEX[3], COLOUR_RED),
+        edge_init(&VERTEX[3], &VERTEX[0], COLOUR_RED),
+        edge_init(&VERTEX[0], &VERTEX[4], COLOUR_BLUE),
+        edge_init(&VERTEX[4], &VERTEX[2], COLOUR_BLUE),
+        edge_init(&VERTEX[2], &VERTEX[5], COLOUR_BLUE),
+        edge_init(&VERTEX[5], &VERTEX[0], COLOUR_BLUE),
+        edge_init(&VERTEX[1], &VERTEX[4], COLOUR_GREEN),
+        edge_init(&VERTEX[4], &VERTEX[3], COLOUR_GREEN),
+        edge_init(&VERTEX[3], &VERTEX[5], COLOUR_GREEN),
+        edge_init(&VERTEX[5], &VERTEX[1], COLOUR_GREEN)
     };
     memcpy(EDGES, edge_array, sizeof(EDGES));
 
     triangle_t* faces[] =
     {
-        triangle_init_list(VERTEX, 0, 1, 4, GREEN),
-        triangle_init_list(VERTEX, 2, 1, 4, MAGENTA),
-        triangle_init_list(VERTEX, 2, 3, 4, BLUE),
-        triangle_init_list(VERTEX, 0, 3, 4, RED),
-        triangle_init_list(VERTEX, 0, 1, 5, BLUE),
-        triangle_init_list(VERTEX, 2, 1, 5, RED),
-        triangle_init_list(VERTEX, 2, 3, 5, GREEN),
-        triangle_init_list(VERTEX, 0, 3, 5, MAGENTA),
+        triangle_init_list(VERTEX, 0, 1, 4, COLOUR_GREEN),
+        triangle_init_list(VERTEX, 2, 1, 4, COLOUR_MAGENTA),
+        triangle_init_list(VERTEX, 2, 3, 4, COLOUR_BLUE),
+        triangle_init_list(VERTEX, 0, 3, 4, COLOUR_RED),
+        triangle_init_list(VERTEX, 0, 1, 5, COLOUR_BLUE),
+        triangle_init_list(VERTEX, 2, 1, 5, COLOUR_RED),
+        triangle_init_list(VERTEX, 2, 3, 5, COLOUR_GREEN),
+        triangle_init_list(VERTEX, 0, 3, 5, COLOUR_MAGENTA),
     };
     memcpy(FACES, faces, sizeof(FACES));
 
