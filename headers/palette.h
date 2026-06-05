@@ -46,5 +46,7 @@ palette_index_t palette_index_get(const palette_t* palette_p, colour_t colour,
 const colour_t* palette_colour_get(const palette_t* palette_p,
                                    palette_index_t index);
 
+colour_t palette_colour_reduce(const palette_t* palette_p, colour_t colour, palette_index_method_e method);
+
 void palette_print(const palette_t* palette_p);
 #endif /* HEADERS_PALETTE_H_ */

@@ -115,6 +115,21 @@ palette_colour_get(const palette_t* palette_p,
     return colour_p;
 }
 
+colour_t
+palette_colour_reduce(const palette_t* palette_p,
+                      colour_t colour,
+                      palette_index_method_e method)
+{
+    const colour_t* colour_p = palette_colour_get(palette_p, palette_index_get(palette_p, colour, method));
+    if(colour_p == NULL)
+    {
+        printf("colour_p error NULL\n");
+        colour_p = &COLOUR_BLACK;
+    }
+    return *colour_p;
+}
+
+
 void
 palette_print(const palette_t* palette_p)
 {
@@ -188,22 +203,29 @@ is_in_box(colour_t new_colour, const colour_t boundary_box[2])
     return in_box_b;
 }
 
+
+struct chosen_colour
+{
+    const colour_t* colour_p;
+    uint32_t proximity;
+};
+
 static void
-update_box(const colour_t* new_colour, const colour_t* indices[2][COLOUR_INDEX_COUNT], colour_t center, colour_t box[2])
+update_box(const colour_t* new_colour_p, struct chosen_colour indices[2][COLOUR_INDEX_COUNT], colour_t center, colour_t box[2])
 {
     for(colour_index_t colour_index = 0;
         colour_index < COLOUR_INDEX_COUNT;
         ++colour_index)
     {
-        if(new_colour->array[colour_index] <= center.array[colour_index])
+        if(new_colour_p->array[colour_index] <= center.array[colour_index])
         {
-            box[0].array[colour_index] = new_colour->array[colour_index];
-            indices[0][colour_index] = new_colour;
+            box[0].array[colour_index] = new_colour_p->array[colour_index];
+            indices[0][colour_index].colour_p = new_colour_p;
         }
         else
         {
-            box[1].array[colour_index] = new_colour->array[colour_index];
-            indices[1][colour_index] = new_colour;
+            box[1].array[colour_index] = new_colour_p->array[colour_index];
+            indices[1][colour_index].colour_p = new_colour_p;
         }
     }
 
@@ -212,10 +234,19 @@ update_box(const colour_t* new_colour, const colour_t* indices[2][COLOUR_INDEX_C
 static palette_index_t
 palette_index_get_dither(const palette_t* palette_p, colour_t colour)
 {
-    const colour_t* indices[2][COLOUR_INDEX_COUNT] =
+    #warning occasional segmentation fault
+    struct chosen_colour closest_colours_p[2][COLOUR_INDEX_COUNT] =
     {
-        {NULL, NULL, NULL},
-        {NULL, NULL, NULL}
+        {
+            {NULL, 0},
+            {NULL, 0},
+            {NULL, 0}
+        },
+        {
+            {NULL, 0},
+            {NULL, 0},
+            {NULL, 0}
+        }
     };
 
     colour_t boundary_box[2] = {COLOUR_BLACK, COLOUR_WHITE};
@@ -226,13 +257,14 @@ palette_index_get_dither(const palette_t* palette_p, colour_t colour)
 
         if(is_in_box(*palette_colour_p, boundary_box))
         {
-            update_box(palette_colour_p, indices, colour, boundary_box);
+            update_box(palette_colour_p, closest_colours_p, colour, boundary_box);
         }
     }
 
-    uint16_t colour_distance = UINT16_MAX;
-    uint8_t chosen_colour_index = 0;
-    uint8_t chosen_boundary     = 0;
+    uint32_t colour_distance_meter = UINT32_MAX;
+
+    const colour_t* chosen_colour_p = NULL;
+
 
     for(colour_index_t colour_index = 0;
         colour_index < COLOUR_INDEX_COUNT;
@@ -240,20 +272,80 @@ palette_index_get_dither(const palette_t* palette_p, colour_t colour)
     {
         for(uint8_t boundary = 0; boundary < 2; ++boundary)
         {
-            if(indices[boundary][colour_index] != NULL)
+            if(closest_colours_p[boundary][colour_index].colour_p != NULL)
             {
-                int16_t selected_colour = (int16_t) indices[boundary][colour_index]->array[colour_index] - (int16_t) colour.array[colour_index];
-                uint16_t distance = selected_colour * selected_colour;
-                if(distance < colour_distance)
+                if(0)
                 {
-                    colour_distance     = distance;
-                    chosen_colour_index = colour_index;
-                    chosen_boundary     = boundary;
+                    uint32_t distance = colour_distance(colour, *closest_colours_p[boundary][colour_index].colour_p);
+                    if(distance < colour_distance_meter)
+                    {
+                        colour_distance_meter = distance;
+                        chosen_colour_p       = closest_colours_p[boundary][colour_index].colour_p;
+                    }
+                }
+                else
+                {
+                    uint32_t current_distance = colour_distance(colour, *closest_colours_p[boundary][colour_index].colour_p);
+                    if(current_distance == 0)
+                    {
+                         chosen_colour_p = closest_colours_p[boundary][colour_index].colour_p;
+                         break;
+                    }
+                    else
+                    {
+                        closest_colours_p[boundary][colour_index].proximity = UINT32_MAX / current_distance;
+                    }
                 }
             }
         }
     }
 
-    palette_index_t selected_index = indices[chosen_boundary][chosen_colour_index] - palette_colour_get(palette_p, 0);
+    if(chosen_colour_p == NULL)
+    {
+        uint32_t proximity_total = 0;
+        //on enleve les doublons.
+        for(uint32_t closest_index = 0; closest_index < 6; ++closest_index)
+        {
+            struct chosen_colour* compare_colour_p = &closest_colours_p[0][0] + closest_index;
+            if(compare_colour_p->colour_p != NULL)
+            {
+                for(uint32_t next_index = closest_index + 1; next_index < 6; ++next_index)
+                {
+                    struct chosen_colour* next_colour_p = &closest_colours_p[0][0] + next_index;
+                    if(compare_colour_p->colour_p == next_colour_p->colour_p)
+                    {
+                        *next_colour_p = (struct chosen_colour) {NULL, 0};
+                    }
+                }
+                proximity_total += compare_colour_p->proximity;
+            }
+        }
+
+        uint32_t score = (proximity_total * (float) rand()) / (RAND_MAX);
+        uint32_t score_sum = 0;
+        struct chosen_colour* element = &closest_colours_p[0][0];
+        uint32_t position = 0;
+        while(score_sum < proximity_total)
+        {
+            position = element - &closest_colours_p[0][0];
+
+            if(position >= 6)
+            {
+                printf("error dickhead!\n");
+                break;
+            }
+
+            if(score_sum <= score && score < score_sum + element->proximity)
+            {
+                chosen_colour_p = element->colour_p;
+                break;
+            }
+
+            score_sum += element->proximity;
+            ++element;
+        }
+    }
+
+    palette_index_t selected_index = chosen_colour_p - palette_colour_get(palette_p, 0);
     return selected_index;
 }

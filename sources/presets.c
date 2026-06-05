@@ -187,10 +187,7 @@ oli_test_palette()
     {
         for(uint32_t y = 0; y < image_height(image_p); ++y)
         {
-            colour_t new_colour = *palette_colour_get(palette_p,
-                                      palette_index_get(palette_p,
-                                                        image_pixel_get(image_p, x, y),
-                                                        PALETTE_INDEX_METHOD_DITHER));
+            colour_t new_colour = palette_colour_reduce(palette_p, image_pixel_get(image_p, x, y), PALETTE_INDEX_METHOD_DITHER);
             image_pixel_set(image_p, x, y, new_colour);
         }
     }
