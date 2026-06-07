@@ -20,6 +20,11 @@ image_file_parameters_t* image_file_parameters_init(
             palette_bit_depth_e bit_depth,
             const palette_t* palette_p);
 
+image_file_parameters_t* image_file_parameters_init_palette(
+        const palette_t* palette_p,
+        palette_index_method_e method);
+void image_file_parameters_free_palette(image_file_parameters_t* parameters_p);
+
 //Writes an image into a windows BITMAP stream.
 void image_file_write(const char* name_p, const image_t* image_p,
                       const image_file_parameters_t* parameters_p);

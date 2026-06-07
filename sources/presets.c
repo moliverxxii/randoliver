@@ -179,20 +179,21 @@ static void
 oli_test_palette()
 {
     palette_t* palette_p = palette_init(PIXEL_BIT_DEPTH_8b, 0);
-    int width = 320;
+    int width = 321;
     int height = 240;
     image_t* image_p  = image_init(width, height);
     test_pattern_scan(image_p);
 
     void* parameters_p = colour_operation_reduce_parameters_init(palette_p, PALETTE_INDEX_METHOD_DITHER);
-    image_process_1(&colour_operation_reduce, image_p, parameters_p);
-    image_file_write("oli test pattern palette", image_p, NULL);
+    image_file_parameters_t* file_parameters_p = image_file_parameters_init_palette(palette_p, PALETTE_INDEX_METHOD_DITHER);
+    image_file_write("oli test pattern palette", image_p, file_parameters_p);
 
     //on teste si l'operation est injective
     image_process_1(&colour_operation_reduce, image_p, parameters_p);
     image_file_write("oli test pattern palette double", image_p, NULL);
     image_free(image_p);
     colour_operation_reduce_parameters_free(parameters_p);
+    image_file_parameters_free_palette(file_parameters_p);
     image_p = image_init(16, 16);
     for(palette_index_t colour = 0; colour < palette_count(palette_p); ++colour)
     {

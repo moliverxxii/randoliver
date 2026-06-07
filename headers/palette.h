@@ -36,6 +36,7 @@ typedef uint32_t palette_index_t;
 
 palette_index_t palette_get_count(palette_bit_depth_e bit_depth);
 palette_index_t palette_count(const palette_t* palette_p);
+uint8_t         palette_get_bits_per_colour(const palette_t* palette_p);
 
 palette_t* palette_init(palette_bit_depth_e bitdepth,
                                       palette_index_t colour_count);

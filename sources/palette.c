@@ -68,6 +68,19 @@ palette_index_t palette_count(const palette_t* palette_p)
     return palette_p->count;
 }
 
+uint8_t
+palette_get_bits_per_colour(const palette_t* palette_p)
+{
+    palette_index_t colours_count = palette_count(palette_p);
+    uint8_t bit_count = 0;
+    while(colours_count >> (bit_count+1)>0)
+    {
+        ++bit_count;
+    }
+    return bit_count;
+}
+
+
 palette_t*
 palette_init(palette_bit_depth_e bitdepth, uint32_t colour_count)
 {

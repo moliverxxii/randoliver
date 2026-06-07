@@ -16,10 +16,20 @@ static const uint8_t BITS_PER_BYTE = 8;
 
 #define BITMAP_INFO_HEADER
 
+typedef struct image_file_parameters_t
+{
+    const palette_t* palette_p;
+    palette_bit_depth_e bit_depth;
+    palette_index_method_e palette_method;
+} image_file_parameters_t;
+
 typedef struct
 {
     char* file_name_p;
     FILE* file_p;
+    const palette_t* palette_p;
+    palette_bit_depth_e bit_depth;
+    palette_index_method_e palette_method;
 } image_file_t;
 
 typedef struct __attribute__((packed))
@@ -67,18 +77,22 @@ typedef struct __attribute__((packed))
 #endif // !BITMAP_INFO_HEADER
 } bmp_file_header_t;
 
-const size_t ROW_PADDING = sizeof(uint32_t);
 const size_t HEADER_SIZE = sizeof(bmp_file_header_t);
-const char BMP_GENERATOR_SIGNATURE[sizeof(uint32_t)] = {'m', 'o', '2', '2'};
+const char* const BMP_GENERATOR_SIGNATURE = "mo22";
 
-static void image_file_init_header(FILE* file, uint32_t width, uint32_t height);
+static void image_file_write_header(image_file_t* file_p, uint32_t width, uint32_t height);
+static void image_file_write_next_row(image_file_t* image_file_p, const row_t row, uint32_t width);
+static void image_file_write_palette();
+static void image_file_write_file_size();
 
-static image_file_t* image_file_init(const char* name);
+static image_file_t* image_file_init(const char* name_p, const image_file_parameters_t* parameters_p);
 static void image_file_free(image_file_t* image_file_p);
+static void image_file_seek_header(image_file_t* image_file_p);
+static void image_file_seek_palette(image_file_t* image_file_p);
+static void image_file_seek_bitmap(image_file_t* image_file_p);
 
-
-image_file_t*
-image_file_init(const char* name_p)
+static image_file_t*
+image_file_init(const char* name_p, const image_file_parameters_t* parameters_p)
 {
     char* image_name_p = malloc((strlen(name_p) + 1)* sizeof(char));
     strcpy(image_name_p, name_p);
@@ -103,7 +117,26 @@ image_file_init(const char* name_p)
         return NULL;
     }
 
-    image_file_t image_file = {image_name_p, file_p};
+    image_file_parameters_t parameters =
+    {
+        NULL,
+        PIXEL_BIT_DEPTH_24b,
+        PALETTE_INDEX_METHOD_RGB
+    };
+
+    if(parameters_p != NULL)
+    {
+        parameters = *parameters_p;
+    }
+
+    image_file_t image_file =
+    {
+            image_name_p,
+            file_p,
+            parameters.palette_p,
+            parameters.bit_depth,
+            parameters.palette_method
+    };
 
     image_file_t* image_file_p = malloc(sizeof(image_file_t));
     *image_file_p = image_file;
@@ -111,7 +144,7 @@ image_file_init(const char* name_p)
     return image_file_p;
 }
 
-void
+static void
 image_file_free(image_file_t* image_file_p)
 {
     free(image_file_p->file_name_p);
@@ -119,26 +152,64 @@ image_file_free(image_file_t* image_file_p)
     free(image_file_p);
 }
 
+static void image_file_seek_header(image_file_t* image_file_p)
+{
+    fseek(image_file_p->file_p, 0, SEEK_SET);
+}
+
+static void image_file_seek_palette(image_file_t* image_file_p)
+{
+    fseek(image_file_p->file_p, HEADER_SIZE, SEEK_SET);
+}
+
+static void
+image_file_seek_bitmap(image_file_t* file_p)
+{
+    image_file_seek_header(file_p);
+    bmp_file_header_t header;
+    fread(&header, sizeof(header), 1, file_p->file_p);
+    fseek(file_p->file_p, header.data_offset, SEEK_SET);
+}
+
+
+image_file_parameters_t*
+image_file_parameters_init_palette(const palette_t* palette_p, palette_index_method_e method)
+{
+    image_file_parameters_t parameters =
+    {
+        palette_p,
+        palette_get_bits_per_colour(palette_p),
+        method
+    };
+    image_file_parameters_t* parameters_p = malloc(sizeof(image_file_parameters_t));
+    if(parameters_p != NULL)
+    {
+        *parameters_p = parameters;
+    }
+    return parameters_p;
+}
+
+void image_file_parameters_free_palette(image_file_parameters_t* parameters_p)
+{
+    free(parameters_p);
+}
 
 void
 image_file_write(const char* name_p, const image_t* image_p,
                  const image_file_parameters_t* parameters_p)
 {
-    OLI_UNUSED(parameters_p);
-
-    image_file_t* image_file_p = image_file_init(name_p);
-    fseek(image_file_p->file_p, HEADER_SIZE, SEEK_SET);
-    image_file_init_header(image_file_p->file_p, image_width(image_p), image_height(image_p));
+    image_file_t* image_file_p = image_file_init(name_p, parameters_p);
+    image_file_write_header(image_file_p, image_width(image_p), image_height(image_p));
+    if(image_file_p->palette_p != NULL)
+    {
+        image_file_write_palette(image_file_p);
+    }
+    image_file_seek_bitmap(image_file_p);
     for(uint32_t y = image_height(image_p); y>0; --y)
     {
-        fwrite(image_row(image_p, y-1),
-               sizeof(colour_t),
-               image_width(image_p),
-               image_file_p->file_p);
-        uint8_t pad[3] = {0, 0, 0};
-        uint8_t pad_length = (ROW_PADDING - (sizeof(colour_t) * image_width(image_p)) % ROW_PADDING) % ROW_PADDING;
-        fwrite(pad, sizeof(uint8_t), pad_length, image_file_p->file_p);
+        image_file_write_next_row(image_file_p, image_row(image_p, y-1), image_width(image_p));
     }
+    image_file_write_file_size(image_file_p);
     image_file_free(image_file_p);
 }
 
@@ -171,16 +242,27 @@ file_name_extension_number(const char* input, int number)
 }
 
 static void
-image_file_init_header(FILE* file, uint32_t width, uint32_t height)
+image_file_write_header(image_file_t* file_p, uint32_t width, uint32_t height)
 {
-    fseek(file, 0, SEEK_SET);
+    int has_palette = 0;
+    size_t palette_size = 0;
+    uint32_t colour_count = 0;
+    if(file_p->palette_p != NULL)
+    {
+        has_palette = 1;
+        colour_count = palette_count(file_p->palette_p);
+        palette_size = colour_count * sizeof(union palette_element_u);
+    }
+
+    uint8_t bits_per_pixel = has_palette
+                           ? palette_get_bits_per_colour(file_p->palette_p)
+                           : sizeof(colour_t) * BITS_PER_BYTE;
     bmp_file_header_t header =
     {
         {'B', 'M'},
-        HEADER_SIZE + COLOUR_INDEX_COUNT * width * height,
+        0, //ecrit a la toute fin.
         *(uint32_t*) BMP_GENERATOR_SIGNATURE,
-        HEADER_SIZE,
-
+        HEADER_SIZE + palette_size,
         {
 #ifndef BITMAP_INFO_HEADER
             sizeof(bitmap_core_header),
@@ -190,17 +272,104 @@ image_file_init_header(FILE* file, uint32_t width, uint32_t height)
             width,
             height,
             BMP_PLANE_COUNT,
-            COLOUR_INDEX_COUNT*BITS_PER_BYTE,
+            bits_per_pixel,
 #ifdef BITMAP_INFO_HEADER
             0,
             0,
             RES,
             RES,
-            0,
+            colour_count,
             0
 #endif // BITMAP_INFO_HEADER
         }
     };
-    fwrite(&header, sizeof(header), 1, file);
+
+    image_file_seek_header(file_p);
+    fwrite(&header, sizeof(header), 1, file_p->file_p);
 }
 
+#define ROW_PADDING sizeof(uint32_t)
+
+static void
+image_file_write_next_row(image_file_t* image_file_p, const row_t row, uint32_t width)
+{
+    size_t row_size = 0;
+    switch(image_file_p->bit_depth)
+    {
+    case PIXEL_BIT_DEPTH_24b:
+    default:
+        row_size = sizeof(colour_t)* fwrite(row,
+                                            sizeof(colour_t),
+                                            width,
+                                            image_file_p->file_p);
+        break;
+    case PIXEL_BIT_DEPTH_1b:
+    case PIXEL_BIT_DEPTH_4b:
+    case PIXEL_BIT_DEPTH_8b:
+        {
+            uint8_t byte = 0;
+            uint8_t bit  = 0;
+            for(uint32_t x = 0; x < width; ++x)
+            {
+                byte |= palette_index_get(image_file_p->palette_p, row[x],
+                        image_file_p->palette_method);
+
+                if(bit == BITS_PER_BYTE - image_file_p->bit_depth)
+                {
+                    row_size += sizeof(byte) * fwrite(&byte, sizeof(byte), 1,
+                            image_file_p->file_p);
+                    byte = 0;
+                }
+                else
+                {
+                    byte <<= image_file_p->bit_depth;
+                }
+                bit = (bit + image_file_p->bit_depth) % BITS_PER_BYTE;
+            }
+
+            if(bit > 0)
+            {
+                byte <<= BITS_PER_BYTE - bit;
+                row_size += sizeof(byte) * fwrite(&byte, sizeof(byte), 1,
+                        image_file_p->file_p);
+            }
+        }
+        break;
+    }
+
+    uint8_t pad[ROW_PADDING - 1] = {0, 0, 0};
+    uint8_t pad_length = ROW_PADDING * ((row_size + (ROW_PADDING - 1)) / ROW_PADDING)  - row_size;
+    fwrite(pad, sizeof(uint8_t), pad_length, image_file_p->file_p);
+}
+
+static void
+image_file_write_palette(image_file_t* file_p)
+{
+    image_file_seek_palette(file_p);
+    palette_index_t colour_count = palette_count(file_p->palette_p);
+    union palette_element_u* table = calloc(colour_count, sizeof(union palette_element_u));
+    for(palette_index_t colour = 0; colour < colour_count; ++colour)
+    {
+        table[colour].colour = *palette_colour_get(file_p->palette_p, colour);
+    }
+    fwrite(table, sizeof(union palette_element_u), colour_count, file_p->file_p);
+    long bitmap_offset = ftell(file_p->file_p);
+    bmp_file_header_t header;
+    fread(&header, sizeof(header), 1, file_p->file_p);
+    header.data_offset = bitmap_offset;
+    image_file_seek_header(file_p);
+    fwrite(&header, sizeof(header), 1, file_p->file_p);
+}
+
+static void
+image_file_write_file_size(image_file_t* file_p)
+{
+    fseek(file_p->file_p, 0, SEEK_END);
+    long size = ftell(file_p->file_p);
+    image_file_seek_header(file_p);
+    bmp_file_header_t header;
+    fread(&header, sizeof(header), 1, file_p->file_p);
+    header.file_size = (uint32_t) size;
+    image_file_seek_header(file_p);
+    fwrite(&header, sizeof(header), 1, file_p->file_p);
+}
