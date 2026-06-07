@@ -80,97 +80,17 @@ typedef struct __attribute__((packed))
 const size_t HEADER_SIZE = sizeof(bmp_file_header_t);
 const char* const BMP_GENERATOR_SIGNATURE = "mo22";
 
-static void image_file_write_header(image_file_t* file_p, uint32_t width, uint32_t height);
-static void image_file_write_next_row(image_file_t* image_file_p, const row_t row, uint32_t width);
-static void image_file_write_palette();
-static void image_file_write_file_size();
-
 static image_file_t* image_file_init(const char* name_p, const image_file_parameters_t* parameters_p);
 static void image_file_free(image_file_t* image_file_p);
+
 static void image_file_seek_header(image_file_t* image_file_p);
 static void image_file_seek_palette(image_file_t* image_file_p);
 static void image_file_seek_bitmap(image_file_t* image_file_p);
 
-static image_file_t*
-image_file_init(const char* name_p, const image_file_parameters_t* parameters_p)
-{
-    char* image_name_p = malloc((strlen(name_p) + 1)* sizeof(char));
-    strcpy(image_name_p, name_p);
-
-
-    char* file_name_p = file_name_extension_bmp(name_p);
-
-    if(!file_name_p)
-    {
-    	printf("file name error\n");
-        return NULL;
-    }
-
-    FILE* file_p = fopen(file_name_p, "wb+");
-    free(file_name_p);
-    file_name_p = NULL;
-
-    if(!file_p)
-    {
-        printf("image file error\n");
-        free(image_name_p);
-        return NULL;
-    }
-
-    image_file_parameters_t parameters =
-    {
-        NULL,
-        PIXEL_BIT_DEPTH_24b,
-        PALETTE_INDEX_METHOD_RGB
-    };
-
-    if(parameters_p != NULL)
-    {
-        parameters = *parameters_p;
-    }
-
-    image_file_t image_file =
-    {
-            image_name_p,
-            file_p,
-            parameters.palette_p,
-            parameters.bit_depth,
-            parameters.palette_method
-    };
-
-    image_file_t* image_file_p = malloc(sizeof(image_file_t));
-    *image_file_p = image_file;
-
-    return image_file_p;
-}
-
-static void
-image_file_free(image_file_t* image_file_p)
-{
-    free(image_file_p->file_name_p);
-    fclose(image_file_p->file_p);
-    free(image_file_p);
-}
-
-static void image_file_seek_header(image_file_t* image_file_p)
-{
-    fseek(image_file_p->file_p, 0, SEEK_SET);
-}
-
-static void image_file_seek_palette(image_file_t* image_file_p)
-{
-    fseek(image_file_p->file_p, HEADER_SIZE, SEEK_SET);
-}
-
-static void
-image_file_seek_bitmap(image_file_t* file_p)
-{
-    image_file_seek_header(file_p);
-    bmp_file_header_t header;
-    fread(&header, sizeof(header), 1, file_p->file_p);
-    fseek(file_p->file_p, header.data_offset, SEEK_SET);
-}
-
+static void image_file_write_header(image_file_t* file_p, uint32_t width, uint32_t height);
+static void image_file_write_next_row(image_file_t* image_file_p, const row_t row, uint32_t width);
+static void image_file_write_palette();
+static void image_file_write_file_size();
 
 image_file_parameters_t*
 image_file_parameters_init_palette(const palette_t* palette_p, palette_index_method_e method)
@@ -189,7 +109,8 @@ image_file_parameters_init_palette(const palette_t* palette_p, palette_index_met
     return parameters_p;
 }
 
-void image_file_parameters_free_palette(image_file_parameters_t* parameters_p)
+void
+image_file_parameters_free_palette(image_file_parameters_t* parameters_p)
 {
     free(parameters_p);
 }
@@ -240,6 +161,89 @@ file_name_extension_number(const char* input, int number)
     strcat(output, number_string);
     return output;
 }
+
+static image_file_t*
+image_file_init(const char* name_p, const image_file_parameters_t* parameters_p)
+{
+    char* image_name_p = malloc((strlen(name_p) + 1)* sizeof(char));
+    strcpy(image_name_p, name_p);
+
+
+    char* file_name_p = file_name_extension_bmp(name_p);
+
+    if(!file_name_p)
+    {
+        printf("file name error\n");
+        return NULL;
+    }
+
+    FILE* file_p = fopen(file_name_p, "wb+");
+    free(file_name_p);
+    file_name_p = NULL;
+
+    if(!file_p)
+    {
+        printf("image file error\n");
+        free(image_name_p);
+        return NULL;
+    }
+
+    image_file_parameters_t parameters =
+    {
+        NULL,
+        PIXEL_BIT_DEPTH_24b,
+        PALETTE_INDEX_METHOD_RGB
+    };
+
+    if(parameters_p != NULL)
+    {
+        parameters = *parameters_p;
+    }
+
+    image_file_t image_file =
+    {
+            image_name_p,
+            file_p,
+            parameters.palette_p,
+            parameters.bit_depth,
+            parameters.palette_method
+    };
+
+    image_file_t* image_file_p = malloc(sizeof(image_file_t));
+    *image_file_p = image_file;
+
+    return image_file_p;
+}
+
+static void
+image_file_free(image_file_t* image_file_p)
+{
+    free(image_file_p->file_name_p);
+    fclose(image_file_p->file_p);
+    free(image_file_p);
+}
+
+static void
+image_file_seek_header(image_file_t* image_file_p)
+{
+    fseek(image_file_p->file_p, 0, SEEK_SET);
+}
+
+static void
+image_file_seek_palette(image_file_t* image_file_p)
+{
+    fseek(image_file_p->file_p, HEADER_SIZE, SEEK_SET);
+}
+
+static void
+image_file_seek_bitmap(image_file_t* file_p)
+{
+    image_file_seek_header(file_p);
+    bmp_file_header_t header;
+    fread(&header, sizeof(header), 1, file_p->file_p);
+    fseek(file_p->file_p, header.data_offset, SEEK_SET);
+}
+
 
 static void
 image_file_write_header(image_file_t* file_p, uint32_t width, uint32_t height)
