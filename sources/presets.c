@@ -202,6 +202,7 @@ oli_test_palette()
                         colour/image_width(image_p),
                         *palette_colour_get(palette_p, colour));
     }
+    palette_free(palette_p);
     image_file_write("palette", image_p, NULL);
     image_free(image_p);
 }

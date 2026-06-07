@@ -123,6 +123,13 @@ palette_init(palette_bit_depth_e bitdepth, uint32_t colour_count)
     return palette_p;
 }
 
+void palette_free(palette_t* palette_p)
+{
+    free(palette_p->colour_array_p);
+    free(palette_p);
+}
+
+
 palette_index_t
 palette_index_get(const palette_t* palette_p, colour_t colour,
                   palette_index_method_e method)

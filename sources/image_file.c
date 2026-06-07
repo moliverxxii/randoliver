@@ -357,6 +357,7 @@ image_file_write_palette(image_file_t* file_p)
         table[colour].colour = *palette_colour_get(file_p->palette_p, colour);
     }
     fwrite(table, sizeof(union palette_element_u), colour_count, file_p->file_p);
+    free(table);
     long bitmap_offset = ftell(file_p->file_p);
     bmp_file_header_t header;
     fread(&header, sizeof(header), 1, file_p->file_p);

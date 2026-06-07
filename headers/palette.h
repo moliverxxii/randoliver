@@ -40,6 +40,7 @@ uint8_t         palette_get_bits_per_colour(const palette_t* palette_p);
 
 palette_t* palette_init(palette_bit_depth_e bitdepth,
                                       palette_index_t colour_count);
+void palette_free(palette_t* palette_p);
 
 palette_index_t palette_index_get(const palette_t* palette_p, colour_t colour,
                                   palette_index_method_e method);
