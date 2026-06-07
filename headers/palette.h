@@ -48,5 +48,10 @@ const colour_t* palette_colour_get(const palette_t* palette_p,
 
 colour_t palette_colour_reduce(const palette_t* palette_p, colour_t colour, palette_index_method_e method);
 
+void*    colour_operation_reduce_parameters_init(palette_t* palette_p,
+                                                 palette_index_method_e method);
+void     colour_operation_reduce_parameters_free(void* parameters_p);
+colour_t colour_operation_reduce(colour_t colour, void* parameters_p);
+
 void palette_print(const palette_t* palette_p);
 #endif /* HEADERS_PALETTE_H_ */

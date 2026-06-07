@@ -17,6 +17,12 @@ typedef struct palette_t
     colour_t* colour_array_p;
 } palette_t;
 
+typedef struct
+{
+    const colour_t* colour_p;
+    uint32_t proximity;
+} colour_candidate;
+
 static float colour_value_access(const void* value_p);
 
 typedef palette_index_t (*palette_index_finder)(const palette_t* palette_p, colour_t colour);
@@ -24,6 +30,24 @@ typedef palette_index_t (*palette_index_finder)(const palette_t* palette_p, colo
 static palette_index_t palette_index_get_rgb(const palette_t* palette_p, colour_t colour);
 static palette_index_t palette_index_get_distance(const palette_t* palette_p, colour_t colour);
 static palette_index_t palette_index_get_dither(const palette_t* palette_p, colour_t colour);
+
+static int palette_colour_is_in_boundary(colour_t new_colour,
+                                  const colour_t boundary_box[2]);
+static void palette_colour_update_boundary(const colour_t* new_colour_p,
+        colour_candidate indices[2][COLOUR_INDEX_COUNT],
+        colour_t center,
+        colour_t box[2]);
+static const colour_t* palette_colour_proximity_get(
+        colour_candidate closest_colours[2][COLOUR_INDEX_COUNT],
+        colour_t colour);
+static uint32_t palette_colour_candidates_prune(
+        colour_candidate closest_colours[2][COLOUR_INDEX_COUNT],
+        uint64_t* proximity_total_p);
+static const colour_t* palette_colour_candidates_dither(
+        colour_candidate closest_colours_p[2][COLOUR_INDEX_COUNT],
+        uint64_t proximity_total,
+        uint32_t different_indexes);
+
 
 
 static palette_index_finder const INDEX_FINDER_TABLE[PALETTE_INDEX_METHOD_COUNT] =
@@ -48,7 +72,7 @@ palette_t*
 palette_init(palette_bit_depth_e bitdepth, uint32_t colour_count)
 {
     palette_t* palette_p = NULL;
-    if(bitdepth < 16)
+    if(bitdepth < PIXEL_BIT_DEPTH_16b)
     {
         if(colour_count == 0)
         {
@@ -111,6 +135,10 @@ palette_colour_get(const palette_t* palette_p,
     {
         colour_p = palette_p->colour_array_p + index;
     }
+    else
+    {
+        printf("index too big my boy! : %x\n", index);
+    }
 
     return colour_p;
 }
@@ -127,6 +155,45 @@ palette_colour_reduce(const palette_t* palette_p,
         colour_p = &COLOUR_BLACK;
     }
     return *colour_p;
+}
+
+struct colour_reduce_parameters
+{
+    palette_t* palette_p;
+    palette_index_method_e method;
+};
+
+void*
+colour_operation_reduce_parameters_init(palette_t* palette_p, palette_index_method_e method)
+{
+    struct colour_reduce_parameters parameters =
+    {
+        palette_p,
+        method
+    };
+    struct colour_reduce_parameters* pointer_p = malloc(sizeof(parameters));
+    if(pointer_p != NULL)
+    {
+        *pointer_p = parameters;
+    }
+    return pointer_p;
+}
+
+void
+colour_operation_reduce_parameters_free(void* parameters_p)
+{
+    free(parameters_p);
+}
+
+
+colour_t
+colour_operation_reduce(colour_t colour, void* parameters_p)
+{
+    struct colour_reduce_parameters* values_p = parameters_p;
+    return palette_colour_reduce(
+            values_p->palette_p,
+            colour,
+            values_p->method);
 }
 
 
@@ -189,53 +256,10 @@ palette_index_get_distance(const palette_t* palette_p, colour_t colour)
     return selected_index;
 }
 
-static int
-is_in_box(colour_t new_colour, const colour_t boundary_box[2])
-{
-    int in_box_b = 1;
-    for(colour_index_t colour_index = 0;
-        colour_index < COLOUR_INDEX_COUNT;
-        ++colour_index)
-    {
-        in_box_b &= (boundary_box[0].array[colour_index] <=      new_colour.array[colour_index])
-                 && (     new_colour.array[colour_index] <= boundary_box[1].array[colour_index]);
-    }
-    return in_box_b;
-}
-
-
-struct chosen_colour
-{
-    const colour_t* colour_p;
-    uint32_t proximity;
-};
-
-static void
-update_box(const colour_t* new_colour_p, struct chosen_colour indices[2][COLOUR_INDEX_COUNT], colour_t center, colour_t box[2])
-{
-    for(colour_index_t colour_index = 0;
-        colour_index < COLOUR_INDEX_COUNT;
-        ++colour_index)
-    {
-        if(new_colour_p->array[colour_index] <= center.array[colour_index])
-        {
-            box[0].array[colour_index] = new_colour_p->array[colour_index];
-            indices[0][colour_index].colour_p = new_colour_p;
-        }
-        else
-        {
-            box[1].array[colour_index] = new_colour_p->array[colour_index];
-            indices[1][colour_index].colour_p = new_colour_p;
-        }
-    }
-
-}
-
 static palette_index_t
 palette_index_get_dither(const palette_t* palette_p, colour_t colour)
 {
-    #warning occasional segmentation fault
-    struct chosen_colour closest_colours_p[2][COLOUR_INDEX_COUNT] =
+    colour_candidate closest_colours[2][COLOUR_INDEX_COUNT] =
     {
         {
             {NULL, 0},
@@ -249,103 +273,170 @@ palette_index_get_dither(const palette_t* palette_p, colour_t colour)
         }
     };
 
-    colour_t boundary_box[2] = {COLOUR_BLACK, COLOUR_WHITE};
+    colour_t colour_boundary[2] = {COLOUR_BLACK, COLOUR_WHITE};
 
     for(palette_index_t index = 0; index < palette_count(palette_p) - 1; ++index)
     {
         const colour_t* palette_colour_p = palette_colour_get(palette_p, index);
 
-        if(is_in_box(*palette_colour_p, boundary_box))
+        if(palette_colour_is_in_boundary(*palette_colour_p, colour_boundary))
         {
-            update_box(palette_colour_p, closest_colours_p, colour, boundary_box);
+            palette_colour_update_boundary(palette_colour_p, closest_colours,
+                                           colour, colour_boundary);
         }
     }
 
-    uint32_t colour_distance_meter = UINT32_MAX;
+    const colour_t* chosen_colour_p = palette_colour_proximity_get(closest_colours,
+                                                                   colour);
 
+    if(chosen_colour_p == NULL)
+    {
+        uint64_t proximity_total = 0;
+        //on enleve les doublons.
+        uint32_t different_indexes = palette_colour_candidates_prune(closest_colours,
+                                                                     &proximity_total);
+
+        chosen_colour_p = palette_colour_candidates_dither(closest_colours,
+                    proximity_total, different_indexes);
+    }
+
+    palette_index_t selected_index = chosen_colour_p - palette_colour_get(palette_p, 0);
+    return selected_index;
+}
+
+static int
+palette_colour_is_in_boundary(colour_t new_colour,
+        const colour_t boundary_box[2])
+{
+    int in_box_b = 1;
+    for(colour_index_t colour_index = 0;
+        colour_index < COLOUR_INDEX_COUNT;
+        ++colour_index)
+    {
+        in_box_b &= (boundary_box[0].array[colour_index]
+                  <=      new_colour.array[colour_index])
+                 && (     new_colour.array[colour_index]
+                  <= boundary_box[1].array[colour_index]);
+    }
+    return in_box_b;
+}
+
+static void
+palette_colour_update_boundary(const colour_t* new_colour_p,
+        colour_candidate indices[2][COLOUR_INDEX_COUNT],
+        colour_t center,
+        colour_t box[2])
+{
+    for(colour_index_t colour_index = 0;
+        colour_index < COLOUR_INDEX_COUNT;
+        ++colour_index)
+    {
+        if(new_colour_p->array[colour_index] < center.array[colour_index])
+        {
+            box[0].array[colour_index] = new_colour_p->array[colour_index];
+            indices[0][colour_index].colour_p = new_colour_p;
+        }
+        else
+        {
+            box[1].array[colour_index] = new_colour_p->array[colour_index];
+            indices[1][colour_index].colour_p = new_colour_p;
+        }
+    }
+
+}
+
+static const colour_t*
+palette_colour_proximity_get(
+        colour_candidate closest_colours[2][COLOUR_INDEX_COUNT],
+        colour_t colour)
+{
     const colour_t* chosen_colour_p = NULL;
-
-
     for(colour_index_t colour_index = 0;
         colour_index < COLOUR_INDEX_COUNT;
         ++colour_index)
     {
         for(uint8_t boundary = 0; boundary < 2; ++boundary)
         {
-            if(closest_colours_p[boundary][colour_index].colour_p != NULL)
+            if(closest_colours[boundary][colour_index].colour_p != NULL)
             {
-                if(0)
+                uint32_t current_distance = colour_distance(colour,
+                        *closest_colours[boundary][colour_index].colour_p);
+                if(current_distance == 0)
                 {
-                    uint32_t distance = colour_distance(colour, *closest_colours_p[boundary][colour_index].colour_p);
-                    if(distance < colour_distance_meter)
-                    {
-                        colour_distance_meter = distance;
-                        chosen_colour_p       = closest_colours_p[boundary][colour_index].colour_p;
-                    }
+                     chosen_colour_p
+                     = closest_colours[boundary][colour_index].colour_p;
+                     break;
                 }
                 else
                 {
-                    uint32_t current_distance = colour_distance(colour, *closest_colours_p[boundary][colour_index].colour_p);
-                    if(current_distance == 0)
-                    {
-                         chosen_colour_p = closest_colours_p[boundary][colour_index].colour_p;
-                         break;
-                    }
-                    else
-                    {
-                        closest_colours_p[boundary][colour_index].proximity = UINT32_MAX / current_distance;
-                    }
+                    closest_colours[boundary][colour_index].proximity
+                     = UINT32_MAX / current_distance;
                 }
             }
         }
     }
-
-    if(chosen_colour_p == NULL)
-    {
-        uint32_t proximity_total = 0;
-        //on enleve les doublons.
-        for(uint32_t closest_index = 0; closest_index < 6; ++closest_index)
-        {
-            struct chosen_colour* compare_colour_p = &closest_colours_p[0][0] + closest_index;
-            if(compare_colour_p->colour_p != NULL)
-            {
-                for(uint32_t next_index = closest_index + 1; next_index < 6; ++next_index)
-                {
-                    struct chosen_colour* next_colour_p = &closest_colours_p[0][0] + next_index;
-                    if(compare_colour_p->colour_p == next_colour_p->colour_p)
-                    {
-                        *next_colour_p = (struct chosen_colour) {NULL, 0};
-                    }
-                }
-                proximity_total += compare_colour_p->proximity;
-            }
-        }
-
-        uint32_t score = (proximity_total * (float) rand()) / (RAND_MAX);
-        uint32_t score_sum = 0;
-        struct chosen_colour* element = &closest_colours_p[0][0];
-        uint32_t position = 0;
-        while(score_sum < proximity_total)
-        {
-            position = element - &closest_colours_p[0][0];
-
-            if(position >= 6)
-            {
-                printf("error dickhead!\n");
-                break;
-            }
-
-            if(score_sum <= score && score < score_sum + element->proximity)
-            {
-                chosen_colour_p = element->colour_p;
-                break;
-            }
-
-            score_sum += element->proximity;
-            ++element;
-        }
-    }
-
-    palette_index_t selected_index = chosen_colour_p - palette_colour_get(palette_p, 0);
-    return selected_index;
+    return chosen_colour_p;
 }
+
+static uint32_t
+palette_colour_candidates_prune(
+        colour_candidate closest_colours[2][COLOUR_INDEX_COUNT],
+        uint64_t* proximity_total_p)
+{
+    uint32_t candidates = 0;
+    for(uint32_t closest_index = 0; closest_index < 6; ++closest_index)
+    {
+        colour_candidate* compare_colour_p = &closest_colours[0][0] + closest_index;
+        if(compare_colour_p->colour_p != NULL)
+        {
+            for(uint32_t next_index = closest_index + 1; next_index < 6; ++next_index)
+            {
+                colour_candidate* next_colour_p = &closest_colours[0][0] + next_index;
+                if(compare_colour_p->colour_p == next_colour_p->colour_p)
+                {
+                    *next_colour_p = (colour_candidate) {NULL, 0};
+                }
+            }
+            *proximity_total_p += compare_colour_p->proximity;
+        }
+        ++candidates;
+    }
+    return candidates;
+}
+
+static const colour_t*
+palette_colour_candidates_dither(
+        colour_candidate closest_colours_p[2][COLOUR_INDEX_COUNT],
+        uint64_t proximity_total,
+        uint32_t different_indexes)
+{
+    const colour_t* chosen_colour_p = NULL;
+
+    uint64_t score = ((uint64_t) proximity_total * (uint64_t) rand())
+                   / (uint64_t) RAND_MAX;
+    uint64_t score_sum = 0;
+    colour_candidate* element = &closest_colours_p[0][0];
+    uint32_t position = 0;
+    while(score_sum < proximity_total)
+    {
+        position = element - &closest_colours_p[0][0];
+
+        if(position >= different_indexes)
+        {
+            break;
+        }
+
+        if(score_sum <= score && score < score_sum + element->proximity)
+        {
+            chosen_colour_p = element->colour_p;
+            break;
+        }
+
+        score_sum += element->proximity;
+        ++element;
+    }
+    return chosen_colour_p;
+}
+
+
+

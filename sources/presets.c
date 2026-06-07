@@ -183,16 +183,16 @@ oli_test_palette()
     int height = 240;
     image_t* image_p  = image_init(width, height);
     test_pattern_scan(image_p);
-    for(uint32_t x = 0; x < image_width(image_p); ++x)
-    {
-        for(uint32_t y = 0; y < image_height(image_p); ++y)
-        {
-            colour_t new_colour = palette_colour_reduce(palette_p, image_pixel_get(image_p, x, y), PALETTE_INDEX_METHOD_DITHER);
-            image_pixel_set(image_p, x, y, new_colour);
-        }
-    }
+
+    void* parameters_p = colour_operation_reduce_parameters_init(palette_p, PALETTE_INDEX_METHOD_DITHER);
+    image_process_1(&colour_operation_reduce, image_p, parameters_p);
     image_file_write("oli test pattern palette", image_p, NULL);
+
+    //on teste si l'operation est injective
+    image_process_1(&colour_operation_reduce, image_p, parameters_p);
+    image_file_write("oli test pattern palette double", image_p, NULL);
     image_free(image_p);
+    colour_operation_reduce_parameters_free(parameters_p);
     image_p = image_init(16, 16);
     for(palette_index_t colour = 0; colour < palette_count(palette_p); ++colour)
     {
@@ -202,6 +202,7 @@ oli_test_palette()
                         *palette_colour_get(palette_p, colour));
     }
     image_file_write("palette", image_p, NULL);
+    image_free(image_p);
 }
 
 static void
