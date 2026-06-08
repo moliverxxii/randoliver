@@ -360,6 +360,7 @@ image_file_write_palette(image_file_t* file_p)
     free(table);
     long bitmap_offset = ftell(file_p->file_p);
     bmp_file_header_t header;
+    image_file_seek_header(file_p);
     fread(&header, sizeof(header), 1, file_p->file_p);
     header.data_offset = bitmap_offset;
     image_file_seek_header(file_p);
