@@ -89,8 +89,8 @@ static void image_file_seek_bitmap(image_file_t* image_file_p);
 
 static void image_file_write_header(image_file_t* file_p, uint32_t width, uint32_t height);
 static void image_file_write_next_row(image_file_t* image_file_p, const row_t row, uint32_t width);
-static void image_file_write_palette();
-static void image_file_write_file_size();
+static void image_file_write_palette(image_file_t* file_p);
+static void image_file_write_file_size(image_file_t* file_p);
 
 image_file_parameters_t*
 image_file_parameters_init_palette(const palette_t* palette_p, palette_index_method_e method)
