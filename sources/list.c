@@ -15,6 +15,8 @@ typedef struct list_t
     size_t  size;
 } list_t;
 
+typedef void (*list_print_f)(const void*);
+
 list_t*
 list_init(const void* element_p, size_t size)
 {
@@ -73,6 +75,17 @@ void*
 list_value(list_t* list_p)
 {
     return list_p->element_p;
+}
+
+void
+list_print(const list_t* list_p, list_print_f print_p)
+{
+    for(const list_t* item_p = list_p;
+        item_p != NULL;
+        item_p = item_p->next_p) //const cast
+    {
+        (*print_p)(item_p->element_p);
+    }
 }
 
 void*
@@ -137,11 +150,11 @@ list_fetch(list_t* list_p, uint32_t index)
     list_t* position_p = list_p;
     for(uint32_t position = 0; position < index; ++position)
     {
-        position_p = position_p->next_p;
         if(position_p == NULL)
         {
             break;
         }
+        position_p = position_p->next_p;
     }
     return position_p;
 }
@@ -183,15 +196,17 @@ list_sort_array(list_t** head_pp,
                 const void* array_p, size_t element_size, uint32_t element_count,
                 sort_value_access_f sort_value, enum list_sort_order_e order)
 {
-    list_t* list_head_vector_p = list_init(array_p, element_size);
+    list_t* list_head_vector_p = NULL;
     //tri des vecteurs de la liste.
-    for(uint32_t point = 1; point < element_count; ++point)
+    for(uint32_t index = 0; index < element_count; ++index)
     {
-        const void* current_p = (const char*) array_p + element_size * point;
+        const void* current_p = (const char*) array_p + element_size * index;
         float current_compare_value = sort_value(current_p);
 
-        list_t** compared_element_pp = &list_head_vector_p;
-        while(*compared_element_pp != NULL)
+        list_t** compared_element_pp = NULL;
+        for(compared_element_pp = &list_head_vector_p;
+            *compared_element_pp != NULL;
+            compared_element_pp = list_next(*compared_element_pp))
         {
             float compared = sort_value(list_value(*compared_element_pp));
             int sort_b = current_compare_value <= compared;
@@ -199,10 +214,6 @@ list_sort_array(list_t** head_pp,
             if(sort_b)
             {
                 break;
-            }
-            else
-            {
-                compared_element_pp = list_next(*compared_element_pp);
             }
         }
 

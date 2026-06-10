@@ -178,14 +178,16 @@ oli_test_pattern_scan()
 static void
 oli_test_palette()
 {
-    palette_t* palette_p = palette_init(PIXEL_BIT_DEPTH_8b, 0);
-    int width = 321;
-    int height = 240;
+    int width = 1280;
+    int height = 720;
     image_t* image_p  = image_init(width, height);
     test_pattern_scan(image_p);
 
-    void* parameters_p = colour_operation_reduce_parameters_init(palette_p, PALETTE_INDEX_METHOD_DITHER);
-    image_file_parameters_t* file_parameters_p = image_file_parameters_init_palette(palette_p, PALETTE_INDEX_METHOD_DITHER);
+//    palette_t* palette_p = palette_init_extreme();
+    palette_t* palette_p = palette_init(7, 0);
+
+    void* parameters_p = colour_operation_reduce_parameters_init(palette_p, PALETTE_INDEX_METHOD_DITHER_DISTANCE);
+    image_file_parameters_t* file_parameters_p = image_file_parameters_init_palette(palette_p, PIXEL_BIT_DEPTH_8b, PALETTE_INDEX_METHOD_DITHER_DISTANCE);
     image_file_write("oli test pattern palette", image_p, file_parameters_p);
 
     //on teste si l'operation est injective
@@ -437,6 +439,8 @@ oli_sphere_2()
 
     free(vector_array_p);
 
-    image_reduce_bit_depth(image_p, 5, 1);
+    palette_t* palette_p = palette_init(PIXEL_BIT_DEPTH_8b, 0);
+    image_file_parameters_t* file_parameters_p = image_file_parameters_init_palette(palette_p, PIXEL_BIT_DEPTH_8b, PALETTE_INDEX_METHOD_DISTANCE);
+
     image_file_write("sphere 2", image_p, NULL);
 }

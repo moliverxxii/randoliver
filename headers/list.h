@@ -19,6 +19,7 @@ enum list_sort_order_e
   SORT_ORDER_DESCENDING
 };
 
+typedef void (*list_print_f)(const void* value_p);
 
 typedef float (*sort_value_access_f)(const void* value_p);
 
@@ -27,6 +28,7 @@ void     list_free(list_t* list_p);
 uint32_t list_length(const list_t* list_p);
 size_t   list_element_size(const list_t* element_p);
 void*    list_value(list_t* list_p);
+void     list_print(const list_t* list_p, list_print_f print_p);
 void*    list_array(const list_t* list_p);
 //    new
 //    vvv

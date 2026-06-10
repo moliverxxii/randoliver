@@ -27,6 +27,7 @@ typedef enum
     PALETTE_INDEX_METHOD_RGB = 0,
     PALETTE_INDEX_METHOD_DISTANCE,
     PALETTE_INDEX_METHOD_DITHER,
+    PALETTE_INDEX_METHOD_DITHER_DISTANCE,
     PALETTE_INDEX_METHOD_COUNT
 } palette_index_method_e;
 
@@ -40,6 +41,9 @@ uint8_t         palette_get_bits_per_colour(const palette_t* palette_p);
 
 palette_t* palette_init(palette_bit_depth_e bitdepth,
                                       palette_index_t colour_count);
+
+palette_t* palette_init_extreme();
+palette_t* palette_init_black_white();
 void palette_free(palette_t* palette_p);
 
 palette_index_t palette_index_get(const palette_t* palette_p, colour_t colour,

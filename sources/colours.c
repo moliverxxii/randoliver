@@ -52,8 +52,9 @@ colour_distance(colour_t a, colour_t b)
     uint32_t total_distance = 0;
     for(uint8_t colour = 0; colour<COLOUR_INDEX_COUNT; ++colour)
     {
-        int16_t colour_distance = (int16_t) a.array[colour] - (int16_t) b.array[colour];
-        colour_distance *= colour_distance;
+        int32_t colour_distance = (int32_t ) a.array[colour] - (int32_t ) b.array[colour];
+//        colour_distance *= colour_distance;
+        colour_distance *= colour_distance > 0 ? 1 : -1;
         total_distance += colour_distance;
     }
     return total_distance;

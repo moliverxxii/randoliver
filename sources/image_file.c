@@ -90,17 +90,19 @@ static void image_file_seek_bitmap(image_file_t* file_p);
 static void image_file_write_header(image_file_t* file_p, uint32_t width, uint32_t height);
 static void image_file_write_next_row(image_file_t* file_p, const row_t row, uint32_t width);
 //danger! ne marche que si le nombre de bit par pixel divise 8.
-static size_t image_file_write_row_palette(FILE* file_p, const row_t row, uint32_t width, const palette_t* palette_p, palette_index_method_e method);
+static size_t image_file_write_row_palette(FILE* file_p,
+       const row_t row, uint32_t width,
+       const palette_t* palette_p, palette_bit_depth_e bit_depth, palette_index_method_e method);
 static void image_file_write_palette(image_file_t* file_p);
 static void image_file_write_file_size(image_file_t* file_p);
 
 image_file_parameters_t*
-image_file_parameters_init_palette(const palette_t* palette_p, palette_index_method_e method)
+image_file_parameters_init_palette(const palette_t* palette_p, palette_bit_depth_e bit_depth, palette_index_method_e method)
 {
     image_file_parameters_t parameters =
     {
         palette_p,
-        palette_get_bits_per_colour(palette_p),
+        bit_depth,
         method
     };
     image_file_parameters_t* parameters_p = malloc(sizeof(image_file_parameters_t));
@@ -256,7 +258,7 @@ image_file_write_header(image_file_t* file_p, uint32_t width, uint32_t height)
     if(file_p->palette_p != NULL)
     {
         palette_size   = colour_count * sizeof(union palette_element_u);
-        bits_per_pixel = palette_get_bits_per_colour(file_p->palette_p);
+        bits_per_pixel = file_p->bit_depth;
         colour_count   = palette_count(file_p->palette_p);
     }
 
@@ -310,7 +312,7 @@ image_file_write_next_row(image_file_t* file_p, const row_t row, uint32_t width)
     case PIXEL_BIT_DEPTH_4b:
     case PIXEL_BIT_DEPTH_8b:
         row_size = image_file_write_row_palette(file_p->file_p, row, width,
-                                                file_p->palette_p, file_p->palette_method);
+                                                file_p->palette_p, file_p->bit_depth, file_p->palette_method);
         break;
     }
 
@@ -320,12 +322,11 @@ image_file_write_next_row(image_file_t* file_p, const row_t row, uint32_t width)
 }
 
 static size_t
-image_file_write_row_palette(FILE* file_p, const row_t row, uint32_t width, const palette_t* palette_p, palette_index_method_e method)
+image_file_write_row_palette(FILE* file_p, const row_t row, uint32_t width, const palette_t* palette_p, palette_bit_depth_e bit_depth, palette_index_method_e method)
 {
     size_t  row_size = 0;
     uint8_t byte     = 0;
     uint8_t bit      = 0;
-    palette_bit_depth_e bit_depth = palette_get_bits_per_colour(palette_p);
     for(uint32_t x = 0; x < width; ++x)
     {
         byte |= palette_index_get(palette_p, row[x],

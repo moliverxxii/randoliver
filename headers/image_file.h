@@ -20,7 +20,7 @@ image_file_parameters_t* image_file_parameters_init(
             palette_bit_depth_e bit_depth,
             const palette_t* palette_p);
 image_file_parameters_t* image_file_parameters_init_palette(
-        const palette_t* palette_p,
+        const palette_t* palette_p, palette_bit_depth_e bit_depth,
         palette_index_method_e method);
 void image_file_parameters_free_palette(image_file_parameters_t* parameters_p);
 
