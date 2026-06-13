@@ -87,3 +87,26 @@ print_memory(void* pointer, size_t size)
 	}
 	printf("\n");
 }
+
+void
+gray_byte(uint8_t* restrict out_p, const uint8_t* restrict in_p, size_t length)
+{
+    const uint16_t GRAY_MAX = UINT8_MAX + 1;
+    uint64_t index = 0;
+    for(int8_t byte = length - 1; byte >= 0; --byte)
+    {
+        index = index << 8;
+        index += in_p[byte];
+    }
+
+    for(uint8_t byte = 0; byte < length; ++byte)
+    {
+        uint8_t byte_value = index % (2*GRAY_MAX) < GRAY_MAX
+                           ? index % (GRAY_MAX)
+                           : GRAY_MAX - 1 - (index % (GRAY_MAX));
+        out_p[byte] = byte_value;
+        index /= GRAY_MAX;
+    }
+
+}
+

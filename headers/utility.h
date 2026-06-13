@@ -33,4 +33,9 @@ void ok(int num);
  */
 void ok_p(int num, void* pointer);
 void print_memory(void* pointer, size_t size);
+
+void gray_byte(uint8_t* restrict out_p,
+               const uint8_t* restrict in_p,
+               size_t length);
+
 #endif /* UTIL_H_ */

@@ -178,8 +178,8 @@ oli_test_pattern_scan()
 static void
 oli_test_palette()
 {
-    int width = 1280;
-    int height = 720;
+    int width = 320;
+    int height = 240;
     image_t* image_p  = image_init(width, height);
     test_pattern_scan(image_p);
 
@@ -197,6 +197,7 @@ oli_test_palette()
     colour_operation_reduce_parameters_free(parameters_p);
     image_file_parameters_free_palette(file_parameters_p);
     image_p = image_init(16, 16);
+    image_set(image_p);
     for(palette_index_t colour = 0; colour < palette_count(palette_p); ++colour)
     {
         image_pixel_set(image_p,
@@ -442,5 +443,6 @@ oli_sphere_2()
     palette_t* palette_p = palette_init(PIXEL_BIT_DEPTH_8b, 0);
     image_file_parameters_t* file_parameters_p = image_file_parameters_init_palette(palette_p, PIXEL_BIT_DEPTH_8b, PALETTE_INDEX_METHOD_DISTANCE);
 
-    image_file_write("sphere 2", image_p, NULL);
+    image_file_write("sphere 2", image_p, file_parameters_p);
+    image_file_parameters_free_palette(file_parameters_p);
 }
