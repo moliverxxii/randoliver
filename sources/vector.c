@@ -124,7 +124,7 @@ vector_t
 vector_add(vector_t vector_a, vector_t vector_b)
 {
     vector_t vector_r = vector_a;
-    for(int axis = 0; axis < VECTOR_AXIS_COUNT; ++axis)
+    for(int axis = 0; axis <= VECTOR_AXIS_Z; ++axis)
     {
          vector_r.array[axis] += vector_b.array[axis];
     }
@@ -141,7 +141,7 @@ vector_t
 vector_scale(vector_t vector, float scale)
 {
     vector_t vector_r = vector;
-    for(int axis = 0; axis < VECTOR_AXIS_COUNT; ++axis)
+    for(int axis = 0; axis <= VECTOR_AXIS_Z; ++axis)
     {
          vector_r.array[axis] *= scale;
     }

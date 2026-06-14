@@ -11,8 +11,6 @@
 #include "utility.h"
 #include "operator.h"
 
-#define MATRIX_OPERATION
-
 typedef struct
 {
     vector_axis_t z; //distance a la camera
@@ -40,7 +38,7 @@ static render_cache_t camera_cache =
 
 const float CAMERA_SUBDIVISION = 2.5;
 
-static void camera_context_update(const camera_t* camera_p);
+static void camera_context_update(const camera_t* camera_p, const image_t* image_p);
 
 static int            render_cache_is_same_image(const render_cache_t* camera_cache_p,
                                                  const image_t* image_p);
@@ -123,14 +121,12 @@ static struct camera_context_t
     vector_t f;
     vector_t of;
     float norme_of;
-    vector_t base[3];
-#ifdef MATRIX_OPERATION
     operator_t* transformation_p;
-#endif // MATRIX_OPERATION
+    float perspective_scale;
 } camera_context;
 
 static void
-camera_context_update(const camera_t* camera_p)
+camera_context_update(const camera_t* camera_p, const image_t* image_p)
 {
     float angle = camera_p->angle;
     vector_t o = camera_p->origin;
@@ -147,21 +143,20 @@ camera_context_update(const camera_t* camera_p)
 
     vector_t w = vector_product(u, v);
 
-    vector_t base[3] =
-    {
-            u,
-            v,
-            w
-    };
-
-#ifdef MATRIX_OPERATION
     if(camera_context.transformation_p != NULL)
     {
         operator_free(camera_context.transformation_p);
     }
 
-    operator_t* matrix_p = operator_init_lines(u, v, w, VECTOR_0);
-#endif //MATRIX_OPERATION
+    operator_t* origin_change_p = operator_init_translation(vector_negative(o));
+    operator_t* orientation_change_p = operator_init_lines(u, v, w, VECTOR_0);
+
+    operator_t* matrix_p = operator_multiply(orientation_change_p, origin_change_p);
+    operator_free(origin_change_p);
+    operator_free(orientation_change_p);
+
+    float scale = (float) image_width(image_p)
+                / (2 * tan(M_PI*angle/360));
 
 
     struct camera_context_t context =
@@ -171,14 +166,8 @@ camera_context_update(const camera_t* camera_p)
         f,
         of,
         norme_of,
-        {
-            base[VECTOR_AXIS_X],
-            base[VECTOR_AXIS_Y],
-            base[VECTOR_AXIS_Z]
-        },
-#ifdef MATRIX_OPERATION
-        matrix_p
-#endif // MATRIX_OPERATION
+        matrix_p,
+        scale
     };
     camera_context = context;
 }
@@ -191,32 +180,19 @@ renderable_vector_position(vector_t p, image_t* image_p,
 {
     if(memcmp(camera_p, &local_camera, sizeof(local_camera)) != 0)
     {
-        camera_context_update(camera_p);
+        camera_context_update(camera_p, image_p);
         local_camera = *camera_p;
     }
 
-    //I changement d'origine PO /1
-    vector_t op = vector_subtract(p, camera_context.o);
-
-    //II changement de base PO /2
     vector_t p_2 = VECTOR_0;
-    for(vector_axis_e axis = VECTOR_AXIS_X; axis <= VECTOR_AXIS_Z; ++axis)
-    {
-        p_2.array[axis] = vector_scalar(op, camera_context.base[axis]);
-    }
 
-    //III u>0
-    if(p_2.x <= 0)
-    {
-        return vector_init(0, 0, -1);
-    }
+    vector_t* p_2_p = operator_operation(camera_context.transformation_p, &p , 1);
+    p_2 = *p_2_p;
+    free(p_2_p);
 
-    //IV projection
-    float scale = (float) image_width(image_p)
-                / (2 * p_2.x * tan(M_PI*camera_context.angle/360));
-
-    float x_image_scale =  scale * p_2.y;
-    float y_image_scale = -scale * p_2.z;
+    //projection
+    float x_image_scale =  camera_context.perspective_scale * p_2.y/p_2.x;
+    float y_image_scale = -camera_context.perspective_scale * p_2.z/p_2.x;
 
     //projection dans l'image
     x_image_scale += (float) image_width(image_p)  / 2;
