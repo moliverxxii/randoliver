@@ -10,14 +10,15 @@
 
 #include <stdlib.h>
 #include <stdint.h>
-#include "matrix.h"
-typedef matrix_data_t vector_axis_t;
+
+typedef float vector_axis_t;
 
 typedef enum
 {
     VECTOR_AXIS_X = 0,
     VECTOR_AXIS_Y,
     VECTOR_AXIS_Z,
+    VECTOR_AXIS_T, //Translation
     VECTOR_AXIS_COUNT
 } vector_axis_e;
 
@@ -32,6 +33,7 @@ typedef union
         vector_axis_t x;
         vector_axis_t y;
         vector_axis_t z;
+        vector_axis_t t;
     };
     vector_axis_t array[VECTOR_AXIS_COUNT];
 } vector_t;
@@ -80,6 +82,8 @@ float vector_norm(vector_t vector_p);
  * <vector_a|vector_b>
  */
 float vector_scalar(vector_t vector_a, vector_t vector_b);
+
+float vector_scalar_full(vector_t vector_a, vector_t vector_b);
 
 /**
  * vector_a ^ vector_b

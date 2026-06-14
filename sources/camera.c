@@ -14,20 +14,8 @@ camera_init(float origin_x, float origin_y, float origin_z,
 {
     camera_t camera =
     {
-        {
-            {
-                origin_x,
-                origin_y,
-                origin_z
-            }
-        },
-        {
-            {
-                destin_x,
-                destin_y,
-                destin_z
-            }
-        },
+        vector_init(origin_x, origin_y, origin_z),
+        vector_init(destin_x, destin_y, destin_z),
         angle
     };
     return camera;

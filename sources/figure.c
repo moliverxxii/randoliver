@@ -109,12 +109,12 @@ figure_get_average_point(const figure_t* figure_p)
     for(uint32_t point_count = 0; point_count<figure_p->length; ++point_count)
     {
         vector_t vector = *point_vector(figure_p->array[point_count]);
-        for(int axis=0; axis<VECTOR_AXIS_COUNT; ++axis)
+        for(int axis=0; axis <= VECTOR_AXIS_Z; ++axis)
         {
             average.array[axis] += vector.array[axis];
         }
     }
-    for(int axis=0; axis<VECTOR_AXIS_COUNT; ++axis)
+    for(int axis=0; axis <= VECTOR_AXIS_Z; ++axis)
     {
         average.array[axis] /= figure_p->length;
     }

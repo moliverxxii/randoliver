@@ -11,22 +11,22 @@
 #include <string.h>
 #include <math.h>
 
+#include "operator.h"
 #include "utility.h"
 #include "vector.h"
-#include "operator.h"
 
-const vector_t VECTOR_X = {{1, 0, 0}};
-const vector_t VECTOR_Y = {{0, 1, 0}};
-const vector_t VECTOR_Z = {{0, 0, 1}};
-const vector_t VECTOR_0 = {{0, 0, 0}};
+const vector_t VECTOR_X = {{1, 0, 0, 1}};
+const vector_t VECTOR_Y = {{0, 1, 0, 1}};
+const vector_t VECTOR_Z = {{0, 0, 1, 1}};
+const vector_t VECTOR_0 = {{0, 0, 0, 1}};
 
-static void get_rotation(matrix_t* r_p, float angle);
-static void get_rotation_base(matrix_t* b_p, vector_t vector, vector_t normal);
+static operator_t* get_rotation(float angle);
+static operator_t* get_rotation_base(vector_t vector, vector_t normal);
 
 vector_t
 vector_init(vector_axis_t x, vector_axis_t y, vector_axis_t z)
 {
-    vector_t vector = {{x, y, z}};
+    vector_t vector = {{x, y, z, 1}};
     return vector;
 }
 
@@ -58,10 +58,11 @@ planetary_t planetary_init_vector(vector_t coordinates)
 void
 vector_print(vector_t vector)
 {
-    printf(" (% 10.3f, % 10.3f, % 10.3f)\n",
+    printf(" (% 10.3f, % 10.3f, % 10.3f % 10.3f)\n",
            vector.x,
            vector.y,
-           vector.z);
+           vector.z,
+           vector.t);
 }
 
 void
@@ -89,6 +90,17 @@ vector_norm(vector_t vector_p)
 
 float
 vector_scalar(vector_t vector_a, vector_t vector_b)
+{
+    float scalar = 0;
+    for(int axis = 0; axis <= VECTOR_AXIS_Z; ++axis)
+    {
+         scalar += vector_a.array[axis]*vector_b.array[axis];
+    }
+    return scalar;
+}
+
+float
+vector_scalar_full(vector_t vector_a, vector_t vector_b)
 {
     float scalar = 0;
     for(int axis = 0; axis < VECTOR_AXIS_COUNT; ++axis)
@@ -152,64 +164,58 @@ vector_rotate(vector_t vector, vector_t normal, float angle)
     static vector_t previous_normal;
     int updated = 0;
 
-    static matrix_t* matrix_base_0r_p = NULL;
-    if(matrix_base_0r_p == NULL)
-    {
-        matrix_base_0r_p = matrix_init_null();
-    }
-    static matrix_t* matrix_base_r0_p = NULL;
-    if(matrix_base_r0_p == NULL)
-    {
-        matrix_base_r0_p = matrix_init_null();
-    }
+    static operator_t* matrix_base_0r_p = NULL;
+    static operator_t* matrix_base_r0_p = NULL;
 
-    if(!vector_is_equal(normal, previous_normal) || !matrix_is_allocated(matrix_base_0r_p))
+    if(!vector_is_equal(normal, previous_normal) || matrix_base_0r_p == NULL)
     {
-        get_rotation_base(matrix_base_0r_p, vector, normal);
+        if(matrix_base_0r_p != NULL)
+        {
+            operator_free(matrix_base_0r_p);
+        }
 
-        matrix_transpose(matrix_base_r0_p, matrix_base_0r_p);
+        matrix_base_0r_p = get_rotation_base(vector, normal);
+
+        if(matrix_base_r0_p != NULL)
+        {
+            operator_free(matrix_base_r0_p);
+        }
+        matrix_base_r0_p = operator_init_null();
+
+        operator_transpose(matrix_base_r0_p, matrix_base_0r_p);
         updated = 1;
     }
 
     static float previous_angle = 0;
-    static matrix_t* matrix_rotation_p = NULL;
-    if(matrix_rotation_p == NULL)
+    static operator_t* matrix_rotation_p = NULL;
+
+    if(angle != previous_angle || matrix_rotation_p == NULL)
     {
-        matrix_rotation_p = matrix_init_null();
-    }
-    if(angle != previous_angle || !matrix_is_allocated(matrix_rotation_p))
-    {
-        get_rotation(matrix_rotation_p, angle);
+        matrix_rotation_p = get_rotation(angle);
         updated = 1;
     }
 
     //calcul de la matrice de rotation totale.
-    static matrix_t* matrix_rotation_total_p = NULL;
-    if(matrix_rotation_total_p == NULL)
-    {
-        matrix_rotation_total_p = matrix_init_null();
-    }
+    static operator_t* matrix_rotation_total_p = NULL;
 
-    if(updated || !matrix_is_allocated(matrix_rotation_total_p))
+    if(updated || matrix_rotation_total_p == NULL)
     {
-        matrix_t* matrix_temp_p = matrix_init(VECTOR_AXIS_COUNT, VECTOR_AXIS_COUNT);
-        matrix_multiply(matrix_temp_p, matrix_rotation_p, matrix_base_0r_p);
+        operator_t* matrix_temp_p = operator_multiply(matrix_rotation_p, matrix_base_0r_p);
 
-        matrix_multiply(matrix_rotation_total_p, matrix_base_r0_p, matrix_temp_p);
-        matrix_free(matrix_temp_p);
+        matrix_rotation_total_p = operator_multiply(matrix_base_r0_p, matrix_temp_p);
+        operator_free(matrix_temp_p);
     }
 
     //calcul du vecteur;
-    matrix_t* matrix_vector_p = matrix_init(VECTOR_AXIS_COUNT, 1);
-    matrix_set(matrix_vector_p, vector.array, VECTOR_AXIS_COUNT, 1);
+    vector_t* vector_r_p = operator_operation(matrix_rotation_total_p, &vector, 1);
 
-    matrix_t* matrix_vector_r_p = matrix_init(VECTOR_AXIS_COUNT, 1);
+    vector_t vector_r = VECTOR_0;
+    if(vector_r_p != NULL)
+    {
+        vector_r = *vector_r_p;
+        free(vector_r_p);
+    }
 
-    matrix_multiply(matrix_vector_r_p, matrix_rotation_total_p, matrix_vector_p);
-
-    vector_t vector_r = vector_init_array(matrix_data(matrix_vector_r_p));
-    matrix_free(matrix_vector_p);
-    matrix_free(matrix_vector_r_p);
     return vector_r;
 }
 
@@ -308,22 +314,21 @@ vector_random_delta(vector_t* point_p, int amplitude, int width, int height)
     modulo(point_p->y, height);
 }
 
-static void
-get_rotation(matrix_t* r_p, float angle)
+static operator_t*
+get_rotation(float angle)
 {
     //calcul de la matrice de rotation
     operator_t* rotation_p = operator_init_lines(
         vector_init(cos(angle), -sin(angle), 0),
         vector_init(sin(angle),  cos(angle), 0),
-        vector_init(         0,           0, 1)
+        vector_init(         0,           0, 1),
+        VECTOR_0
     );
-    matrix_set(r_p, operator_data(rotation_p),
-               VECTOR_AXIS_COUNT, VECTOR_AXIS_COUNT);
-    operator_free(rotation_p);
+    return rotation_p;
 }
 
-static void
-get_rotation_base(matrix_t* b_p, vector_t vector, vector_t normal)
+static operator_t*
+get_rotation_base(vector_t vector, vector_t normal)
 {
     //rot_z // normal
     vector_t rot_z = vector_normalise(normal);
@@ -335,11 +340,8 @@ get_rotation_base(matrix_t* b_p, vector_t vector, vector_t normal)
 
     vector_t rot_y = vector_product(rot_z, rot_x);
 
-    operator_t* base_change_0r = operator_init_lines(rot_x, rot_y, rot_z);
+    operator_t* base_change_0r = operator_init_lines(rot_x, rot_y, rot_z, VECTOR_0);
 
-
-    matrix_set(b_p, operator_data(base_change_0r),
-               VECTOR_AXIS_COUNT, VECTOR_AXIS_COUNT);
-    operator_free(base_change_0r);
+    return base_change_0r;
 }
 

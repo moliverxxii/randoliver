@@ -181,6 +181,7 @@ solid_file_parse_step_title(enum solid_file_line_e line_type,
         line_type = SOLID_FILE_LINE_FACE;
         if(solid_struct_p->list_p == NULL)
         {
+            printf("vertex where???\n");
             //on passe aux faces mais nous n'avons pas de sommets!
             //erreur
         }
@@ -227,7 +228,7 @@ static int solid_file_content_parser_vertex(const char* line_p,
                                   &vector.x,
                                   &vector.y,
                                   &vector.z);
-    if(conversion_count == VECTOR_AXIS_COUNT)
+    if(conversion_count == VECTOR_AXIS_Z - VECTOR_AXIS_X + 1)
     {
         list_append(&solid_struct_p->list_p, &vector, sizeof(vector));
         solid_struct_p->vertex_count++;

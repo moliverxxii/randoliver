@@ -9,6 +9,9 @@
 
 #include "renderable.h"
 #include "utility.h"
+#include "operator.h"
+
+#define MATRIX_OPERATION
 
 typedef struct
 {
@@ -120,9 +123,10 @@ static struct camera_context_t
     vector_t f;
     vector_t of;
     float norme_of;
-    vector_t u;
-    vector_t v;
-    vector_t w;
+    vector_t base[3];
+#ifdef MATRIX_OPERATION
+    operator_t* transformation_p;
+#endif // MATRIX_OPERATION
 } camera_context;
 
 static void
@@ -143,16 +147,38 @@ camera_context_update(const camera_t* camera_p)
 
     vector_t w = vector_product(u, v);
 
-    struct camera_context_t context =
+    vector_t base[3] =
     {
-            angle,
-            o,
-            f,
-            of,
-            norme_of,
             u,
             v,
             w
+    };
+
+#ifdef MATRIX_OPERATION
+    if(camera_context.transformation_p != NULL)
+    {
+        operator_free(camera_context.transformation_p);
+    }
+
+    operator_t* matrix_p = operator_init_lines(u, v, w, VECTOR_0);
+#endif //MATRIX_OPERATION
+
+
+    struct camera_context_t context =
+    {
+        angle,
+        o,
+        f,
+        of,
+        norme_of,
+        {
+            base[VECTOR_AXIS_X],
+            base[VECTOR_AXIS_Y],
+            base[VECTOR_AXIS_Z]
+        },
+#ifdef MATRIX_OPERATION
+        matrix_p
+#endif // MATRIX_OPERATION
     };
     camera_context = context;
 }
@@ -160,7 +186,7 @@ camera_context_update(const camera_t* camera_p)
 static camera_t local_camera;
 
 vector_t
-renderable_vector_position(vector_t point, image_t* image_p,
+renderable_vector_position(vector_t p, image_t* image_p,
                            const camera_t* camera_p)
 {
     if(memcmp(camera_p, &local_camera, sizeof(local_camera)) != 0)
@@ -169,34 +195,34 @@ renderable_vector_position(vector_t point, image_t* image_p,
         local_camera = *camera_p;
     }
 
-    //I P /1
-    vector_t p = point;
-
-    //II PO /1
+    //I changement d'origine PO /1
     vector_t op = vector_subtract(p, camera_context.o);
 
-    //III PO /2
-    float op_u_scalaire = vector_scalar(op, camera_context.u);
-    float op_v_scalaire = vector_scalar(op, camera_context.v);
-    float op_w_scalaire = vector_scalar(op, camera_context.w);
+    //II changement de base PO /2
+    vector_t p_2 = VECTOR_0;
+    for(vector_axis_e axis = VECTOR_AXIS_X; axis <= VECTOR_AXIS_Z; ++axis)
+    {
+        p_2.array[axis] = vector_scalar(op, camera_context.base[axis]);
+    }
 
-    //IV u>0
-    if(op_u_scalaire <= 0)
+    //III u>0
+    if(p_2.x <= 0)
     {
         return vector_init(0, 0, -1);
     }
 
-    //V
+    //IV projection
     float scale = (float) image_width(image_p)
-                / (2 * op_u_scalaire * tan(M_PI*camera_context.angle/360));
+                / (2 * p_2.x * tan(M_PI*camera_context.angle/360));
 
-    float x_image_scale =  scale * op_v_scalaire;
-    float y_image_scale = -scale * op_w_scalaire;
+    float x_image_scale =  scale * p_2.y;
+    float y_image_scale = -scale * p_2.z;
 
+    //projection dans l'image
     x_image_scale += (float) image_width(image_p)  / 2;
     y_image_scale += (float) image_height(image_p) / 2;
 
-    return vector_init(x_image_scale, y_image_scale, op_u_scalaire);
+    return vector_init(x_image_scale, y_image_scale, p_2.x);
 }
 
 void
