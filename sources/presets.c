@@ -21,6 +21,7 @@
 #include "performance.h"
 #include "solid.h"
 #include "solid_file.h"
+#include "solid_plane.h"
 
 static const char* const PRESET_NAME_NONE = "Not a preset";
 
@@ -33,6 +34,7 @@ typedef struct preset_t
 static void oli_test_3d_middle_point();
 static void oli_test_2d_corners();
 static void oli_test_vectors();
+static void oli_plane();
 static void oli_brown();
 static void oli_test_pattern();
 static void oli_test_pattern_scan();
@@ -48,6 +50,7 @@ static const preset_t PRESET_LIST[] =
     {"test 3D point milieu", &oli_test_3d_middle_point},
     {"test 2D coins", &oli_test_2d_corners},
     {"test vectors", &oli_test_vectors},
+    {"test plane", &oli_plane},
     {"brownien 1", &oli_brown},
     {"test pattern", &oli_test_pattern},
     {"test pattern scan", &oli_test_pattern_scan},
@@ -205,6 +208,42 @@ oli_test_vectors()
     operator_free(c_p);
 }
 
+static void
+oli_plane()
+{
+    int width = 1280;
+    int height = 720;
+    image_t* image_p  = image_init(width, height);
+    image_set(image_p);
+    camera_t camera = camera_init(-5, -2, 2, 1, 1, 0, 45);
+
+    solid_t* solid_p = solid_plane_init(200, 200, 2, 2);
+
+    solid_render(solid_p , image_p, &camera);
+
+    image_file_write("plan", image_p, NULL);
+
+    image_set(image_p);
+    float previousvalue = 0;
+    for(uint32_t vertex_index = 0; vertex_index < solid_vertex_count(solid_p); ++vertex_index)
+    {
+        vector_t* vertex_p = solid_vertex(solid_p, vertex_index);
+        vector_axis_t random_delta =  0.5 * rand() / (double) RAND_MAX;
+        float new_value = 0.05 * random_delta + 0.95 * previousvalue;
+        vector_t new_v = vector_add(*vertex_p, vector_scale(VECTOR_Z, new_value));
+        *vertex_p = new_v;
+        previousvalue = new_value;
+    }
+    solid_render(solid_p , image_p, &camera);
+
+    palette_t* palette_p = palette_init_extreme();
+    image_file_parameters_init_palette(palette_p, PIXEL_BIT_DEPTH_4b, PALETTE_INDEX_METHOD_DITHER_DISTANCE);
+    image_reduce_bit_depth(image_p, 5, 1);
+    image_file_write("plan 2", image_p, NULL);
+
+    image_free(image_p);
+
+}
 
 static void
 oli_brown()

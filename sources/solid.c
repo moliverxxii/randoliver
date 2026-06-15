@@ -151,6 +151,20 @@ solid_render(const void* this_p,
     }
 }
 
+uint32_t
+solid_vertex_count(const solid_t* solid_p)
+{
+    return solid_p->vertex_count;
+}
+
+vector_t*
+solid_vertex(solid_t* solid_p, uint32_t index)
+{
+    return &solid_p->vertex_array_p[index];
+}
+
+
+
 renderable_i*
 solid_renderable(solid_t* solid_p)
 {

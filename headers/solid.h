@@ -24,6 +24,9 @@ void solid_render(const void* this_p,
                   image_t* image_p,
                   const camera_t* camera_p);
 
+uint32_t  solid_vertex_count(const solid_t* solid_p);
+vector_t* solid_vertex(solid_t* solid_p, uint32_t index);
+
 renderable_i* solid_renderable(solid_t* solid_p);
 
 extern const solid_t* const OCTAHEDRON_P;
