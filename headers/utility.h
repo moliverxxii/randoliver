@@ -9,6 +9,7 @@
 #define UTIL_H_
 
 #include <stdlib.h>
+#include <stdint.h>
 
 #define OLI_UNUSED(PARAMETER) (void) PARAMETER
 
