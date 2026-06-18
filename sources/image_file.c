@@ -13,6 +13,7 @@
 
 static const uint8_t BMP_PLANE_COUNT = 1;
 static const uint8_t BITS_PER_BYTE = 8;
+static const uint32_t IMAGE_FILE_RESOLUTION = 2835; //pixel/m
 
 #define BITMAP_INFO_HEADER
 
@@ -281,8 +282,8 @@ image_file_write_header(image_file_t* file_p, uint32_t width, uint32_t height)
 #ifdef BITMAP_INFO_HEADER
             0,
             0,
-            RES,
-            RES,
+            IMAGE_FILE_RESOLUTION,
+            IMAGE_FILE_RESOLUTION,
             colour_count,
             0
 #endif // BITMAP_INFO_HEADER

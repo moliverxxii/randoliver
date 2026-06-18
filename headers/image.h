@@ -11,10 +11,6 @@
 #include "colours.h"
 #include "vector.h"
 
-#define RES 2835
-
-typedef colour_t* row_t;
-
 /** Conteneur avec les donnees de bases d'une image.
  *  Doit être utilisé pour tous les traitements d'images.
  *
