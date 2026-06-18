@@ -11,6 +11,8 @@
 #include "colours.h"
 #include "vector.h"
 
+typedef colour_t* row_t;
+
 /** Conteneur avec les donnees de bases d'une image.
  *  Doit être utilisé pour tous les traitements d'images.
  *

@@ -13,19 +13,28 @@ typedef struct camera_t
 {
     vector_t origin;
     vector_t direction;
-    float angle; //[0, pi]
+    camera_projection_e projection;
+    union
+    {
+        float angle;
+        float pixel_per_unit;
+    };
 } camera_t;
 
 camera_t*
 camera_init(float origin_x, float origin_y, float origin_z,
             float destin_x, float destin_y, float destin_z,
-            float angle)
+            camera_projection_e type,
+            float projection_coefficient)
 {
     camera_t camera =
     {
         vector_init(origin_x, origin_y, origin_z),
         vector_init(destin_x, destin_y, destin_z),
-        angle
+        type,
+        {
+            projection_coefficient
+        }
     };
 
     camera_t* camera_p = malloc(sizeof(camera));
@@ -77,6 +86,12 @@ camera_direction(camera_t* camera_p)
 {
     return &camera_p->direction;
 
+}
+
+camera_projection_e
+camera_projection(const camera_t* camera_p)
+{
+    return camera_p->projection;
 }
 
 float

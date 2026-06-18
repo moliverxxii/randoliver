@@ -110,6 +110,7 @@ oli_test_3d_middle_point()
                                      point_vector(p_p)->x,
                                      point_vector(p_p)->y,
                                      point_vector(p_p)->z,
+                                     CAMERA_PROJECTION_PERSPECTIVE,
                                      45.0f);
     point_render(p_p, image_p, camera_p);
     point_free(p_p);
@@ -218,8 +219,10 @@ oli_plane()
     int height = 720;
     image_t* image_p  = image_init(width, height);
     image_set(image_p);
-    camera_t* camera_p = camera_init(-5, -2, 2, 1, 1, 0, 45);
-
+    camera_t* camera_p = camera_init(-5, -2, 2,
+                                     1, 1, 0,
+                                     CAMERA_PROJECTION_PERSPECTIVE,
+                                     45);
     solid_t* solid_p = solid_plane_init(200, 200, 2, 2);
 
     solid_render(solid_p , image_p, camera_p);
@@ -385,6 +388,7 @@ oli_solid()
 
     camera_t* camera_p = camera_init(-5, -1.5, -1,
                                      0, 0, 0,
+                                     CAMERA_PROJECTION_PERSPECTIVE,
                                      45);
 
     renderable_cache_clear();
@@ -471,7 +475,10 @@ oli_sphere()
                                              COLOUR_VALUE_MAX * rand_vertical);
     }
 
-    camera_t* camera_p = camera_init(10, -40, 30, 0, 0, 0, 4.5);
+    camera_t* camera_p = camera_init(10, -40, 30,
+                                     0, 0, 0,
+                                     CAMERA_PROJECTION_PERSPECTIVE,
+                                     4.5);
 
     image_set(image_p);
     figure_render(sphere_points_p, image_p, camera_p);
@@ -555,7 +562,10 @@ oli_sphere_2()
 
     uint32_t edge_count = point_count - 1;
 
-    camera_t* camera_p = camera_init(1, 1, 30, 0, 0, 0, 4.5);
+    camera_t* camera_p = camera_init(1, 1, 30,
+                                     0, 0, 0,
+                                     CAMERA_PROJECTION_PERSPECTIVE,
+                                     4.5);
 
     image_set(image_p);
     for(uint32_t edge = 0; edge < edge_count; edge++)

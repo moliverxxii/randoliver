@@ -116,13 +116,18 @@ render_vector(vector_t vector, colour_t colour, image_t* image_p, const camera_t
 
 static struct camera_context_t
 {
-    float angle;
+    camera_projection_e projection_type;
+    union
+    {
+        float angle;
+        float pixel_per_unit;
+    } projection;
     vector_t o;
     vector_t f;
     vector_t of;
     float norme_of;
     operator_t* transformation_p;
-    float perspective_scale;
+    float scale;
 } camera_context;
 
 static void
@@ -155,13 +160,25 @@ camera_context_update(const camera_t* camera_p, const image_t* image_p)
     operator_free(origin_change_p);
     operator_free(orientation_change_p);
 
-    float scale = (float) image_width(image_p)
-                / (2 * tan(M_PI*angle/360));
-
+    float scale = 1;
+    switch(camera_projection(camera_p))
+    {
+    case CAMERA_PROJECTION_ORTHOGRAPHIC:
+        scale = camera_field_of_view(camera_p);
+        break;
+    case CAMERA_PROJECTION_PERSPECTIVE:
+        scale = (float) image_width(image_p) / (2 * tan(M_PI*angle/360));
+        break;
+    default:
+        break;
+    }
 
     struct camera_context_t context =
     {
-        angle,
+        camera_projection(camera_p),
+        {
+            angle
+        },
         o,
         f,
         of,
@@ -195,8 +212,22 @@ renderable_vector_position(vector_t p, image_t* image_p,
     free(p_2_p);
 
     //projection
-    float x_image_scale =  camera_context.perspective_scale * p_2.y/p_2.x;
-    float y_image_scale = -camera_context.perspective_scale * p_2.z/p_2.x;
+    float x_image_scale =  p_2.y;
+    float y_image_scale = -p_2.z;
+
+    switch(camera_context.projection_type)
+    {
+    case CAMERA_PROJECTION_PERSPECTIVE:
+        x_image_scale /= p_2.x;
+        y_image_scale /= p_2.x;
+        //fallthrough
+    case CAMERA_PROJECTION_ORTHOGRAPHIC:
+        x_image_scale *= camera_context.scale;
+        y_image_scale *= camera_context.scale;
+        break;
+    default:
+        break;
+    }
 
     //projection dans l'image
     x_image_scale += (float) image_width(image_p)  / 2;

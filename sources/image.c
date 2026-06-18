@@ -11,8 +11,6 @@
 #include "utility.h"
 #include "image.h"
 
-typedef colour_t* row_t;
-
 typedef struct image_t
 {
     uint32_t width;
