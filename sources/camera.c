@@ -6,6 +6,7 @@
  */
 
 #include <string.h>
+
 #include "camera.h"
 
 typedef struct camera_t

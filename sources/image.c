@@ -10,7 +10,6 @@
 #include <math.h>
 #include "utility.h"
 #include "image.h"
-#include "interface.h"
 
 typedef struct image_t
 {

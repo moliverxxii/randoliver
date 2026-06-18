@@ -76,6 +76,10 @@ solid_plane_init(uint32_t L, uint32_t H, vector_axis_t l_u, vector_axis_t h_u)
         }
     }
     solid_t* solid_p = solid_init(LH_N, vector_array_p, T, triangle_vertices_pp, colours_p);
+    free(vector_array_p);
+    free(triangle_vertices_pp);
+    free(indices_p);
+    free(colours_p);
     return solid_p;
 }
 

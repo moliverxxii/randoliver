@@ -113,6 +113,7 @@ oli_test_3d_middle_point()
                                      45.0f);
     point_render(p_p, image_p, camera_p);
     point_free(p_p);
+    camera_free(camera_p);
     image_file_write("test 3D point milieu", image_p, NULL);
     image_free(image_p);
 }
@@ -183,14 +184,16 @@ oli_test_vectors()
            vector_scalar_full(table[0], VECTOR_X));
 
     printf("operator operation\n");
-    operator_operation(b_p, table, 3);
+    vector_t* result_p = operator_operation(b_p, table, 3);
 
     for(int vector = 0; vector < 3; ++vector)
     {
-        vector_print(table[vector]);
+        vector_print(result_p[vector]);
     }
+    free(result_p);
+
     printf("operator translation\n");
-    vector_t* result_p = operator_operation(a_p, table, 3);
+    result_p = operator_operation(a_p, table, 3);
 
     for(int vector = 0; vector < 3; ++vector)
     {
@@ -235,9 +238,9 @@ oli_plane()
         previousvalue = new_value;
     }
     solid_render(solid_p , image_p, camera_p);
+    solid_free(solid_p);
+    camera_free(camera_p);
 
-    palette_t* palette_p = palette_init_extreme();
-    image_file_parameters_init_palette(palette_p, PIXEL_BIT_DEPTH_4b, PALETTE_INDEX_METHOD_DITHER_DISTANCE);
     image_reduce_bit_depth(image_p, 5, 1);
     image_file_write("plan 2", image_p, NULL);
 
@@ -387,6 +390,8 @@ oli_solid()
     renderable_cache_clear();
 
     solid_render(solid_p, image_p, camera_p);
+    camera_free(camera_p);
+
     image_reduce_bit_depth(image_p, 5, 1);
 
     image_file_write("oli solid", image_p, NULL);
@@ -470,6 +475,8 @@ oli_sphere()
 
     image_set(image_p);
     figure_render(sphere_points_p, image_p, camera_p);
+    camera_free(camera_p);
+
     figure_free(sphere_points_p);
     image_reduce_bit_depth(image_p, 5, 1);
     image_file_write("sphere", image_p, NULL);
@@ -562,11 +569,13 @@ oli_sphere_2()
         edge_free(edge_p);
     }
 
+    camera_free(camera_p);
     free(vector_array_p);
 
     palette_t* palette_p = palette_init(PIXEL_BIT_DEPTH_8b, 0);
     image_file_parameters_t* file_parameters_p = image_file_parameters_init_palette(palette_p, PIXEL_BIT_DEPTH_8b, PALETTE_INDEX_METHOD_DISTANCE);
 
     image_file_write("sphere 2", image_p, file_parameters_p);
+    palette_free(palette_p);
     image_file_parameters_free_palette(file_parameters_p);
 }

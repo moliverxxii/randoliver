@@ -191,6 +191,10 @@ vector_rotate(vector_t vector, vector_t normal, float angle)
 
     if(angle != previous_angle || matrix_rotation_p == NULL)
     {
+        if(matrix_rotation_p != NULL)
+        {
+            operator_free(matrix_rotation_p);
+        }
         matrix_rotation_p = get_rotation(angle);
         updated = 1;
     }
@@ -200,6 +204,11 @@ vector_rotate(vector_t vector, vector_t normal, float angle)
 
     if(updated || matrix_rotation_total_p == NULL)
     {
+        if(matrix_rotation_total_p != NULL)
+        {
+            operator_free(matrix_rotation_total_p);
+        }
+
         operator_t* matrix_temp_p = operator_multiply(matrix_rotation_p, matrix_base_0r_p);
 
         matrix_rotation_total_p = operator_multiply(matrix_base_r0_p, matrix_temp_p);
