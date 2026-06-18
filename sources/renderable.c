@@ -128,9 +128,9 @@ static struct camera_context_t
 static void
 camera_context_update(const camera_t* camera_p, const image_t* image_p)
 {
-    float angle = camera_p->angle;
-    vector_t o = camera_p->origin;
-    vector_t f = camera_p->direction;
+    float angle = camera_field_of_view(camera_p);
+    vector_t o = *camera_origin((camera_t*) camera_p);
+    vector_t f = *camera_direction((camera_t*) camera_p);
     vector_t of = vector_subtract(f, o);
 
     float norme_of = vector_norm(of);
@@ -172,16 +172,20 @@ camera_context_update(const camera_t* camera_p, const image_t* image_p)
     camera_context = context;
 }
 
-static camera_t local_camera;
+static camera_t* local_camera = NULL;
 
 vector_t
 renderable_vector_position(vector_t p, image_t* image_p,
                            const camera_t* camera_p)
 {
-    if(memcmp(camera_p, &local_camera, sizeof(local_camera)) != 0)
+    if(!camera_is_equal(local_camera, camera_p))
     {
         camera_context_update(camera_p, image_p);
-        local_camera = *camera_p;
+        if(local_camera != NULL)
+        {
+            camera_free(local_camera);
+        }
+        local_camera = camera_copy(camera_p);
     }
 
     vector_t p_2 = VECTOR_0;
