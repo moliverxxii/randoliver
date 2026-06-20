@@ -191,6 +191,31 @@ list_sort(list_t** head_pp,
     *head_pp = new_list_p;
 }
 
+int
+list_is_sorted(const list_t** head_pp, sort_value_access_f sort_value)
+{
+    float previous_value = 0;
+    int is_sorted = 1;
+    for(const list_t* element_p = *head_pp;
+        element_p != NULL;
+        element_p = *list_next((list_t*)element_p))
+    {
+        float value = (*sort_value)(list_value((list_t*) element_p));
+
+        if(element_p != *head_pp)
+        {
+            if(value < previous_value)
+            {
+                is_sorted = 0;
+                break;
+            }
+        }
+        previous_value = value;
+    }
+    return is_sorted;
+}
+
+
 void
 list_sort_array(list_t** head_pp,
                 const void* array_p, size_t element_size, uint32_t element_count,

@@ -33,6 +33,7 @@ typedef struct preset_t
 
 static void oli_test_3d_middle_point();
 static void oli_test_2d_corners();
+static void oli_test_lists();
 static void oli_test_vectors();
 static void oli_plane();
 static void oli_brown();
@@ -49,6 +50,7 @@ static const preset_t PRESET_LIST[] =
 {
     {"test 3D point milieu", &oli_test_3d_middle_point},
     {"test 2D coins", &oli_test_2d_corners},
+    {"test listes et tri", &oli_test_lists},
     {"test vectors", &oli_test_vectors},
     {"test plane", &oli_plane},
     {"brownien 1", &oli_brown},
@@ -98,8 +100,8 @@ preset_run(uint32_t preset_index)
 static void
 oli_test_3d_middle_point()
 {
-    int width = 4;
-    int height = 4;
+    int width = 100;
+    int height = 100;
     image_t* image_p  = image_init(width, height);
     image_set(image_p);
 
@@ -122,8 +124,8 @@ oli_test_3d_middle_point()
 static void
 oli_test_2d_corners()
 {
-    int width = 4;
-    int height = 4;
+    int width = 100;
+    int height = 100;
     image_t* image_p  = image_init(width, height);
     image_set(image_p);
 
@@ -135,6 +137,53 @@ oli_test_2d_corners()
     image_file_write("test 2d coins", image_p, NULL);
     image_free(image_p);
 }
+
+static void
+test_list_print(const void* value_p)
+{
+    const int* number_p = value_p;
+    printf("%10d\n", *number_p);
+}
+
+static float
+test_list_value(const void* value_p)
+{
+    return (float) *(const int*) value_p;
+}
+
+static void
+oli_test_lists()
+{
+    //liste courte
+    uint32_t list_length = 10;
+    list_t* list_p = NULL;
+    for(uint32_t item = 0; item < list_length; ++item)
+    {
+        int rand_int = rand();
+        list_append(&list_p, &rand_int, sizeof(rand_int));
+    }
+
+    list_print(list_p, &test_list_print);
+    printf("%s\n", list_is_sorted((const list_t**) &list_p, &test_list_value) ? "trie" : "pas trie!");
+
+    list_sort(&list_p, &test_list_value, SORT_ORDER_ASCENDING);
+    list_print(list_p, &test_list_print);
+    printf("%s\n", list_is_sorted((const list_t**) &list_p, &test_list_value) ? "trie" : "pas trie!");
+
+    list_free(list_p);
+    list_p = NULL;
+
+    list_length = 25000;
+    for(uint32_t item = 0; item < list_length; ++item)
+    {
+        int rand_int = rand();
+        list_append(&list_p, &rand_int, sizeof(rand_int));
+    }
+
+    list_sort(&list_p, &test_list_value, SORT_ORDER_ASCENDING);
+    list_free(list_p);
+}
+
 
 static void
 oli_test_vectors()
