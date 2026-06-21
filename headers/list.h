@@ -49,8 +49,7 @@ list_t**  list_fetch_last(list_t** list_pp);
 void list_sort(list_t** head_pp, sort_value_access_f sort_value, enum list_sort_order_e order);
 int list_is_sorted(const list_t** head_pp, sort_value_access_f sort_value);
 
-void list_sort_array(list_t** head_pp,
-                     const void* array, size_t element_size, uint32_t element_count,
+void list_sort_array(void* array_p, size_t element_size, uint32_t element_count,
                      sort_value_access_f sort_value, enum list_sort_order_e order);
 
 #endif /* HEADERS_LIST_H_ */

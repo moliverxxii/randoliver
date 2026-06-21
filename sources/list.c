@@ -288,8 +288,7 @@ list_is_sorted(const list_t** head_pp, sort_value_access_f sort_value)
 
 
 void
-list_sort_array(list_t** head_pp,
-                const void* array_p, size_t element_size, uint32_t element_count,
+list_sort_array(void* array_p, size_t element_size, uint32_t element_count,
                 sort_value_access_f sort_value, enum list_sort_order_e order)
 {
     list_t* list_head_vector_p = NULL;
@@ -303,5 +302,9 @@ list_sort_array(list_t** head_pp,
 
     list_sort(&list_head_vector_p, sort_value, order);
 
-    *head_pp = list_head_vector_p;
+    void* vector_array_p = list_array(list_head_vector_p);
+    list_free(list_head_vector_p);
+
+    memcpy(array_p, vector_array_p, element_count*element_size);
+    free(vector_array_p);
 }

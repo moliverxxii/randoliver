@@ -586,30 +586,18 @@ oli_sphere_2()
     {
         vector_array_p[point] = *point_vector(figure_point(sphere_points_p, point));
     }
-    list_t* list_head_vector_p = NULL;
-    list_sort_array(&list_head_vector_p,
-                    vector_array_p, sizeof(vector_t), point_count,
+    list_sort_array(vector_array_p, sizeof(vector_t), point_count,
                     &vector_z_access, SORT_ORDER_ASCENDING);
 
     figure_free(sphere_points_p);
-
-    free(vector_array_p);
-    vector_array_p = list_array(list_head_vector_p);
-    list_free(list_head_vector_p);
 
     for(uint32_t point = 0; point < point_count; point += class_count)
     {
         uint32_t element_count = ((point_count - point) > class_count)
                                ? class_count
                                : (point_count - point);
-        list_sort_array(&list_head_vector_p,
-                        &vector_array_p[point], sizeof(vector_t), element_count,
+        list_sort_array(&vector_array_p[point], sizeof(vector_t), element_count,
                         &vector_longitude_access, SORT_ORDER_ASCENDING);
-        vector_t* vector_slice_p = list_array(list_head_vector_p);
-        list_free(list_head_vector_p);
-
-        memcpy(vector_array_p + point, vector_slice_p, element_count * sizeof(vector_t));
-        free(vector_slice_p);
     }
 
     uint32_t edge_count = point_count - 1;

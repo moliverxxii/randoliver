@@ -114,13 +114,8 @@ palette_init(palette_bit_depth_e bitdepth, uint32_t colour_count)
                     palette_p->colour_array_p[colour] = colour_get_random();
                 }
 
-                list_t* colour_list_p;
-                list_sort_array(&colour_list_p,
-                        palette_p->colour_array_p, sizeof(*palette_p->colour_array_p), palette_p->count,
-                        &colour_value_access, SORT_ORDER_ASCENDING);
-                free(palette_p->colour_array_p);
-                palette_p->colour_array_p = list_array(colour_list_p);
-                list_free(colour_list_p);
+                list_sort_array(palette_p->colour_array_p, sizeof(*palette_p->colour_array_p), palette_p->count,
+                                &colour_value_access, SORT_ORDER_ASCENDING);
             }
         }
     }
@@ -372,27 +367,15 @@ palette_index_get_dither_distance(const palette_t* palette_p, colour_t colour)
             array_p[index].proximity = UINT32_MAX / distance;
         }
     }
-    list_t* list_p = NULL;
-    list_sort_array(&list_p, array_p, sizeof(colour_candidate_t), palette_count(palette_p), &colour_distance_sort_access, SORT_ORDER_ASCENDING);
-    free(array_p);
+    list_sort_array(array_p, sizeof(colour_candidate_t), palette_count(palette_p), &colour_distance_sort_access, SORT_ORDER_ASCENDING);
 
     //TODO MAGIC NUMBER!
-    list_t* last_p = *list_fetch(&list_p, 3);
-    if(last_p != NULL)
-    {
-        if(*list_next(last_p) != NULL)
-        {
-            list_free(*list_next(last_p));
-            *list_next(last_p) = NULL;
-        }
-    }
 
-    array_p = list_array(list_p);
-    uint32_t different_indexes = list_length(list_p);
-    list_free(list_p);
     uint64_t proximity_total = 0;
 
-    for(uint32_t candidate = 0; candidate < different_indexes; ++candidate)
+    const uint32_t total_indexes = 4;
+
+    for(uint32_t candidate = 0; candidate < total_indexes; ++candidate)
     {
         proximity_total += array_p[candidate].proximity;
     }
@@ -408,11 +391,6 @@ palette_index_get_dither_distance(const palette_t* palette_p, colour_t colour)
     while(score_sum < proximity_total)
     {
         position = element_p - array_p;
-
-        if(position >= different_indexes)
-        {
-            break;
-        }
 
         if(score_sum <= score && score < score_sum + element_p->proximity)
         {
