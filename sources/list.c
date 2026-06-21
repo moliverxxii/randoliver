@@ -297,24 +297,11 @@ list_sort_array(list_t** head_pp,
     for(uint32_t index = 0; index < element_count; ++index)
     {
         const void* current_p = (const char*) array_p + element_size * index;
-        float current_compare_value = sort_value(current_p);
 
-        list_t** compared_element_pp = NULL;
-        for(compared_element_pp = &list_head_vector_p;
-            *compared_element_pp != NULL;
-            compared_element_pp = list_next(*compared_element_pp))
-        {
-            float compared = sort_value(list_value(*compared_element_pp));
-            int sort_b = current_compare_value <= compared;
-            sort_b = (order == SORT_ORDER_ASCENDING) ? sort_b : !sort_b;
-            if(sort_b)
-            {
-                break;
-            }
-        }
-
-        list_insert(compared_element_pp, current_p, element_size);
+        list_insert(&list_head_vector_p, current_p, element_size);
     }
+
+    list_sort(&list_head_vector_p, sort_value, order);
 
     *head_pp = list_head_vector_p;
 }
