@@ -43,8 +43,8 @@ list_t*  list_insert(list_t** element_pp, const void* next_p, size_t size);
 // n, n+1, n+2, new
 list_t*  list_append(list_t** element_pp, const void* next_p, size_t size);
 list_t** list_next(list_t* list_p);
-list_t*  list_fetch(list_t* list_p, uint32_t index);
-list_t*  list_fetch_last(list_t* list_p);
+list_t**  list_fetch(list_t** list_pp, uint32_t index);
+list_t**  list_fetch_last(list_t** list_pp);
 
 void list_sort(list_t** head_pp, sort_value_access_f sort_value, enum list_sort_order_e order);
 int list_is_sorted(const list_t** head_pp, sort_value_access_f sort_value);

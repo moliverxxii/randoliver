@@ -159,7 +159,7 @@ oli_test_lists()
     list_t* list_p = NULL;
     for(uint32_t item = 0; item < list_length; ++item)
     {
-        int rand_int = rand();
+        int rand_int = rand() >> 16;
         list_append(&list_p, &rand_int, sizeof(rand_int));
     }
 
@@ -169,18 +169,21 @@ oli_test_lists()
     list_sort(&list_p, &test_list_value, SORT_ORDER_ASCENDING);
     list_print(list_p, &test_list_print);
     printf("%s\n", list_is_sorted((const list_t**) &list_p, &test_list_value) ? "trie" : "pas trie!");
-
     list_free(list_p);
-    list_p = NULL;
 
-    list_length = 25000;
+    list_p = NULL;
+    list_length = 250000;
+    printf("on rempli la liste\n");
     for(uint32_t item = 0; item < list_length; ++item)
     {
         int rand_int = rand();
-        list_append(&list_p, &rand_int, sizeof(rand_int));
+        list_insert(&list_p, &rand_int, sizeof(rand_int));
     }
+    printf("liste remplie\n");
 
+    printf("%s\n", list_is_sorted((const list_t**) &list_p, &test_list_value) ? "trie" : "pas trie!");
     list_sort(&list_p, &test_list_value, SORT_ORDER_ASCENDING);
+    printf("%s\n", list_is_sorted((const list_t**) &list_p, &test_list_value) ? "trie" : "pas trie!");
     list_free(list_p);
 }
 

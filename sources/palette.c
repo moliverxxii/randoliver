@@ -377,7 +377,7 @@ palette_index_get_dither_distance(const palette_t* palette_p, colour_t colour)
     free(array_p);
 
     //TODO MAGIC NUMBER!
-    list_t* last_p = list_fetch(list_p, 3);
+    list_t* last_p = *list_fetch(&list_p, 3);
     if(last_p != NULL)
     {
         if(*list_next(last_p) != NULL)

@@ -6,6 +6,7 @@
  */
 #include "list.h"
 
+#include <stdio.h>
 #include <string.h>
 
 typedef struct list_t
@@ -59,7 +60,7 @@ list_length(const list_t* list_p)
     while(head_p != NULL)
     {
         length++;
-        list_t* next_p = head_p->next_p;
+        const list_t* next_p = head_p->next_p;
         head_p = next_p;
     }
     return length;
@@ -119,7 +120,7 @@ list_insert(list_t** element_pp, const void* new_p, size_t size)
 list_t*
 list_append(list_t** element_pp, const void* new_p, size_t size)
 {
-    list_t* last_element_p = list_fetch_last(*element_pp);
+    list_t* last_element_p = *list_fetch_last(element_pp);
     list_t** write_element_pp = NULL;
     if(last_element_p == NULL)
     {
@@ -144,51 +145,121 @@ list_next(list_t* list_p)
     return next_pp;
 }
 
-list_t*
-list_fetch(list_t* list_p, uint32_t index)
+list_t**
+list_fetch(list_t** list_pp, uint32_t index)
 {
-    list_t* position_p = list_p;
+    list_t** position_pp = list_pp;
     for(uint32_t position = 0; position < index; ++position)
     {
-        if(position_p == NULL)
+        if(*position_pp == NULL)
         {
             break;
         }
-        position_p = position_p->next_p;
+        position_pp = &(*position_pp)->next_p;
     }
-    return position_p;
+    return position_pp;
+}
+
+list_t**
+list_fetch_last(list_t** list_pp)
+{
+    list_t** position_pp = list_pp;
+    if(*position_pp != NULL)
+    {
+        while((*position_pp)->next_p != NULL)
+        {
+            position_pp = &(*position_pp)->next_p;
+        }
+    }
+
+    return position_pp;
 }
 
 list_t*
-list_fetch_last(list_t* list_p)
+list_pop(list_t** item_pp)
 {
-    list_t* position_p = list_p;
-    list_t* previous_p = NULL;
-    while(position_p != NULL)
+    list_t* popped_p = *item_pp;
+    if(popped_p != NULL)
     {
-        previous_p = position_p;
-        position_p = position_p->next_p;
+        *item_pp = popped_p->next_p;
+        popped_p->next_p = NULL;
     }
+    return popped_p;
+}
 
-    return previous_p;
+void
+list_push(list_t** list_pp, list_t* element_p)
+{
+    if(element_p != NULL)
+    {
+        element_p->next_p = *list_pp;
+        *list_pp = element_p;
+    }
+}
+
+void
+list_stick(list_t** list_a_pp, list_t* list_b_p)
+{
+    list_t** last_pp = list_fetch_last(list_a_pp);
+    if(*last_pp != NULL)
+    {
+        (*last_pp)->next_p = list_b_p;
+    }
+    else
+    {
+        *last_pp = list_b_p;
+    }
+}
+
+void
+list_partition(list_t** inferior_pp, list_t** superior_pp, sort_value_access_f sort_value)
+{
+    uint32_t length = list_length(*inferior_pp);
+    uint32_t random_threshold_index = (uint32_t) ((uint64_t) (length - 1) * rand() / (uint64_t) RAND_MAX);
+
+    list_t** pivot_pp = list_fetch(inferior_pp, random_threshold_index);
+    float pivot_value = (*sort_value)(list_value(*pivot_pp));
+
+    list_t* list_inferior_p = NULL;
+    list_t* list_superior_p = list_pop(pivot_pp);
+    for(list_t* element_p = list_pop(inferior_pp);
+        element_p != NULL;
+        element_p = list_pop(inferior_pp))
+    {
+        float value = (*sort_value)(list_value(element_p));
+        if(value <= pivot_value)
+        {
+            list_push(&list_inferior_p, element_p);
+        }
+        else
+        {
+            list_push(&list_superior_p, element_p);
+        }
+    }
+    *inferior_pp = list_inferior_p;
+    *superior_pp = list_superior_p;
 }
 
 void
 list_sort(list_t** head_pp,
           sort_value_access_f sort_value, enum list_sort_order_e order)
 {
-    uint32_t elment_count = list_length(*head_pp);
-    void* array_p = list_array(*head_pp);
-    size_t element_size = list_element_size(*head_pp);
+    list_t* list_inferior_p = *head_pp;
+    list_t* list_superior_p = NULL;
 
-    list_t* new_list_p;
+    list_partition(&list_inferior_p, &list_superior_p, sort_value);
+    if(list_length(list_inferior_p) > 1)
+    {
+        list_sort(&list_inferior_p, sort_value, order);
+    }
+    if(list_length(list_superior_p) > 1)
+    {
+        list_sort(&list_superior_p, sort_value, order);
+    }
 
-    list_sort_array(&new_list_p,
-                    array_p, element_size, elment_count,
-                    sort_value, order);
-    free(array_p);
-    list_free(*head_pp);
-    *head_pp = new_list_p;
+    list_stick(&list_inferior_p, list_superior_p);
+
+    *head_pp = list_inferior_p;
 }
 
 int
