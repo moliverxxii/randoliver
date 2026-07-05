@@ -5,8 +5,8 @@
  *      Author: moliver
  */
 
-#ifndef HEADERS_PRESETS_H_
-#define HEADERS_PRESETS_H_
+#ifndef HEADERS_PRESET_H_
+#define HEADERS_PRESET_H_
 
 #include <stdint.h>
 
@@ -31,4 +31,4 @@ uint32_t preset_get_total_count();
 const char* preset_get_name(uint32_t preset_index);
 void        preset_run(uint32_t preset_index);
 
-#endif /* HEADERS_PRESETS_H_ */
+#endif /* HEADERS_PRESET_H_ */

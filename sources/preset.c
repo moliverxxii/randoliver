@@ -5,11 +5,12 @@
  *      Author: moliver
  */
 
+#include "../headers/preset.h"
+
 #include <stdlib.h>
 #include <string.h>
 
 #include "image.h"
-#include "presets.h"
 
 static const char* const PRESET_NAME_NONE = "Not a preset";
 
