@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <time.h>
 
+#include "image_file.h"
 #include "interface.h"
 #include "performance.h"
 #include "preset.h"
@@ -30,17 +31,29 @@ main(int argc, char* argv[])
 
     preset_list_init();
     //interface_state_save();
+    image_t* frame_p = image_init(320,240);
     for(uint32_t preset = 0; preset < preset_get_total_count(); ++preset)
     {
         //TODO utiliser la nouvelle architecture de preset
         performance_t performance_preset
             = performance_init(preset_get_name(preset));
         performance_try_start(&performance_preset);
-        preset_run(preset);
+
+        preset_model_init(preset);
+        uint32_t frame_count = preset_frame_count(preset);
+        for(uint32_t frame = 0; frame < frame_count; ++frame)
+        {
+            preset_model_update(preset);
+            image_set(frame_p);
+            preset_frame_render(preset, frame_p);
+            image_file_write(preset_get_name(preset), frame_p, NULL);
+        }
+        preset_model_free(preset);
         performance_try_add(&performance_preset);
         performance_print(&performance_preset);
         performance_free(&performance_preset);
     }
+    image_free(frame_p);
 
     performance_try_add(&performance_total);
     performance_print(&performance_total);

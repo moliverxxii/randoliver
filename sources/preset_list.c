@@ -19,7 +19,10 @@
 #include "solid_file.h"
 #include "solid_plane.h"
 
-static void oli_test_3d_middle_point();
+static void oli_3d_middle_point_init();
+static void oli_3d_middle_point_render(image_t* image_p, uint32_t frame);
+static void oli_3d_middle_point_free();
+
 static void oli_test_2d_corners();
 static void oli_test_lists();
 static void oli_test_vectors();
@@ -38,44 +41,54 @@ static void oli_sphere_2();
 void
 preset_list_init()
 {
-    preset_add("test 3D point milieu", &oli_test_3d_middle_point, NULL, NULL, 1);
-    preset_add("test 2D coins",        &oli_test_2d_corners     , NULL, NULL, 1);
-    preset_add("test listes et tri",   &oli_test_lists          , NULL, NULL, 1);
-    preset_add("test vectors",         &oli_test_vectors        , NULL, NULL, 1);
-    preset_add("test plane",           &oli_plane               , NULL, NULL, 1);
-    preset_add("brownien 1",           &oli_brown               , NULL, NULL, 1);
-    preset_add("test pattern",         &oli_test_pattern        , NULL, NULL, 1);
-    preset_add("test pattern scan",    &oli_test_pattern_scan   , NULL, NULL, 1);
-    preset_add("test palette",         &oli_test_palette        , NULL, NULL, 1);
-    preset_add("test pattern squares", &oli_test_pattern_squares, NULL, NULL, 1);
-    preset_add("solid file",           &oli_solid               , NULL, NULL, 1);
-    preset_add("figure",               &oli_figure              , NULL, NULL, 1);
-    preset_add("sphere 1",             &oli_sphere              , NULL, NULL, 1);
-    preset_add("sphere 2",             &oli_sphere_2            , NULL, NULL, 1);
+    preset_add("3D point milieu",      &oli_3d_middle_point_init, NULL, &oli_3d_middle_point_render, &oli_3d_middle_point_free, 1000);
+    preset_add("test 2D coins",        &oli_test_2d_corners       , NULL, NULL, NULL, 1);
+    preset_add("test listes et tri",   &oli_test_lists            , NULL, NULL, NULL, 1);
+    preset_add("test vectors",         &oli_test_vectors          , NULL, NULL, NULL, 1);
+    preset_add("test plane",           &oli_plane                 , NULL, NULL, NULL, 1);
+    preset_add("brownien 1",           &oli_brown                 , NULL, NULL, NULL, 1);
+    preset_add("test pattern",         &oli_test_pattern          , NULL, NULL, NULL, 1);
+    preset_add("test pattern scan",    &oli_test_pattern_scan     , NULL, NULL, NULL, 1);
+    preset_add("test palette",         &oli_test_palette          , NULL, NULL, NULL, 1);
+    preset_add("test pattern squares", &oli_test_pattern_squares  , NULL, NULL, NULL, 1);
+    preset_add("solid file",           &oli_solid                 , NULL, NULL, NULL, 1);
+    preset_add("figure",               &oli_figure                , NULL, NULL, NULL, 1);
+    preset_add("sphere 1",             &oli_sphere                , NULL, NULL, NULL, 1);
+    preset_add("sphere 2",             &oli_sphere_2              , NULL, NULL, NULL, 1);
+}
+
+static struct
+{
+    point_t* p_p;
+    camera_t* camera_p;
+} middle_point_context = {NULL, NULL};
+
+static void
+oli_3d_middle_point_init()
+{
+    middle_point_context.p_p = point_init(0, 0, 0, COLOUR_WHITE);
+    middle_point_context.camera_p = camera_init(-1,
+                                     0,
+                                     0,
+                                     point_vector(middle_point_context.p_p)->x,
+                                     point_vector(middle_point_context.p_p)->y,
+                                     point_vector(middle_point_context.p_p)->z,
+                                     CAMERA_PROJECTION_PERSPECTIVE,
+                                     45.0f);
 }
 
 static void
-oli_test_3d_middle_point()
+oli_3d_middle_point_render(image_t* image_p, uint32_t frame)
 {
-    int width = 100;
-    int height = 100;
-    image_t* image_p  = image_init(width, height);
-    image_set(image_p);
+    (void) frame;
+    point_render(middle_point_context.p_p, image_p, middle_point_context.camera_p);
+}
 
-    point_t* p_p = point_init(0, 0, 0, COLOUR_WHITE);
-    camera_t* camera_p = camera_init(-1,
-                                     0,
-                                     0,
-                                     point_vector(p_p)->x,
-                                     point_vector(p_p)->y,
-                                     point_vector(p_p)->z,
-                                     CAMERA_PROJECTION_PERSPECTIVE,
-                                     45.0f);
-    point_render(p_p, image_p, camera_p);
-    point_free(p_p);
-    camera_free(camera_p);
-    image_file_write("test 3D point milieu", image_p, NULL);
-    image_free(image_p);
+static void
+oli_3d_middle_point_free()
+{
+    point_free(middle_point_context.p_p);
+    camera_free(middle_point_context.camera_p);
 }
 
 static void
