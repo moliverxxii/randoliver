@@ -11,6 +11,7 @@
 #include "interface.h"
 #include "performance.h"
 #include "presets.h"
+#include "preset_list.h"
 #include "utility.h"
 
 int
@@ -24,14 +25,14 @@ main(int argc, char* argv[])
     performance_t performance_total = performance_init("total");
     performance_try_start(&performance_total);
 
-
-
     //Initialisation des particules
     srand(time(NULL));
 
+    preset_list_init();
     //interface_state_save();
     for(uint32_t preset = 0; preset < preset_get_total_count(); ++preset)
     {
+        //TODO utiliser la nouvelle architecture de preset
         performance_t performance_preset
             = performance_init(preset_get_name(preset));
         performance_try_start(&performance_preset);
