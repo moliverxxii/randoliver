@@ -46,7 +46,7 @@ main(int argc, char* argv[])
 
         uint32_t frame_count = preset_frame_count(preset);
 
-        performance_t perf_frame  = performance_init("  frame");
+        performance_t perf_frame  = performance_init("  frame:");
         performance_t perf_update = performance_init("  update");
         performance_t perf_render = performance_init("  render");
         performance_t perf_file   = performance_init("  file");
@@ -67,18 +67,22 @@ main(int argc, char* argv[])
             performance_try_start(&perf_file);
             image_file_write(preset_get_name(preset), frame_p, NULL);
             performance_try_add(&perf_file);
+
+            performance_try_add(&perf_frame);
         }
         preset_model_free(preset);
 
         performance_try_add(&performance_preset);
         performance_print(&performance_preset);
         performance_print(&perf_init);
+        performance_print(&perf_frame);
         performance_print(&perf_update);
         performance_print(&perf_render);
         performance_print(&perf_file);
 
         performance_free(&performance_preset);
         performance_free(&perf_init);
+        performance_free(&perf_frame);
         performance_free(&perf_update);
         performance_free(&perf_render);
         performance_free(&perf_file);

@@ -23,7 +23,7 @@ static void oli_3d_middle_point_init();
 static void oli_3d_middle_point_render(image_t* image_p, uint32_t frame);
 static void oli_3d_middle_point_free();
 
-static void oli_test_2d_corners();
+static void oli_test_2d_corners_render(image_t* image_p, uint32_t frame);
 static void oli_test_lists();
 static void oli_test_vectors();
 static void oli_plane();
@@ -41,8 +41,8 @@ static void oli_sphere_2();
 void
 preset_list_init()
 {
-    preset_add("3D point milieu",      &oli_3d_middle_point_init, NULL, &oli_3d_middle_point_render, &oli_3d_middle_point_free, 1000);
-    preset_add("test 2D coins",        &oli_test_2d_corners       , NULL, NULL, NULL, 1);
+    preset_add("3D point milieu",      &oli_3d_middle_point_init  , NULL, &oli_3d_middle_point_render, &oli_3d_middle_point_free, 10000);
+    preset_add("test 2D coins",        NULL                       , NULL, &oli_test_2d_corners_render,  NULL,                      1);
     preset_add("test listes et tri",   &oli_test_lists            , NULL, NULL, NULL, 1);
     preset_add("test vectors",         &oli_test_vectors          , NULL, NULL, NULL, 1);
     preset_add("test plane",           &oli_plane                 , NULL, NULL, NULL, 1);
@@ -92,20 +92,15 @@ oli_3d_middle_point_free()
 }
 
 static void
-oli_test_2d_corners()
+oli_test_2d_corners_render(image_t* image_p, uint32_t frame)
 {
-    int width = 100;
-    int height = 100;
-    image_t* image_p  = image_init(width, height);
-    image_set(image_p);
-
+    (void) frame;
+    uint32_t width  = image_width(image_p);
+    uint32_t height = image_height(image_p);
     image_pixel_set(image_p,         0,         0,   COLOUR_BLUE);
     image_pixel_set(image_p, width - 1,         0,    COLOUR_RED);
     image_pixel_set(image_p, width - 1, height -1, COLOUR_YELLOW);
     image_pixel_set(image_p,         0, height -1,  COLOUR_GREEN);
-
-    image_file_write("test 2d coins", image_p, NULL);
-    image_free(image_p);
 }
 
 static void

@@ -18,7 +18,7 @@ typedef struct
 {
     char* name_p;
     uint64_t total_operations;
-    uint64_t total_time; //ms
+    double total_time; //ms
     clock_t try_start;
     clock_t try_end;
 } performance_t;

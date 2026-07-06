@@ -45,7 +45,7 @@ performance_try_add(performance_t* performance_p)
 {
     performance_p->try_end = clock();
     clock_t operation_time = performance_p->try_end - performance_p->try_start;
-    uint64_t operation_time_ms = (operation_time * MILLISECONDS_PER_SECOND)/CLOCKS_PER_SEC;
+    double operation_time_ms = ((double) operation_time * MILLISECONDS_PER_SECOND)/CLOCKS_PER_SEC;
     performance_p->total_time += operation_time_ms;
     ++performance_p->total_operations;
 }
