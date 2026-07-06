@@ -15,9 +15,11 @@
 #include "operator.h"
 #include "point.h"
 #include "preset.h"
+#include "preset_squares.h"
 #include "solid.h"
 #include "solid_file.h"
 #include "solid_plane.h"
+#include "utility.h"
 
 static void oli_3d_middle_point_init();
 static void oli_3d_middle_point_render(image_t* image_p, uint32_t frame);
@@ -31,8 +33,11 @@ static void oli_brown();
 static void oli_test_pattern();
 static void oli_test_pattern_scan();
 static void oli_test_palette();
-static void oli_test_pattern_squares();
-static void oli_solid();
+
+static void oli_solid_init();
+static void oli_solid_render(image_t* image_p, uint32_t frame);
+static void oli_solid_free();
+
 static void oli_figure();
 static void oli_sphere();
 static void oli_sphere_2();
@@ -50,8 +55,8 @@ preset_list_init()
     preset_add("test pattern",         &oli_test_pattern          , NULL, NULL, NULL, 1);
     preset_add("test pattern scan",    &oli_test_pattern_scan     , NULL, NULL, NULL, 1);
     preset_add("test palette",         &oli_test_palette          , NULL, NULL, NULL, 1);
-    preset_add("test pattern squares", &oli_test_pattern_squares  , NULL, NULL, NULL, 1);
-    preset_add("solid file",           &oli_solid                 , NULL, NULL, NULL, 1);
+    preset_add_squares(); //TODO incrementation du numero de fichier.
+    preset_add("solid file",           &oli_solid_init            , NULL, &oli_solid_render, &oli_solid_free, 1);
     preset_add("figure",               &oli_figure                , NULL, NULL, NULL, 1);
     preset_add("sphere 1",             &oli_sphere                , NULL, NULL, NULL, 1);
     preset_add("sphere 2",             &oli_sphere_2              , NULL, NULL, NULL, 1);
@@ -357,71 +362,40 @@ oli_test_palette()
     image_free(image_p);
 }
 
+static solid_t* solid_p = NULL;
+static camera_t* camera_p = NULL;
+
 static void
-oli_test_pattern_squares()
+oli_solid_init()
 {
-    int width = 320;
-    int height = 240;
-    image_t* image_p  = image_init(width, height);
-    test_pattern_squares(image_p, 1);
+    solid_init_const();
 
-    int frame_count = 32;
+    solid_p = solid_file_open("scene.txt");
 
-    for(int frame = 0; frame < frame_count; ++frame)
-    {
-        figure_t* figure_p = figure_from_image(image_p);
-        for(uint32_t point = 0; point<figure_length(figure_p); ++point)
-        {
-           vector_random_delta(point_vector(figure_point(figure_p, point)),
-                             8,
-                             image_width(image_p),
-                             image_height(image_p));
-        }
-
-        figure_draw(figure_p, image_p);
-        figure_free(figure_p);
-        image_scale(image_p, 1.0f/8, SCALE_ALGORITHM_DUMB);
-        image_scale(image_p, 8, SCALE_ALGORITHM_DUMB);
-
-        char* file_name_p = file_name_extension_number("squares", frame);
-        image_file_write(file_name_p, image_p, NULL);
-        free(file_name_p);
-    }
-    image_free(image_p);
+    ok(42);
+    camera_p = camera_init(-5, -1.5, -1,
+                           0, 0, 0,
+                           CAMERA_PROJECTION_PERSPECTIVE,
+                           45);
 }
 
 static void
-oli_solid()
+oli_solid_render(image_t* image_p, uint32_t frame)
 {
-    int width = 320;
-    int height = 240;
-    float scale = 1.0f;
-    image_t* image_p  = image_init(width, height);
-    image_set(image_p);
-
-    solid_init_const();
-    solid_t* solid_p = solid_file_open("scene.txt");
-
-
-    camera_t* camera_p = camera_init(-5, -1.5, -1,
-                                     0, 0, 0,
-                                     CAMERA_PROJECTION_PERSPECTIVE,
-                                     45);
-
+    (void) frame;
     renderable_cache_clear();
 
     solid_render(solid_p, image_p, camera_p);
-    camera_free(camera_p);
-
     image_reduce_bit_depth(image_p, 5, 1);
-
-    image_file_write("oli solid", image_p, NULL);
-
+    float scale = 1.0f;
     image_scale(image_p, scale, SCALE_ALGORITHM_LINEAR);
-    image_set(image_p);
+}
 
-    image_free(image_p);
+static void
+oli_solid_free()
+{
     solid_free(solid_p);
+    camera_free(camera_p);
 }
 
 static void
