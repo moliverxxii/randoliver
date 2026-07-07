@@ -26,8 +26,6 @@ int preset_add(const char* preset_p,
                model_free_f free_f,
                uint32_t frame_count);
 
-//TODO utiliser la nouvelle architecture de preset
-
 uint32_t preset_get_total_count();
 
 const char* preset_get_name(uint32_t preset_index);
@@ -35,6 +33,6 @@ uint32_t    preset_frame_count(uint32_t preset_index);
 void        preset_model_init(uint32_t preset_index);
 void        preset_model_free(uint32_t preset_index);
 void        preset_model_update(uint32_t preset_index);
-void        preset_frame_render(uint32_t preset_index, image_t* image_p);
+int         preset_frame_render(uint32_t preset_index, image_t* image_p);
 
 #endif /* HEADERS_PRESET_H_ */

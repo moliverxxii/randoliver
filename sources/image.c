@@ -63,6 +63,18 @@ image_init(uint32_t width, uint32_t height)
     return image_p;
 }
 
+image_t*
+image_copy(const image_t* image_p)
+{
+    image_t* new_image_p = image_init(image_p->width, image_p->height);
+    if(new_image_p != NULL)
+    {
+        image_draw(new_image_p, image_p);
+    }
+    return new_image_p;
+}
+
+
 void
 image_free(image_t* image_p)
 {
@@ -117,7 +129,7 @@ image_pixel_set(image_t* image_p, uint32_t x, uint32_t y, colour_t colour)
 void
 image_scale(image_t* image_p, float scale, image_scale_algorithm_t algorithm)
 {
-    if(algorithm>SCALE_ALGORITHM_COUNT && algorithm < 0)
+    if(algorithm < 0 && SCALE_ALGORITHM_COUNT <= algorithm)
     {
         return;
     }
@@ -267,6 +279,18 @@ image_draw_rect(colour_t color, uint32_t botLeftX, uint32_t botLeftY, uint32_t t
         }
     }
 }
+
+void image_draw(image_t* image_p, const image_t* source_p)
+{
+    for(uint32_t x = 0; x < image_width(image_p) && x < image_width(source_p); ++x)
+    {
+        for(uint32_t y = 0; y < image_height(image_p) && y < image_height(source_p); ++y)
+        {
+            image_p->image[y][x] = source_p->image[y][x];
+        }
+    }
+}
+
 
 static int
 image_data_is_allocated(image_t* image_p)

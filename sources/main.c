@@ -31,12 +31,12 @@ main(int argc, char* argv[])
 
     preset_list_init();
     //interface_state_save();
-    image_t* frame_p = image_init(320,240);
     for(uint32_t preset = 0; preset < preset_get_total_count(); ++preset)
     {
-        //TODO utiliser la nouvelle architecture de preset
+        image_t* frame_p = image_init(320,240);
+
         performance_t performance_preset
-            = performance_init(preset_get_name(preset));
+          = performance_init(preset_get_name(preset));
         performance_try_start(&performance_preset);
 
         performance_t perf_init = performance_init("  init");
@@ -61,11 +61,15 @@ main(int argc, char* argv[])
 
             image_set(frame_p);
             performance_try_start(&perf_render);
-            preset_frame_render(preset, frame_p);
+            int exists_b = preset_frame_render(preset, frame_p);
             performance_try_add(&perf_render);
 
+
             performance_try_start(&perf_file);
-            image_file_write(preset_get_name(preset), frame_p, NULL);
+            if(exists_b)
+            {
+                image_file_write(preset_get_name(preset), frame_p, NULL);
+            }
             performance_try_add(&perf_file);
 
             performance_try_add(&perf_frame);
@@ -86,8 +90,8 @@ main(int argc, char* argv[])
         performance_free(&perf_update);
         performance_free(&perf_render);
         performance_free(&perf_file);
+        image_free(frame_p);
     }
-    image_free(frame_p);
 
     performance_try_add(&performance_total);
     performance_print(&performance_total);

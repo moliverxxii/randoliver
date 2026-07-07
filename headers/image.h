@@ -42,7 +42,7 @@ extern const image_t SYSTEM_SCREEN;
 /* Elementaires */
 //Returns a pointer to an image.
 image_t* image_init(uint32_t width, uint32_t height);
-
+image_t* image_copy(const image_t* image_p);
 //Frees the memory the image occupies in memory.
 void image_free(image_t* image);
 
@@ -79,6 +79,6 @@ void image_print(const image_t* image);
 //Draws a colored rectangle in an image.
 void image_draw_rect(colour_t color, uint32_t botLeftX, uint32_t botLeftY, uint32_t topRightX,
 			   uint32_t topRightY, image_t* image);
-
+void image_draw(image_t* image_p, const image_t* source_p);
 
 #endif /* IMGUTIL_H_ */

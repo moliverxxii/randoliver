@@ -9,7 +9,6 @@
 
 #include "point.h"
 #include "preset.h"
-#include "preset_middle_point.h"
 
 static void oli_3d_middle_point_init();
 static void oli_3d_middle_point_render(image_t* image_p, uint32_t frame);
@@ -26,7 +25,7 @@ preset_add_middle_point()
                NULL,
                &oli_3d_middle_point_render,
                &oli_3d_middle_point_free,
-               10000);
+               1);
 }
 
 static void

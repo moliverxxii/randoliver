@@ -2,7 +2,6 @@
 
 #include "preset.h"
 #include "figure.h"
-#include "preset_squares.h"
 #include "image_drawing.h"
 
 static void oli_test_pattern_squares();
@@ -30,6 +29,7 @@ oli_test_pattern_squares()
 static figure_t* figure_p = NULL;
 static uint32_t height;
 static uint32_t width;
+static image_t* current_image_p = NULL;
 
 static void
 oli_test_pattern_squares_update()
@@ -57,13 +57,16 @@ oli_test_pattern_squares_render(image_t* image_p, uint32_t frame)
         test_pattern_squares(image_p, 1);
         width  = image_width(image_p);
         height = image_height(image_p);
+        current_image_p = image_copy(image_p);
     }
     else
     {
+        image_draw(image_p, current_image_p);
         figure_draw(figure_p, image_p);
 
         image_scale(image_p, 1.0f/8, SCALE_ALGORITHM_DUMB);
         image_scale(image_p, 8, SCALE_ALGORITHM_DUMB);
+        image_draw(current_image_p, image_p);
     }
     if(figure_p != NULL)
     {
@@ -77,7 +80,7 @@ static void
 oli_test_pattern_squares_free()
 {
     figure_free(figure_p);
-
+    image_free(current_image_p);
 }
 
 

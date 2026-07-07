@@ -122,16 +122,19 @@ preset_model_update(uint32_t preset_index)
 
 }
 
-void
+int
 preset_frame_render(uint32_t preset_index, image_t* image_p)
 {
+    int exists = 0;
     if(preset_index < preset_get_total_count())
     {
         if(PRESET_LIST[preset_index].render_f != NULL)
         {
             (*PRESET_LIST[preset_index].render_f)(image_p, 0);
+            exists = 1;
         }
     }
+    return exists;
 
 }
 
