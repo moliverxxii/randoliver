@@ -65,6 +65,10 @@ oli_test_pattern_squares_render(image_t* image_p, uint32_t frame)
         image_scale(image_p, 1.0f/8, SCALE_ALGORITHM_DUMB);
         image_scale(image_p, 8, SCALE_ALGORITHM_DUMB);
     }
+    if(figure_p != NULL)
+    {
+        figure_free(figure_p);
+    }
     figure_p = figure_from_image(image_p);
 
 }
@@ -72,6 +76,7 @@ oli_test_pattern_squares_render(image_t* image_p, uint32_t frame)
 static void
 oli_test_pattern_squares_free()
 {
+    figure_free(figure_p);
 
 }
 
