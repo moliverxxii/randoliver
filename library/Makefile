@@ -1,30 +1,24 @@
-LIBRARY_DIR = library
-
 SOURCE_DIR = sources
-HEADER_DIR := headers
-HEADER_DIR += $(LIBRARY_DIR)/$(HEADER_DIR)
+HEADER_DIR = headers
 OBJECT_DIR = objects
 DEPENDENCY_DIR = dependencies
 
 SOURCES = $(wildcard $(SOURCE_DIR)/*.c)
+HEADERS = $(SOURCES:$(SOURCE_DIR)/%.c=$(HEADER_DIR)/%.h)
 OBJECTS = $(SOURCES:$(SOURCE_DIR)/%.c=$(OBJECT_DIR)/%.o)
 DEPENDENCIES = $(SOURCES:$(SOURCE_DIR)/%.c=$(DEPENDENCY_DIR)/%.d)
 DIRS = $(OBJECT_DIR) $(DEPENDENCY_DIR)
 
 OPTIMISE = 3
-CC_FLAGS = -c -g -pedantic -Wall -Wextra -Wno-strict-prototypes -O$(OPTIMISE) $(SYSTEM) $(addprefix -I,$(HEADER_DIR)) $(SANITIZE)
+CC_FLAGS = -c -g -pedantic -Wall -Wextra -Wno-strict-prototypes -O$(OPTIMISE) $(SYSTEM) -I$(HEADER_DIR) $(SANITIZE)
 DEPENDENCY_FLAGS = -MMD
 CC = gcc
-PROJECT = randoliver
-LIBRARIES = librandoliver
+PROJECT = librandoliver
 
 all: $(PROJECT)
 
-$(PROJECT): $(OBJECTS) $(LIBRARY_DIR)/$(LIBRARIES)
-	$(CC) -o $@ $^ $(SANITIZE) -lm
-	
-$(LIBRARY_DIR)/$(LIBRARIES):
-	$(MAKE) -C $(LIBRARY_DIR)
+$(PROJECT): $(OBJECTS)
+	ar r $@ $^
 
 $(OBJECTS): $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c | $(OBJECT_DIR) $(DEPENDENCY_DIR)
 	$(CC) $(CC_FLAGS) $(DEPENDENCY_FLAGS) -MF $(patsubst $(@D)%.o,$(DEPENDENCY_DIR)%.d,$@) -o $@ $< 
@@ -34,12 +28,9 @@ $(OBJECTS): $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c | $(OBJECT_DIR) $(DEPENDENCY_DI
 $(DIRS):
 	mkdir -p $@
 
-clean: $(library_clean)
+clean:
 	rm -fr $(OBJECT_DIR) $(DEPENDENCY_DIR) $(PROJECT)
 	
-library_clean:
-	make
-
 rebuild: clean all
 
 debug: rebuild
