@@ -4,22 +4,6 @@
  *  Created on: 5 juil. 2026
  *      Author: moliver
  */
-
-#include <math.h>
-
-#include "edge.h"
-#include "figure.h"
-#include "image_file.h"
-#include "image_drawing.h"
-#include "list.h"
-#include "operator.h"
-#include "point.h"
-#include "preset.h"
-#include "solid.h"
-#include "solid_file.h"
-#include "solid_plane.h"
-#include "utility.h"
-
 void preset_add_middle_point();
 void preset_add_corners();
 void preset_add_lists();
@@ -32,7 +16,6 @@ void preset_add_squares();
 void preset_add_solid_file();
 void preset_add_figure();
 void preset_add_sphere();
-
 
 void
 preset_list_init()
