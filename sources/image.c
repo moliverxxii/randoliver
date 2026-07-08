@@ -282,12 +282,18 @@ image_draw_rect(colour_t color, uint32_t botLeftX, uint32_t botLeftY, uint32_t t
 
 void image_draw(image_t* image_p, const image_t* source_p)
 {
-    for(uint32_t x = 0; x < image_width(image_p) && x < image_width(source_p); ++x)
+    for(uint32_t y = 0; y < image_height(image_p) && y < image_height(source_p); ++y)
     {
-        for(uint32_t y = 0; y < image_height(image_p) && y < image_height(source_p); ++y)
+        uint32_t minimum_width = 0;
+        if(image_width(image_p) < image_width(source_p))
         {
-            image_p->image[y][x] = source_p->image[y][x];
+            minimum_width = image_width(image_p);
         }
+        else
+        {
+            minimum_width = image_width(source_p);
+        }
+        memcpy(image_p->image[y], source_p->image[y], minimum_width * sizeof(colour_t));
     }
 }
 
