@@ -142,7 +142,7 @@ oli_sphere_2_init()
     camera_p = camera_init(1, 5, 5,
                            0, 0, 0,
                            CAMERA_PROJECTION_PERSPECTIVE,
-                           4.5);
+                           30);
 }
 
 
