@@ -10,6 +10,7 @@ void preset_add_lists();
 void preset_add_vectors();
 void preset_add_plane();
 void preset_add_brown();
+void preset_add_bitarray();
 void preset_add_test_pattern();
 void preset_add_palette();
 void preset_add_squares();
@@ -26,6 +27,7 @@ preset_list_init()
     preset_add_vectors();
     preset_add_plane();
     preset_add_brown();
+    preset_add_bitarray();
     preset_add_test_pattern();
     preset_add_palette();
     preset_add_squares(); //TODO incrementation du numero de fichier.
