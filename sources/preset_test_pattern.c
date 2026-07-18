@@ -56,7 +56,7 @@ oli_test_pattern_scan_render(image_t* image_p, uint32_t frame)
 {
     (void) frame;
     test_pattern_scan(image_p);
-    image_reduce_bit_depth(image_p, 5, 1);
+    image_reduce_bit_depth(image_p, 5, 0);
 }
 
 static void
@@ -64,6 +64,6 @@ oli_test_pattern_scan_2_render(image_t* image_p, uint32_t frame)
 {
     (void) frame;
     test_pattern_scan(image_p);
-    image_reduce_bit_depth(image_p, 5, 0);
+    image_reduce_bit_depth(image_p, 5, 1);
 }
 
