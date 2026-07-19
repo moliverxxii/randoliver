@@ -4,41 +4,118 @@
  *  Created on: 13 juil. 2026
  *      Author: moliver
  */
+#include <ctype.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "bitarray.h"
 #include "preset.h"
+
+#define CHARACTER_COUNT 40
+
+
+typedef struct
+{
+    uint32_t underpopulation; //start
+    uint32_t reproduction_start; //start
+    uint32_t reproduction_end; //start
+    uint32_t overpopulation; //start
+    bitarray_t* kernel_p;
+} game_rules_t;
 
 static void oli_bitarray_init();
 static void oli_bitarray(image_t* image_p, uint32_t frame);
 static void oli_bitarray_update();
+
+static void game_rules_print(const game_rules_t* rules_p);
+
 void
 preset_add_bitarray()
 {
-    preset_add("bitarray", &oli_bitarray_init, &oli_bitarray_update, &oli_bitarray, NULL, 2000);
+    preset_add("bitarray", &oli_bitarray_init, &oli_bitarray_update, &oli_bitarray, NULL, 1000);
 }
 
-static const uint32_t stable_start = 8;
-static const uint32_t reprod_start = 13;
-static const uint32_t overpo_start = 20;
-static const uint32_t neighbourhood = 7;
-static bitarray_t* kernel_p        = NULL;
+static game_rules_t rules =
+{
+        0,
+        0,
+        0,
+        0,
+        NULL
+};
+
+static uint32_t neighbourhood_horizontal = 0;
+static uint32_t neighbourhood_vertical   = 0;
 static bitarray_t* neighbourhood_p = NULL;
 
+static const char * const GAME_PARAMETERS_FORMAT = "%u , %u , %u, %u";
 
 static void
 oli_bitarray_init()
 {
-    kernel_p = bitarray_init(neighbourhood, neighbourhood);
-    neighbourhood_p = bitarray_init(neighbourhood, neighbourhood);
+    char line_p[CHARACTER_COUNT + 1];
 
+    //regles
+    FILE* rule_file_p = fopen("kernel.txt", "r");
+    fgets(line_p, CHARACTER_COUNT, rule_file_p);
+    sscanf(line_p, GAME_PARAMETERS_FORMAT,
+           &rules.underpopulation,
+           &rules.reproduction_start,
+           &rules.reproduction_end,
+           &rules.overpopulation);
 
-    for(uint32_t n_x = 0; n_x < neighbourhood; ++n_x)
+    game_rules_print(&rules);
+
+    uint32_t rows_pp[40][40] = {{0}};
+    uint32_t line = 0;
+    int line_valid = 0;
+    while(NULL != fgets(line_p, CHARACTER_COUNT, rule_file_p))
     {
-        for(uint32_t n_y = 0; n_y < neighbourhood; ++n_y)
+        for(uint32_t index = 0; index < strlen(line_p); ++index)
         {
-         //   bitarray_bit_set(kernel_p, n_x, n_y);
+            if(isspace(line_p[index]))
+            {
+                break;
+            }
+
+            line_valid = 1;
+            int is_on = line_p[index] == '1';
+            printf("%1c", is_on ? '1' : ' ');
+            if(index + 1 >= neighbourhood_horizontal)
+            {
+                neighbourhood_horizontal = index + 1;
+            }
+            rows_pp[line][index] = is_on;
+        }
+        if(line_valid)
+        {
+            ++neighbourhood_vertical;
+            ++line;
+            line_valid = 0;
+            printf("\n");
         }
     }
-    bitarray_bit_reset(kernel_p, neighbourhood/2, neighbourhood/2);
+
+    fclose(rule_file_p);
+
+    rules.kernel_p = bitarray_init(neighbourhood_horizontal, neighbourhood_vertical);
+    neighbourhood_p = bitarray_init(neighbourhood_horizontal, neighbourhood_vertical);
+
+    for(uint32_t n_x = 0; n_x < neighbourhood_horizontal; ++n_x)
+    {
+        for(uint32_t n_y = 0; n_y < neighbourhood_vertical; ++n_y)
+        {
+            if(rows_pp[n_y][n_x])
+            {
+                bitarray_bit_set(rules.kernel_p, n_x, n_y);
+            }
+            else
+            {
+                bitarray_bit_reset(rules.kernel_p, n_x, n_y);
+            }
+        }
+    }
+    bitarray_print(rules.kernel_p);
 }
 
 
@@ -61,17 +138,17 @@ oli_bitarray_update()
         {
             bitarray_extract(neighbourhood_p,
                              array_p,
-                             (int32_t)x-(int32_t) neighbourhood/2,
-                             (int32_t)y-(int32_t) neighbourhood/2);
-            bitarray_and(neighbourhood_p, kernel_p);
+                             (int32_t)x-(int32_t) neighbourhood_horizontal/2,
+                             (int32_t)y-(int32_t) neighbourhood_vertical/2);
+            bitarray_and(neighbourhood_p, rules.kernel_p);
             uint32_t count = bitarray_on_get(neighbourhood_p);
             int value = 0;
 
-            if(count < stable_start || overpo_start <= count)
+            if(count <= rules.underpopulation || rules.overpopulation <= count)
             {
                 value = 0;
             }
-            else if(reprod_start <= count)
+            else if(rules.reproduction_start <= count && count <= rules.reproduction_end)
             {
                 value = 1;
             }
@@ -91,6 +168,16 @@ oli_bitarray_update()
         }
     }
     bitarray_extract(array_p, dest_array_p, 0, 0);
+}
+
+static void
+game_rules_print(const game_rules_t* rules_p)
+{
+    printf("rules: %u,%u,%u,%u\n",
+           rules_p->underpopulation,
+           rules_p->reproduction_start,
+           rules_p->reproduction_end,
+           rules_p->overpopulation);
 }
 
 static void
