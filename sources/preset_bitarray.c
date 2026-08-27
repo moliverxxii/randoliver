@@ -144,17 +144,22 @@ oli_bitarray_update()
             uint32_t count = bitarray_on_get(neighbourhood_p);
             int value = 0;
 
-            if(count <= rules.underpopulation || rules.overpopulation <= count)
+            value = bitarray_bit_get(array_p, x, y);
+
+            if(value)
             {
-                value = 0;
-            }
-            else if(rules.reproduction_start <= count && count <= rules.reproduction_end)
-            {
-                value = 1;
+                if(count <= rules.underpopulation || rules.overpopulation <= count)
+                {
+                    value = 0;
+                }
             }
             else
             {
-                value = bitarray_bit_get(array_p, x, y);
+                if(rules.reproduction_start <= count && count <= rules.reproduction_end)
+                {
+                    value = 1;
+                }
+
             }
 
             if(value)
@@ -180,6 +185,14 @@ game_rules_print(const game_rules_t* rules_p)
            rules_p->overpopulation);
 }
 
+static int probability(float p)
+{
+    int value = rand();
+    int threshold = p*RAND_MAX;
+
+    return value <= threshold;
+}
+
 static void
 oli_bitarray(image_t* image_p, uint32_t frame)
 {
@@ -190,19 +203,22 @@ oli_bitarray(image_t* image_p, uint32_t frame)
         height       = image_height(image_p);
         array_p      = bitarray_init(width, height);
         dest_array_p = bitarray_init(width, height);
-        for(uint32_t x = 0; x < width/8; ++x)
+        for(uint32_t x = 0; x < image_width(image_p); ++x)
         {
-            for(uint32_t y = 0; y < height; ++y)
+            float probability_x = (float) ((x + width/2)%width) / (width - 1);
+
+            for(uint32_t y = 0; y < image_height(image_p); ++y)
             {
-                bitarray_bit_set(array_p, x, y);
+                if(probability(probability_x))
+                {
+                    bitarray_bit_set(array_p, x, y);
+                }
+                else
+                {
+                    bitarray_bit_reset(array_p, x, y);
+                }
             }
-        }
-        for(uint32_t x = 7*width/8; x < width; ++x)
-        {
-            for(uint32_t y = 0; y < height; ++y)
-            {
-                bitarray_bit_reset(array_p, x, y);
-            }
+
         }
     }
 
